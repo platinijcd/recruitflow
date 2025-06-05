@@ -9,6 +9,7 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import Candidatures from "./pages/Candidatures";
 import Recherche from "./pages/Recherche";
+import Recruteurs from "./pages/Recruteurs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/candidatures" element={<Candidatures />} />
                 <Route path="/recherche" element={<Recherche />} />
+                <Route path="/recruteurs" element={<Recruteurs />} />
                 {/* TODO: Ajouter les autres routes */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

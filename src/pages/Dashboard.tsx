@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,71 +12,38 @@ import {
   MoreVertical
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Poste, Candidature } from '@/types';
+import { usePosts } from '@/hooks/usePosts';
+import { useCandidates } from '@/hooks/useCandidates';
+import { useInterviews } from '@/hooks/useInterviews';
 
 const Dashboard = () => {
-  // Données de démonstration
-  const [postes] = useState<Poste[]>([
-    {
-      id: '1',
-      titre: 'Développeur Full Stack',
-      description: 'Recherche développeur expérimenté en React/Node.js',
-      nombre_de_postes: 2,
-      date_limite: '2024-07-15',
-      recruteurs_assignes: ['rec1', 'rec2'],
-      date_creation: '2024-06-01',
-      statut: 'Ouvert',
-      type_contrat: 'CDI',
-      lieu: 'Paris'
-    },
-    {
-      id: '2',
-      titre: 'Designer UX/UI',
-      description: 'Designer créatif pour nos projets mobiles',
-      nombre_de_postes: 1,
-      date_limite: '2024-07-20',
-      recruteurs_assignes: ['rec1'],
-      date_creation: '2024-06-05',
-      statut: 'Ouvert',
-      type_contrat: 'CDI',
-      lieu: 'Lyon'
-    },
-    {
-      id: '3',
-      titre: 'Chef de Projet Digital',
-      description: 'Management d\'équipes techniques',
-      nombre_de_postes: 1,
-      date_limite: '2024-06-30',
-      recruteurs_assignes: ['rec2'],
-      date_creation: '2024-05-15',
-      statut: 'Fermé',
-      type_contrat: 'CDI',
-      lieu: 'Remote'
-    }
-  ]);
+  const { data: posts = [], isLoading: postsLoading } = usePosts();
+  const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
+  const { data: interviews = [], isLoading: interviewsLoading } = useInterviews();
 
-  const [stats] = useState({
-    totalCandidatures: 156,
-    aEvaluer: 23,
-    pertinentes: 45,
-    entretiensAVenir: 12,
-    postesOuverts: 8
-  });
+  const stats = {
+    totalCandidatures: candidates.length,
+    aEvaluer: candidates.filter(c => c.evaluation_status === 'To Evaluate').length,
+    pertinentes: candidates.filter(c => c.evaluation_status === 'Relevant').length,
+    entretiensAVenir: interviews.filter(i => i.status === 'Scheduled').length,
+    postesOuverts: posts.filter(p => p.post_status === 'Open').length
+  };
 
-  const getCandidatureCount = (posteId: string) => {
-    // Simulation des données - à remplacer par de vraies données
-    const counts = { '1': 45, '2': 23, '3': 12 };
-    return counts[posteId as keyof typeof counts] || 0;
+  const getCandidatureCount = (postId: string) => {
+    return candidates.filter(c => c.post_id === postId).length;
   };
 
   const getStatusColor = (statut: string) => {
     switch (statut) {
-      case 'Ouvert': return 'bg-recruit-green text-white';
-      case 'Fermé': return 'bg-recruit-red text-white';
-      case 'En pause': return 'bg-recruit-orange text-white';
+      case 'Open': return 'bg-recruit-green text-white';
+      case 'Close': return 'bg-recruit-red text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
+
+  if (postsLoading || candidatesLoading || interviewsLoading) {
+    return <div className="p-6">Chargement...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -170,24 +136,21 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {postes.filter(poste => poste.statut === 'Ouvert').map((poste) => (
+            {posts.filter(poste => poste.post_status === 'Open').map((poste) => (
               <div key={poste.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
-                      <h3 className="font-semibold text-lg text-gray-900">{poste.titre}</h3>
-                      <Badge className={getStatusColor(poste.statut)}>
-                        {poste.statut}
+                      <h3 className="font-semibold text-lg text-gray-900">{poste.title}</h3>
+                      <Badge className={getStatusColor(poste.post_status)}>
+                        {poste.post_status === 'Open' ? 'Ouvert' : 'Fermé'}
                       </Badge>
-                      <Badge variant="outline">{poste.type_contrat}</Badge>
                     </div>
                     <p className="text-gray-600 mt-1">{poste.description}</p>
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
-                      <span>{poste.lieu}</span>
+                      <span>{poste.location}</span>
                       <span>•</span>
-                      <span>{poste.nombre_de_postes} poste{poste.nombre_de_postes > 1 ? 's' : ''}</span>
-                      <span>•</span>
-                      <span>Date limite: {new Date(poste.date_limite).toLocaleDateString('fr-FR')}</span>
+                      <span>{poste.department}</span>
                     </div>
                   </div>
                   

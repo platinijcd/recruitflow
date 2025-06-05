@@ -6,89 +6,36 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CandidatureCard from '@/components/CandidatureCard';
 import { Search, Filter, Download, Plus } from 'lucide-react';
-import type { Candidature } from '@/types';
+import { useCandidates } from '@/hooks/useCandidates';
+import { usePosts } from '@/hooks/usePosts';
 
 const Candidatures = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [posteFilter, setPosteFilter] = useState<string>('all');
+  
+  const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
+  const { data: posts = [], isLoading: postsLoading } = usePosts();
 
-  // Données de démonstration
-  const [candidatures] = useState<Candidature[]>([
-    {
-      id: '1',
-      nom: 'Marie Dupont',
-      email: 'marie.dupont@email.com',
-      telephone: '06 12 34 56 78',
-      lien_linkedin: 'https://linkedin.com/in/marie-dupont',
-      poste_souhaite: 'Développeur Full Stack',
-      statut: 'A évaluer',
-      date_reception: '2024-06-10',
-      note: 8,
-      competences: ['React', 'Node.js', 'TypeScript', 'PostgreSQL'],
-      experience_annees: 5
-    },
-    {
-      id: '2',
-      nom: 'Pierre Martin',
-      email: 'pierre.martin@email.com',
-      telephone: '06 98 76 54 32',
-      lien_linkedin: 'https://linkedin.com/in/pierre-martin',
-      poste_souhaite: 'Designer UX/UI',
-      statut: 'Pertinent',
-      date_reception: '2024-06-08',
-      note: 9,
-      commentaire_evaluateur: 'Excellent portfolio, expérience solide',
-      competences: ['Figma', 'Sketch', 'Adobe CC', 'Prototyping'],
-      experience_annees: 7
-    },
-    {
-      id: '3',
-      nom: 'Julie Leroy',
-      email: 'julie.leroy@email.com',
-      telephone: '06 45 67 89 12',
-      poste_souhaite: 'Chef de Projet Digital',
-      statut: 'Entretien programmé',
-      date_reception: '2024-06-05',
-      date_entretien: '2024-06-15',
-      recruteur_assigne: 'John Doe',
-      note: 7,
-      competences: ['Agile', 'Scrum', 'JIRA', 'Leadership'],
-      experience_annees: 6
-    },
-    {
-      id: '4',
-      nom: 'Thomas Blanc',
-      email: 'thomas.blanc@email.com',
-      telephone: '06 11 22 33 44',
-      lien_linkedin: 'https://linkedin.com/in/thomas-blanc',
-      poste_souhaite: 'Développeur Full Stack',
-      statut: 'Rejeté',
-      date_reception: '2024-06-03',
-      note: 4,
-      commentaire_evaluateur: 'Expérience insuffisante pour le poste',
-      competences: ['JavaScript', 'HTML', 'CSS'],
-      experience_annees: 2
-    }
-  ]);
-
-  const filteredCandidatures = candidatures.filter(candidature => {
-    const matchesSearch = candidature.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidature.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidature.poste_souhaite.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredCandidatures = candidates.filter(candidature => {
+    const matchesSearch = candidature.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         candidature.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         candidature.desired_position?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || candidature.statut === statusFilter;
-    const matchesPoste = posteFilter === 'all' || candidature.poste_souhaite === posteFilter;
+    const matchesStatus = statusFilter === 'all' || candidature.evaluation_status === statusFilter;
+    const matchesPoste = posteFilter === 'all' || candidature.post_id === posteFilter;
     
     return matchesSearch && matchesStatus && matchesPoste;
   });
 
-  const postes = [...new Set(candidatures.map(c => c.poste_souhaite))];
-
-  const handleSendEmail = (candidature: Candidature) => {
-    console.log('Envoi email pour:', candidature.nom);
+  const handleSendEmail = (candidature: any) => {
+    console.log('Envoi email pour:', candidature.name);
     // Ici, appel webhook n8n pour envoyer l'email
   };
+
+  if (candidatesLoading || postsLoading) {
+    return <div className="p-6">Chargement...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -136,10 +83,10 @@ const Candidatures = () => {
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="A évaluer">À évaluer</SelectItem>
-                <SelectItem value="Pertinent">Pertinent</SelectItem>
-                <SelectItem value="Rejeté">Rejeté</SelectItem>
-                <SelectItem value="Entretien programmé">Entretien programmé</SelectItem>
+                <SelectItem value="To Evaluate">À évaluer</SelectItem>
+                <SelectItem value="Relevant">Pertinent</SelectItem>
+                <SelectItem value="Rejected">Rejeté</SelectItem>
+                <SelectItem value="Interview Scheduled">Entretien programmé</SelectItem>
               </SelectContent>
             </Select>
 
@@ -149,8 +96,8 @@ const Candidatures = () => {
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="all">Tous les postes</SelectItem>
-                {postes.map(poste => (
-                  <SelectItem key={poste} value={poste}>{poste}</SelectItem>
+                {posts.map(poste => (
+                  <SelectItem key={poste.id} value={poste.id}>{poste.title}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -171,7 +118,22 @@ const Candidatures = () => {
         {filteredCandidatures.map((candidature) => (
           <CandidatureCard 
             key={candidature.id} 
-            candidature={candidature}
+            candidature={{
+              id: candidature.id,
+              nom: candidature.name || '',
+              email: candidature.email,
+              telephone: candidature.phone || '',
+              lien_linkedin: candidature.linkedin_url || undefined,
+              poste_souhaite: candidature.desired_position || '',
+              statut: candidature.evaluation_status === 'To Evaluate' ? 'A évaluer' : 
+                     candidature.evaluation_status === 'Relevant' ? 'Pertinent' :
+                     candidature.evaluation_status === 'Rejected' ? 'Rejeté' : 'Entretien programmé',
+              date_reception: candidature.application_date || '',
+              note: candidature.relevance_score || undefined,
+              commentaire_evaluateur: candidature.score_explanation || undefined,
+              competences: candidature.skills ? candidature.skills.split(',') : undefined,
+              experience_annees: undefined
+            }}
             onSendEmail={handleSendEmail}
           />
         ))}
@@ -191,7 +153,7 @@ const Candidatures = () => {
         <CardContent className="py-4">
           <div className="flex items-center justify-between text-sm text-gray-600">
             <span>{filteredCandidatures.length} candidature{filteredCandidatures.length > 1 ? 's' : ''} affichée{filteredCandidatures.length > 1 ? 's' : ''}</span>
-            <span>Total: {candidatures.length} candidatures</span>
+            <span>Total: {candidates.length} candidatures</span>
           </div>
         </CardContent>
       </Card>
