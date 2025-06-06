@@ -1,45 +1,55 @@
 
 export interface Candidature {
   id: string;
-  nom: string;
+  name: string;
   email: string;
-  telephone: string;
-  lien_linkedin?: string;
-  poste_souhaite: string;
-  statut: 'A évaluer' | 'Pertinent' | 'Rejeté' | 'Entretien programmé';
-  date_reception: string;
-  note?: number;
-  commentaire_evaluateur?: string;
-  date_entretien?: string;
-  recruteur_assigne?: string;
-  google_calendar_event_id?: string;
-  cv_url?: string;
-  competences?: string[];
-  experience_annees?: number;
+  phone_number?: string;
+  linkedin_url?: string;
+  desired_position?: string;
+  application_status: 'To Be Reviewed' | 'Relevant' | 'Rejectable';
+  application_date?: string;
+  relevance_score?: number;
+  score_justification?: string;
+  interview_date?: string;
+  recruiter_assigned?: string;
+  interviewer_id?: string;
+  evaluation_status: 'Not Started' | 'Scheduled' | 'Hired' | 'Rejected';
+  cv_link?: string;
+  post_id?: string;
+  experiences?: Array<{
+    position: string;
+    company: string;
+    duration: string;
+    missions: string;
+  }>;
+  degrees?: Array<{
+    title: string;
+    institution: string;
+    specialization: string;
+  }>;
+  skills?: string[];
+  certifications?: string[];
+  profile_summary?: string;
 }
 
 export interface Poste {
   id: string;
-  titre: string;
-  description: string;
-  nombre_de_postes: number;
-  date_limite: string;
-  recruteurs_assignes: string[];
-  date_creation: string;
-  statut: 'Ouvert' | 'Fermé' | 'En pause';
-  salaire_min?: number;
-  salaire_max?: number;
-  lieu?: string;
-  type_contrat?: 'CDI' | 'CDD' | 'Stage' | 'Freelance';
+  title: string;
+  description?: string;
+  post_status: 'Open' | 'Close';
+  created_at?: string;
+  location?: string;
+  enterprise?: string;
+  department?: string;
 }
 
 export interface Recruteur {
   id: string;
-  nom: string;
+  name: string;
   email: string;
-  telephone: string;
-  role: 'Admin' | 'Recruteur' | 'Lecteur';
-  avatar_url?: string;
+  phone?: string;
+  role?: string;
+  created_at?: string;
 }
 
 export interface LinkedInProfile {
@@ -55,12 +65,15 @@ export interface LinkedInProfile {
 
 export interface Entretien {
   id: string;
-  candidature_id: string;
-  recruteur_id: string;
-  date_entretien: string;
-  duree_minutes: number;
-  type: 'Téléphonique' | 'Visioconférence' | 'Présentiel';
-  lien_meet?: string;
-  notes?: string;
-  statut: 'Programmé' | 'Terminé' | 'Annulé' | 'Reporter';
+  candidate_id?: string;
+  recruiter_id?: string;
+  post_id?: string;
+  scheduled_at: string;
+  location?: string;
+  interviews_status: 'Scheduled' | 'Done';
+  feedback?: string;
+  created_at?: string;
+  candidates?: { name: string; email: string };
+  posts?: { title: string };
+  recruiters?: { name: string };
 }

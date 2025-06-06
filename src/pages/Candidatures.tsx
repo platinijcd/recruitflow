@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CandidatureCard from '@/components/CandidatureCard';
-import CandidatureDetailDialog from '@/components/CandidatureDetailDialog';
+import CandidateDetailPage from '@/components/CandidateDetailPage';
 import { Search, Filter, Plus } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
@@ -15,7 +15,7 @@ const Candidatures = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [posteFilter, setPosteFilter] = useState<string>('all');
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: posts = [], isLoading: postsLoading } = usePosts();
@@ -31,13 +31,9 @@ const Candidatures = () => {
     return matchesSearch && matchesStatus && matchesPoste;
   });
 
-  const handleSendEmail = (candidature: any) => {
-    console.log('Envoi email pour:', candidature.name);
-  };
-
   const handleViewDetails = (candidature: any) => {
     setSelectedCandidate(candidature);
-    setIsDialogOpen(true);
+    setIsDetailOpen(true);
   };
 
   if (candidatesLoading || postsLoading) {
@@ -107,30 +103,29 @@ const Candidatures = () => {
         </CardContent>
       </Card>
 
-      {/* Résultats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+      {/* Résultats - cartes allongées avec moins d'espace */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
         {filteredCandidatures.map((candidature) => (
-          <CandidatureCard 
-            key={candidature.id} 
-            candidature={{
-              id: candidature.id,
-              nom: candidature.name || '',
-              email: candidature.email,
-              telephone: candidature.phone || '',
-              lien_linkedin: candidature.linkedin_url || undefined,
-              poste_souhaite: candidature.desired_position || '',
-              statut: candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
-                     candidature.application_status === 'Relevant' ? 'Pertinent' :
-                     candidature.application_status === 'Rejectable' ? 'Rejeté' : 'Entretien programmé',
-              date_reception: candidature.application_date || '',
-              note: candidature.relevance_score || undefined,
-              commentaire_evaluateur: candidature.score_justification || undefined,
-              competences: candidature.skills ? candidature.skills.split(',') : undefined,
-              experience_annees: undefined
-            }}
-            onViewDetails={() => handleViewDetails(candidature)}
-            onSendEmail={handleSendEmail}
-          />
+          <div key={candidature.id} className="h-full">
+            <CandidatureCard 
+              candidature={{
+                id: candidature.id,
+                nom: candidature.name || '',
+                email: candidature.email,
+                telephone: candidature.phone_number || '',
+                lien_linkedin: candidature.linkedin_url || undefined,
+                poste_souhaite: candidature.desired_position || '',
+                statut: candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
+                       candidature.application_status === 'Relevant' ? 'Pertinent' : 'Rejeté',
+                date_reception: candidature.application_date || '',
+                note: candidature.relevance_score || undefined,
+                commentaire_evaluateur: candidature.score_justification || undefined,
+                competences: Array.isArray(candidature.skills) ? candidature.skills : undefined,
+                experience_annees: undefined
+              }}
+              onViewDetails={() => handleViewDetails(candidature)}
+            />
+          </div>
         ))}
       </div>
 
@@ -154,10 +149,10 @@ const Candidatures = () => {
       </Card>
 
       {/* Dialog des détails */}
-      <CandidatureDetailDialog
-        candidature={selectedCandidate}
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
+      <CandidateDetailPage
+        candidate={selectedCandidate}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
       />
     </div>
   );

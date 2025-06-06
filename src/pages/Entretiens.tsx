@@ -7,22 +7,24 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Calendar } from '@/components/ui/calendar';
-import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, MapPin, User, List, CalendarDays } from 'lucide-react';
+import { Search, Filter, Plus, Calendar as CalendarIcon, Clock, MapPin, User, List, CalendarDays, Eye } from 'lucide-react';
 import { useInterviews } from '@/hooks/useInterviews';
+import InterviewDetailPage from '@/components/InterviewDetailPage';
 
 const Entretiens = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedInterview, setSelectedInterview] = useState<any>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   const { data: interviews = [], isLoading } = useInterviews();
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'bg-recruit-blue text-white';
-      case 'Completed': return 'bg-recruit-green text-white';
-      case 'Cancelled': return 'bg-recruit-red text-white';
+      case 'Done': return 'bg-recruit-green text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
@@ -30,8 +32,7 @@ const Entretiens = () => {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'Programmé';
-      case 'Completed': return 'Terminé';
-      case 'Cancelled': return 'Annulé';
+      case 'Done': return 'Terminé';
       default: return status;
     }
   };
@@ -51,6 +52,11 @@ const Entretiens = () => {
       const interviewDate = new Date(interview.scheduled_at);
       return interviewDate.toDateString() === date.toDateString();
     });
+  };
+
+  const handleViewDetails = (interview: any) => {
+    setSelectedInterview(interview);
+    setIsDetailOpen(true);
   };
 
   if (isLoading) {
@@ -86,8 +92,7 @@ const Entretiens = () => {
                 <SelectContent className="bg-white rounded-lg">
                   <SelectItem value="all">Tous les statuts</SelectItem>
                   <SelectItem value="Scheduled">Programmé</SelectItem>
-                  <SelectItem value="Completed">Terminé</SelectItem>
-                  <SelectItem value="Cancelled">Annulé</SelectItem>
+                  <SelectItem value="Done">Terminé</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -196,12 +201,15 @@ const Entretiens = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        {interview.interviews_status !== 'Completed' && (
-                          <Button size="sm" variant="outline">
-                            Modifier
-                          </Button>
-                        )}
-                        {interview.interviews_status === 'Completed' && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleViewDetails(interview)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                        {interview.interviews_status === 'Done' && (
                           <Button size="sm" variant="outline">
                             {interview.feedback ? 'Voir feedback' : 'Ajouter feedback'}
                           </Button>
@@ -309,6 +317,13 @@ const Entretiens = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog des détails */}
+      <InterviewDetailPage
+        interview={selectedInterview}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </div>
   );
 };

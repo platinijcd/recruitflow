@@ -8,11 +8,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Filter, Plus, MapPin, Building, Users, Eye, Briefcase } from 'lucide-react';
 import { usePosts } from '@/hooks/usePosts';
 import { useCandidates } from '@/hooks/useCandidates';
-import { Link } from 'react-router-dom';
+import PostDetailPage from '@/components/PostDetailPage';
 
 const Postes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedPost, setSelectedPost] = useState<any>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   
   const { data: posts = [], isLoading: postsLoading } = usePosts();
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
@@ -37,6 +39,11 @@ const Postes = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  const handleViewDetails = (post: any) => {
+    setSelectedPost(post);
+    setIsDetailOpen(true);
+  };
 
   if (postsLoading || candidatesLoading) {
     return <div className="p-6">Chargement...</div>;
@@ -142,12 +149,14 @@ const Postes = () => {
                   </div>
                   
                   <div className="flex space-x-2">
-                    <Link to={`/candidatures?post=${post.id}`}>
-                      <Button size="sm" variant="outline">
-                        <Eye className="h-4 w-4 mr-2" />
-                        Voir candidatures
-                      </Button>
-                    </Link>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleViewDetails(post)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Voir
+                    </Button>
                   </div>
                 </div>
 
@@ -179,6 +188,13 @@ const Postes = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog des détails */}
+      <PostDetailPage
+        post={selectedPost}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </div>
   );
 };

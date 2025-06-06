@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
   Table,
@@ -13,11 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Search, Mail, Phone, MoreVertical, Filter } from 'lucide-react';
+import { Plus, Search, Phone, Filter, Eye } from 'lucide-react';
 import { useRecruiters } from '@/hooks/useRecruiters';
+import RecruiterDetailPage from '@/components/RecruiterDetailPage';
 
 const Recruteurs = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRecruiter, setSelectedRecruiter] = useState<any>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const { data: recruiters = [], isLoading } = useRecruiters();
 
   const filteredRecruiters = recruiters.filter(recruiter => 
@@ -29,13 +31,9 @@ const Recruteurs = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'Admin': return 'bg-recruit-blue text-white';
-      case 'Recruiter': return 'bg-recruit-green text-white';
-      case 'Manager': return 'bg-recruit-orange text-white';
-      default: return 'bg-gray-500 text-white';
-    }
+  const handleViewDetails = (recruiter: any) => {
+    setSelectedRecruiter(recruiter);
+    setIsDetailOpen(true);
   };
 
   if (isLoading) {
@@ -116,8 +114,8 @@ const Recruteurs = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Recruteur</TableHead>
-                <TableHead>Rôle</TableHead>
-                <TableHead>Contact</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Numéro de téléphone</TableHead>
                 <TableHead>Date d'ajout</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -136,28 +134,21 @@ const Recruteurs = () => {
                         <p className="font-semibold text-gray-900">
                           {recruiter.name}
                         </p>
-                        <p className="text-sm text-gray-600">{recruiter.email}</p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getRoleColor(recruiter.role || 'Recruiter')}>
-                      {recruiter.role || 'Recruiter'}
-                    </Badge>
+                    <span>{recruiter.email}</span>
                   </TableCell>
                   <TableCell>
-                    <div className="space-y-1">
+                    {recruiter.phone ? (
                       <div className="flex items-center space-x-2 text-sm">
-                        <Mail className="h-4 w-4 text-gray-400" />
-                        <span>{recruiter.email}</span>
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <span>{recruiter.phone}</span>
                       </div>
-                      {recruiter.phone && (
-                        <div className="flex items-center space-x-2 text-sm">
-                          <Phone className="h-4 w-4 text-gray-400" />
-                          <span>{recruiter.phone}</span>
-                        </div>
-                      )}
-                    </div>
+                    ) : (
+                      <span className="text-gray-500">Non renseigné</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-gray-600">
@@ -165,8 +156,14 @@ const Recruteurs = () => {
                     </span>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="ghost">
-                      <MoreVertical className="h-4 w-4" />
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleViewDetails(recruiter)}
+                      className="flex items-center space-x-1"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Voir</span>
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -181,6 +178,13 @@ const Recruteurs = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog des détails */}
+      <RecruiterDetailPage
+        recruiter={selectedRecruiter}
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </div>
   );
 };

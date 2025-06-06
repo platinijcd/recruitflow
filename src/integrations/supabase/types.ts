@@ -13,13 +13,13 @@ export type Database = {
         Row: {
           application_date: string | null
           application_status: Database["public"]["Enums"]["application_status"]
-          certifications: string | null
+          certifications: Json[] | null
           cv_url: string | null
-          degrees: string | null
+          degrees: Json[] | null
           desired_position: string | null
           email: string
           evaluation_status: Database["public"]["Enums"]["evaluation_status"]
-          experiences: string | null
+          experiences: Json[] | null
           id: string
           interview_date: string | null
           interviewer_id: string | null
@@ -31,18 +31,18 @@ export type Database = {
           recruiter_assigned: string | null
           relevance_score: number | null
           score_justification: string | null
-          skills: string | null
+          skills: Json[] | null
         }
         Insert: {
           application_date?: string | null
           application_status?: Database["public"]["Enums"]["application_status"]
-          certifications?: string | null
+          certifications?: Json[] | null
           cv_url?: string | null
-          degrees?: string | null
+          degrees?: Json[] | null
           desired_position?: string | null
           email: string
           evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
-          experiences?: string | null
+          experiences?: Json[] | null
           id?: string
           interview_date?: string | null
           interviewer_id?: string | null
@@ -54,18 +54,18 @@ export type Database = {
           recruiter_assigned?: string | null
           relevance_score?: number | null
           score_justification?: string | null
-          skills?: string | null
+          skills?: Json[] | null
         }
         Update: {
           application_date?: string | null
           application_status?: Database["public"]["Enums"]["application_status"]
-          certifications?: string | null
+          certifications?: Json[] | null
           cv_url?: string | null
-          degrees?: string | null
+          degrees?: Json[] | null
           desired_position?: string | null
           email?: string
           evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
-          experiences?: string | null
+          experiences?: Json[] | null
           id?: string
           interview_date?: string | null
           interviewer_id?: string | null
@@ -77,7 +77,7 @@ export type Database = {
           recruiter_assigned?: string | null
           relevance_score?: number | null
           score_justification?: string | null
-          skills?: string | null
+          skills?: Json[] | null
         }
         Relationships: [
           {
@@ -344,6 +344,7 @@ export type Database = {
     }
     Enums: {
       application_status: "To Be Reviewed" | "Relevant" | "Rejectable"
+      candidate_match: "Exact Match" | "AI" | "No Match"
       evaluation_status: "Not Started" | "Scheduled" | "Hired" | "Rejected"
       interviews_status: "Scheduled" | "Done"
       Post_status: "Open" | "Close"
@@ -463,6 +464,7 @@ export const Constants = {
   public: {
     Enums: {
       application_status: ["To Be Reviewed", "Relevant", "Rejectable"],
+      candidate_match: ["Exact Match", "AI", "No Match"],
       evaluation_status: ["Not Started", "Scheduled", "Hired", "Rejected"],
       interviews_status: ["Scheduled", "Done"],
       Post_status: ["Open", "Close"],
