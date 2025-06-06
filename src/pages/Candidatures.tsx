@@ -22,7 +22,7 @@ const Candidatures = () => {
                          candidature.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          candidature.desired_position?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || candidature.evaluation_status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || candidature.application_status === statusFilter;
     const matchesPoste = posteFilter === 'all' || candidature.post_id === posteFilter;
     
     return matchesSearch && matchesStatus && matchesPoste;
@@ -83,10 +83,9 @@ const Candidatures = () => {
               </SelectTrigger>
               <SelectContent className="bg-white">
                 <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="To Evaluate">À évaluer</SelectItem>
+                <SelectItem value="To Be Reviewed">À réviser</SelectItem>
                 <SelectItem value="Relevant">Pertinent</SelectItem>
-                <SelectItem value="Rejected">Rejeté</SelectItem>
-                <SelectItem value="Interview Scheduled">Entretien programmé</SelectItem>
+                <SelectItem value="Rejectable">À rejeter</SelectItem>
               </SelectContent>
             </Select>
 
@@ -125,12 +124,12 @@ const Candidatures = () => {
               telephone: candidature.phone || '',
               lien_linkedin: candidature.linkedin_url || undefined,
               poste_souhaite: candidature.desired_position || '',
-              statut: candidature.evaluation_status === 'To Evaluate' ? 'A évaluer' : 
-                     candidature.evaluation_status === 'Relevant' ? 'Pertinent' :
-                     candidature.evaluation_status === 'Rejected' ? 'Rejeté' : 'Entretien programmé',
+              statut: candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
+                     candidature.application_status === 'Relevant' ? 'Pertinent' :
+                     candidature.application_status === 'Rejectable' ? 'Rejeté' : 'Entretien programmé',
               date_reception: candidature.application_date || '',
               note: candidature.relevance_score || undefined,
-              commentaire_evaluateur: candidature.score_explanation || undefined,
+              commentaire_evaluateur: candidature.score_justification || undefined,
               competences: candidature.skills ? candidature.skills.split(',') : undefined,
               experience_annees: undefined
             }}

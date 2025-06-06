@@ -1,82 +1,76 @@
 
 import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { 
   LayoutDashboard, 
   Users, 
+  FileText, 
   Calendar, 
   Search, 
-  FileText,
-  UserPlus,
-  BarChart3
+  UserCheck
 } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
-  
-  const navItems = [
-    { 
-      label: 'Tableau de bord', 
-      path: '/', 
-      icon: LayoutDashboard 
+
+  const menuItems = [
+    {
+      path: '/',
+      icon: LayoutDashboard,
+      label: 'Tableau de bord'
     },
-    { 
-      label: 'Candidatures', 
-      path: '/candidatures', 
-      icon: Users 
+    {
+      path: '/candidatures',
+      icon: Users,
+      label: 'Candidatures'
     },
-    { 
-      label: 'Postes', 
-      path: '/postes', 
-      icon: FileText 
+    {
+      path: '/postes',
+      icon: FileText,
+      label: 'Postes'
     },
-    { 
-      label: 'Entretiens', 
-      path: '/entretiens', 
-      icon: Calendar 
+    {
+      path: '/entretiens',
+      icon: Calendar,
+      label: 'Entretiens'
     },
-    { 
-      label: 'Recherche LinkedIn', 
-      path: '/recherche', 
-      icon: Search 
+    {
+      path: '/recherche',
+      icon: Search,
+      label: 'Recherche LinkedIn'
     },
-    { 
-      label: 'Recruteurs', 
-      path: '/recruteurs', 
-      icon: UserPlus 
-    },
-    { 
-      label: 'Statistiques', 
-      path: '/statistiques', 
-      icon: BarChart3 
+    {
+      path: '/recruteurs',
+      icon: UserCheck,
+      label: 'Recruteurs'
     }
   ];
 
   return (
-    <nav className="bg-white border-r border-gray-200 w-64 min-h-screen">
-      <div className="p-4">
-        <div className="space-y-2">
-          {navItems.map((item) => {
+    <nav className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+      <div className="p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">Navigation</h2>
+        <ul className="space-y-2">
+          {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             
             return (
-              <Link key={item.path} to={item.path}>
-                <Button 
-                  variant={isActive ? "default" : "ghost"} 
-                  className={`w-full justify-start space-x-2 ${
-                    isActive 
-                      ? 'bg-recruit-blue text-white' 
-                      : 'text-gray-700 hover:bg-recruit-blue-light hover:text-recruit-blue'
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-recruit-blue text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5" />
                   <span>{item.label}</span>
-                </Button>
-              </Link>
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </div>
     </nav>
   );

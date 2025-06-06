@@ -12,13 +12,13 @@ export type Database = {
       candidates: {
         Row: {
           application_date: string | null
-          application_status: string | null
+          application_status: Database["public"]["Enums"]["application_status"]
           certifications: string | null
           cv_url: string | null
           degrees: string | null
           desired_position: string | null
           email: string
-          evaluation_status: string | null
+          evaluation_status: Database["public"]["Enums"]["evaluation_status"]
           experiences: string | null
           id: string
           interview_date: string | null
@@ -27,22 +27,21 @@ export type Database = {
           name: string
           phone: string | null
           post_id: string | null
-          post_name: string | null
           profile_summary: string | null
           recruiter_assigned: string | null
           relevance_score: number | null
-          score_explanation: string | null
+          score_justification: string | null
           skills: string | null
         }
         Insert: {
           application_date?: string | null
-          application_status?: string | null
+          application_status?: Database["public"]["Enums"]["application_status"]
           certifications?: string | null
           cv_url?: string | null
           degrees?: string | null
           desired_position?: string | null
           email: string
-          evaluation_status?: string | null
+          evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
           experiences?: string | null
           id?: string
           interview_date?: string | null
@@ -51,22 +50,21 @@ export type Database = {
           name?: string
           phone?: string | null
           post_id?: string | null
-          post_name?: string | null
           profile_summary?: string | null
           recruiter_assigned?: string | null
           relevance_score?: number | null
-          score_explanation?: string | null
+          score_justification?: string | null
           skills?: string | null
         }
         Update: {
           application_date?: string | null
-          application_status?: string | null
+          application_status?: Database["public"]["Enums"]["application_status"]
           certifications?: string | null
           cv_url?: string | null
           degrees?: string | null
           desired_position?: string | null
           email?: string
-          evaluation_status?: string | null
+          evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
           experiences?: string | null
           id?: string
           interview_date?: string | null
@@ -75,11 +73,10 @@ export type Database = {
           name?: string
           phone?: string | null
           post_id?: string | null
-          post_name?: string | null
           profile_summary?: string | null
           recruiter_assigned?: string | null
           relevance_score?: number | null
-          score_explanation?: string | null
+          score_justification?: string | null
           skills?: string | null
         }
         Relationships: [
@@ -116,36 +113,33 @@ export type Database = {
       interviews: {
         Row: {
           candidate_id: string | null
-          created_at: string | null
+          created_at: string
           feedback: string | null
           id: string
           location: string | null
           post_id: string | null
           recruiter_id: string | null
           scheduled_at: string
-          status: string | null
         }
         Insert: {
           candidate_id?: string | null
-          created_at?: string | null
+          created_at?: string
           feedback?: string | null
           id?: string
           location?: string | null
           post_id?: string | null
           recruiter_id?: string | null
           scheduled_at: string
-          status?: string | null
         }
         Update: {
           candidate_id?: string | null
-          created_at?: string | null
+          created_at?: string
           feedback?: string | null
           id?: string
           location?: string | null
           post_id?: string | null
           recruiter_id?: string | null
           scheduled_at?: string
-          status?: string | null
         }
         Relationships: [
           {
@@ -176,6 +170,7 @@ export type Database = {
           created_at: string | null
           department: string | null
           description: string | null
+          enterprise: string | null
           id: string
           location: string | null
           post_status: Database["public"]["Enums"]["Post_status"]
@@ -185,6 +180,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           description?: string | null
+          enterprise?: string | null
           id?: string
           location?: string | null
           post_status?: Database["public"]["Enums"]["Post_status"]
@@ -194,6 +190,7 @@ export type Database = {
           created_at?: string | null
           department?: string | null
           description?: string | null
+          enterprise?: string | null
           id?: string
           location?: string | null
           post_status?: Database["public"]["Enums"]["Post_status"]
@@ -205,27 +202,24 @@ export type Database = {
         Row: {
           created_at: string | null
           email: string
-          first_name: string
           id: string
-          last_name: string
+          name: string
           phone: string | null
           role: string | null
         }
         Insert: {
           created_at?: string | null
           email: string
-          first_name: string
           id?: string
-          last_name: string
+          name: string
           phone?: string | null
           role?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string
-          first_name?: string
           id?: string
-          last_name?: string
+          name?: string
           phone?: string | null
           role?: string | null
         }
@@ -339,6 +333,8 @@ export type Database = {
       }
     }
     Enums: {
+      application_status: "To Be Reviewed" | "Relevant" | "Rejectable"
+      evaluation_status: "Not Started" | "Scheduled" | "Hired" | "Rejected"
       Post_status: "Open" | "Close"
     }
     CompositeTypes: {
@@ -455,6 +451,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      application_status: ["To Be Reviewed", "Relevant", "Rejectable"],
+      evaluation_status: ["Not Started", "Scheduled", "Hired", "Rejected"],
       Post_status: ["Open", "Close"],
     },
   },
