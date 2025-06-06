@@ -34,21 +34,20 @@ const Navigation = () => {
       label: 'Entretiens'
     },
     {
-      path: '/recherche',
-      icon: Search,
-      label: 'Recherche LinkedIn'
-    },
-    {
       path: '/recruteurs',
       icon: UserCheck,
       label: 'Recruteurs'
+    },
+    {
+      path: '/recherche',
+      icon: Search,
+      label: 'Recherche LinkedIn'
     }
   ];
 
   return (
     <nav className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
       <div className="p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-6">Navigation</h2>
         <ul className="space-y-2">
           {menuItems.map((item) => {
             const Icon = item.icon;

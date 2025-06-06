@@ -18,24 +18,22 @@ const Entretiens = () => {
   
   const { data: interviews = [], isLoading } = useInterviews();
 
-  const getStatusColor = (scheduledAt: string) => {
-    const interviewDate = new Date(scheduledAt);
-    const now = new Date();
-    const isPast = interviewDate < now;
-    
-    if (isPast) {
-      return 'bg-gray-500 text-white';
-    } else {
-      return 'bg-recruit-blue text-white';
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Scheduled': return 'bg-recruit-blue text-white';
+      case 'Completed': return 'bg-recruit-green text-white';
+      case 'Cancelled': return 'bg-recruit-red text-white';
+      default: return 'bg-gray-500 text-white';
     }
   };
 
-  const getStatusLabel = (scheduledAt: string) => {
-    const interviewDate = new Date(scheduledAt);
-    const now = new Date();
-    const isPast = interviewDate < now;
-    
-    return isPast ? 'Terminé' : 'Programmé';
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'Scheduled': return 'Programmé';
+      case 'Completed': return 'Terminé';
+      case 'Cancelled': return 'Annulé';
+      default: return status;
+    }
   };
 
   const filteredInterviews = interviews.filter(interview => {
@@ -43,27 +41,10 @@ const Entretiens = () => {
                          interview.recruiters?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interview.posts?.title?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const status = getStatusLabel(interview.scheduled_at);
-    const matchesStatus = statusFilter === 'all' || status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || interview.interviews_status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
-
-  const getWeekInterviews = () => {
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    return interviews.filter(interview => {
-      const interviewDate = new Date(interview.scheduled_at);
-      return interviewDate >= startOfWeek && interviewDate <= endOfWeek;
-    });
-  };
 
   const getDayInterviews = (date: Date) => {
     return interviews.filter(interview => {
@@ -77,26 +58,18 @@ const Entretiens = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Bouton d'action */}
-      <div className="flex justify-end">
-        <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
-          <Plus className="h-4 w-4 mr-2" />
-          Programmer un entretien
-        </Button>
-      </div>
-
-      {/* Filtres */}
+    <div className="space-y-4">
+      {/* Filtres et boutons sur la même ligne */}
       <Card className="rounded-xl">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
                 <Filter className="h-4 w-4 text-gray-500" />
                 <span className="text-sm font-medium text-gray-700">Filtres:</span>
               </div>
               
-              <div className="relative w-64">
+              <div className="relative w-48">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   placeholder="Rechercher..."
@@ -107,13 +80,14 @@ const Entretiens = () => {
               </div>
               
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-48 rounded-lg">
+                <SelectTrigger className="w-40 rounded-lg">
                   <SelectValue placeholder="Statut" />
                 </SelectTrigger>
                 <SelectContent className="bg-white rounded-lg">
                   <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="Programmé">Programmé</SelectItem>
-                  <SelectItem value="Terminé">Terminé</SelectItem>
+                  <SelectItem value="Scheduled">Programmé</SelectItem>
+                  <SelectItem value="Completed">Terminé</SelectItem>
+                  <SelectItem value="Cancelled">Annulé</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -123,28 +97,33 @@ const Entretiens = () => {
               }} className="rounded-lg">
                 Réinitialiser
               </Button>
+
+              <div className="flex items-center space-x-2 ml-4">
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('list')}
+                  className="rounded-lg"
+                >
+                  <List className="h-4 w-4 mr-2" />
+                  Liste
+                </Button>
+                <Button
+                  variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('calendar')}
+                  className="rounded-lg"
+                >
+                  <CalendarDays className="h-4 w-4 mr-2" />
+                  Calendrier
+                </Button>
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="rounded-lg"
-              >
-                <List className="h-4 w-4 mr-2" />
-                Liste
-              </Button>
-              <Button
-                variant={viewMode === 'calendar' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('calendar')}
-                className="rounded-lg"
-              >
-                <CalendarDays className="h-4 w-4 mr-2" />
-                Calendrier
-              </Button>
-            </div>
+            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+              <Plus className="h-4 w-4 mr-2" />
+              Programmer un entretien
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -211,24 +190,25 @@ const Entretiens = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(interview.scheduled_at)}>
-                        {getStatusLabel(interview.scheduled_at)}
+                      <Badge className={getStatusColor(interview.interviews_status)}>
+                        {getStatusLabel(interview.interviews_status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
-                          Modifier
-                        </Button>
-                        {interview.feedback ? (
+                        {interview.interviews_status !== 'Completed' && (
                           <Button size="sm" variant="outline">
-                            Voir feedback
-                          </Button>
-                        ) : (
-                          <Button size="sm" variant="outline">
-                            Ajouter feedback
+                            Modifier
                           </Button>
                         )}
+                        {interview.interviews_status === 'Completed' && (
+                          <Button size="sm" variant="outline">
+                            {interview.feedback ? 'Voir feedback' : 'Ajouter feedback'}
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline">
+                          Supprimer
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -297,8 +277,8 @@ const Entretiens = () => {
                             </div>
                           </div>
                         </div>
-                        <Badge className={getStatusColor(interview.scheduled_at)}>
-                          {getStatusLabel(interview.scheduled_at)}
+                        <Badge className={getStatusColor(interview.interviews_status)}>
+                          {getStatusLabel(interview.interviews_status)}
                         </Badge>
                       </div>
                     </div>

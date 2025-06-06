@@ -47,7 +47,7 @@ const CandidatureCard = ({ candidature, onViewDetails, onSendEmail }: Candidatur
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200">
+    <Card className="hover:shadow-md transition-shadow duration-200 border border-gray-200 h-fit">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">

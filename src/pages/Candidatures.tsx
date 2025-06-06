@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CandidatureCard from '@/components/CandidatureCard';
 import CandidatureDetailDialog from '@/components/CandidatureDetailDialog';
-import { Search, Filter, Download, Plus } from 'lucide-react';
+import { Search, Filter, Plus } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
 
@@ -33,7 +33,6 @@ const Candidatures = () => {
 
   const handleSendEmail = (candidature: any) => {
     console.log('Envoi email pour:', candidature.name);
-    // Ici, appel webhook n8n pour envoyer l'email
   };
 
   const handleViewDetails = (candidature: any) => {
@@ -46,75 +45,70 @@ const Candidatures = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Bouton d'action */}
-      <div className="flex justify-end space-x-3">
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Exporter
-        </Button>
-        <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter candidature
-        </Button>
-      </div>
-
-      {/* Filtres */}
+    <div className="space-y-4">
+      {/* Filtres et boutons sur la même ligne */}
       <Card className="rounded-xl">
         <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filtres:</span>
-            </div>
-            
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Rechercher..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 rounded-lg"
-              />
-            </div>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48 rounded-lg">
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent className="bg-white rounded-lg">
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="To Be Reviewed">À réviser</SelectItem>
-                <SelectItem value="Relevant">Pertinent</SelectItem>
-                <SelectItem value="Rejectable">À rejeter</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filtres:</span>
+              </div>
+              
+              <div className="relative w-48">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 rounded-lg"
+                />
+              </div>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40 rounded-lg">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-lg">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="To Be Reviewed">À réviser</SelectItem>
+                  <SelectItem value="Relevant">Pertinent</SelectItem>
+                  <SelectItem value="Rejectable">À rejeter</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Select value={posteFilter} onValueChange={setPosteFilter}>
-              <SelectTrigger className="w-48 rounded-lg">
-                <SelectValue placeholder="Poste" />
-              </SelectTrigger>
-              <SelectContent className="bg-white rounded-lg">
-                <SelectItem value="all">Tous les postes</SelectItem>
-                {posts.map(poste => (
-                  <SelectItem key={poste.id} value={poste.id}>{poste.title}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select value={posteFilter} onValueChange={setPosteFilter}>
+                <SelectTrigger className="w-40 rounded-lg">
+                  <SelectValue placeholder="Poste" />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-lg">
+                  <SelectItem value="all">Tous les postes</SelectItem>
+                  {posts.map(poste => (
+                    <SelectItem key={poste.id} value={poste.id}>{poste.title}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Button variant="outline" onClick={() => {
-              setSearchTerm('');
-              setStatusFilter('all');
-              setPosteFilter('all');
-            }} className="rounded-lg">
-              Réinitialiser
+              <Button variant="outline" onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+                setPosteFilter('all');
+              }} className="rounded-lg">
+                Réinitialiser
+              </Button>
+            </div>
+
+            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter candidature
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Résultats */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
         {filteredCandidatures.map((candidature) => (
           <CandidatureCard 
             key={candidature.id} 

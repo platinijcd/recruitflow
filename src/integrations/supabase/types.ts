@@ -22,7 +22,7 @@ export type Database = {
           experiences: string | null
           id: string
           interview_date: string | null
-          interview_link: string | null
+          interviewer_id: string | null
           linkedin_url: string | null
           name: string
           phone: string | null
@@ -45,7 +45,7 @@ export type Database = {
           experiences?: string | null
           id?: string
           interview_date?: string | null
-          interview_link?: string | null
+          interviewer_id?: string | null
           linkedin_url?: string | null
           name?: string
           phone?: string | null
@@ -68,7 +68,7 @@ export type Database = {
           experiences?: string | null
           id?: string
           interview_date?: string | null
-          interview_link?: string | null
+          interviewer_id?: string | null
           linkedin_url?: string | null
           name?: string
           phone?: string | null
@@ -80,6 +80,13 @@ export type Database = {
           skills?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "candidates_interviewer_id_fkey"
+            columns: ["interviewer_id"]
+            isOneToOne: false
+            referencedRelation: "recruiters"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fk_post"
             columns: ["post_id"]
@@ -116,6 +123,7 @@ export type Database = {
           created_at: string
           feedback: string | null
           id: string
+          interviews_status: Database["public"]["Enums"]["interviews_status"]
           location: string | null
           post_id: string | null
           recruiter_id: string | null
@@ -126,6 +134,7 @@ export type Database = {
           created_at?: string
           feedback?: string | null
           id?: string
+          interviews_status?: Database["public"]["Enums"]["interviews_status"]
           location?: string | null
           post_id?: string | null
           recruiter_id?: string | null
@@ -136,6 +145,7 @@ export type Database = {
           created_at?: string
           feedback?: string | null
           id?: string
+          interviews_status?: Database["public"]["Enums"]["interviews_status"]
           location?: string | null
           post_id?: string | null
           recruiter_id?: string | null
@@ -335,6 +345,7 @@ export type Database = {
     Enums: {
       application_status: "To Be Reviewed" | "Relevant" | "Rejectable"
       evaluation_status: "Not Started" | "Scheduled" | "Hired" | "Rejected"
+      interviews_status: "Scheduled" | "Done"
       Post_status: "Open" | "Close"
     }
     CompositeTypes: {
@@ -453,6 +464,7 @@ export const Constants = {
     Enums: {
       application_status: ["To Be Reviewed", "Relevant", "Rejectable"],
       evaluation_status: ["Not Started", "Scheduled", "Hired", "Rejected"],
+      interviews_status: ["Scheduled", "Done"],
       Post_status: ["Open", "Close"],
     },
   },

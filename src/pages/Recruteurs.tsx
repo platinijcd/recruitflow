@@ -43,32 +43,65 @@ const Recruteurs = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Bouton d'action */}
-      <div className="flex justify-end">
-        <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
-          <Plus className="h-4 w-4 mr-2" />
-          Ajouter un recruteur
-        </Button>
+    <div className="space-y-4">
+      {/* Statistiques en haut */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-recruit-blue">{recruiters.length}</p>
+              <p className="text-sm text-gray-600">Total recruteurs</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-recruit-green">
+                {recruiters.filter(r => r.role === 'Admin').length}
+              </p>
+              <p className="text-sm text-gray-600">Administrateurs</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-recruit-orange">
+                {recruiters.filter(r => r.role === 'Recruiter' || !r.role).length}
+              </p>
+              <p className="text-sm text-gray-600">Recruteurs actifs</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Filtres */}
+      {/* Filtres et boutons sur la même ligne */}
       <Card className="rounded-xl">
         <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Rechercher:</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Rechercher:</span>
+              </div>
+              <div className="relative w-48">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher par nom ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 rounded-lg"
+                />
+              </div>
             </div>
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Rechercher par nom ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 rounded-lg"
-              />
-            </div>
+
+            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+              <Plus className="h-4 w-4 mr-2" />
+              Ajouter un recruteur
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -148,40 +181,6 @@ const Recruteurs = () => {
           )}
         </CardContent>
       </Card>
-
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-recruit-blue">{recruiters.length}</p>
-              <p className="text-sm text-gray-600">Total recruteurs</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-recruit-green">
-                {recruiters.filter(r => r.role === 'Admin').length}
-              </p>
-              <p className="text-sm text-gray-600">Administrateurs</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-recruit-orange">
-                {recruiters.filter(r => r.role === 'Recruiter' || !r.role).length}
-              </p>
-              <p className="text-sm text-gray-600">Recruteurs actifs</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 };

@@ -43,50 +43,49 @@ const Postes = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Bouton d'action */}
-      <div className="flex justify-end">
-        <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
-          <Plus className="h-4 w-4 mr-2" />
-          Créer un poste
-        </Button>
-      </div>
-
-      {/* Filtres */}
+    <div className="space-y-4">
+      {/* Filtres et boutons sur la même ligne */}
       <Card className="rounded-xl">
         <CardContent className="p-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Filter className="h-4 w-4 text-gray-500" />
-              <span className="text-sm font-medium text-gray-700">Filtres:</span>
-            </div>
-            
-            <div className="relative w-64">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Rechercher..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 rounded-lg"
-              />
-            </div>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48 rounded-lg">
-                <SelectValue placeholder="Statut" />
-              </SelectTrigger>
-              <SelectContent className="bg-white rounded-lg">
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="Open">Ouvert</SelectItem>
-                <SelectItem value="Close">Fermé</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filtres:</span>
+              </div>
+              
+              <div className="relative w-48">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Rechercher..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 rounded-lg"
+                />
+              </div>
+              
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-40 rounded-lg">
+                  <SelectValue placeholder="Statut" />
+                </SelectTrigger>
+                <SelectContent className="bg-white rounded-lg">
+                  <SelectItem value="all">Tous les statuts</SelectItem>
+                  <SelectItem value="Open">Ouvert</SelectItem>
+                  <SelectItem value="Close">Fermé</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <Button variant="outline" onClick={() => {
-              setSearchTerm('');
-              setStatusFilter('all');
-            }} className="rounded-lg">
-              Réinitialiser
+              <Button variant="outline" onClick={() => {
+                setSearchTerm('');
+                setStatusFilter('all');
+              }} className="rounded-lg">
+                Réinitialiser
+              </Button>
+            </div>
+
+            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+              <Plus className="h-4 w-4 mr-2" />
+              Créer un poste
             </Button>
           </div>
         </CardContent>

@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Linkedin, UserPlus, ExternalLink, Filter } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Search, Linkedin, UserPlus, ExternalLink, Info } from 'lucide-react';
 import type { LinkedInProfile } from '@/types';
 
 const Recherche = () => {
@@ -20,7 +20,6 @@ const Recherche = () => {
     title: ''
   });
   
-  // Résultats de démonstration
   const [searchResults, setSearchResults] = useState<LinkedInProfile[]>([
     {
       nom: 'Alice Developer',
@@ -55,16 +54,13 @@ const Recherche = () => {
     setIsSearching(true);
     console.log('Recherche avec critères:', searchCriteria);
     
-    // Simulation de l'appel webhook n8n
     setTimeout(() => {
       setIsSearching(false);
-      // Les résultats sont déjà définis pour la démo
     }, 2000);
   };
 
   const handleAddToDatabase = (profile: LinkedInProfile) => {
     console.log('Ajout du profil à la base:', profile.nom);
-    // Ici, logique pour ajouter le profil comme candidature
   };
 
   const getInitials = (nom: string) => {
@@ -73,10 +69,28 @@ const Recherche = () => {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div>
+      {/* En-tête avec bouton d'information */}
+      <div className="flex items-center space-x-2">
         <h1 className="text-3xl font-bold text-gray-900">Recherche LinkedIn</h1>
-        <p className="text-gray-600 mt-1">Trouvez et importez de nouveaux profils depuis LinkedIn</p>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button size="sm" className="bg-recruit-blue hover:bg-recruit-blue-dark rounded-full w-6 h-6 p-0">
+              <Info className="h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" side="right">
+            <div className="space-y-2 text-sm">
+              <h4 className="font-semibold text-recruit-blue-dark">Comment utiliser la recherche LinkedIn ?</h4>
+              <p>1. <strong>Remplissez les critères</strong> de recherche selon vos besoins</p>
+              <p>2. <strong>Lancez la recherche</strong> - un webhook sera envoyé à n8n</p>
+              <p>3. <strong>n8n scrape LinkedIn</strong> et retourne les profils correspondants</p>
+              <p>4. <strong>Consultez les profils</strong> et ajoutez les candidats intéressants à votre base</p>
+              <p className="text-recruit-blue-dark font-medium mt-3">
+                ⚠️ Assurez-vous que votre workflow n8n est configuré et actif
+              </p>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* Formulaire de recherche */}
@@ -236,22 +250,6 @@ const Recherche = () => {
           </CardContent>
         </Card>
       )}
-
-      {/* Instructions */}
-      <Card className="bg-recruit-blue-light border-recruit-blue">
-        <CardHeader>
-          <CardTitle className="text-recruit-blue-dark">Comment utiliser la recherche LinkedIn ?</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <p>1. <strong>Remplissez les critères</strong> de recherche selon vos besoins</p>
-          <p>2. <strong>Lancez la recherche</strong> - un webhook sera envoyé à n8n</p>
-          <p>3. <strong>n8n scrape LinkedIn</strong> et retourne les profils correspondants</p>
-          <p>4. <strong>Consultez les profils</strong> et ajoutez les candidats intéressants à votre base</p>
-          <p className="text-recruit-blue-dark font-medium mt-3">
-            ⚠️ Assurez-vous que votre workflow n8n est configuré et actif
-          </p>
-        </CardContent>
-      </Card>
     </div>
   );
 };
