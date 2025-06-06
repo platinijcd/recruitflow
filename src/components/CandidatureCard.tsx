@@ -6,11 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import StatusBadge from './StatusBadge';
 import { Eye, Mail, Phone, Linkedin, Star } from 'lucide-react';
 import type { Candidature } from '@/types';
-import { Link } from 'react-router-dom';
 
 interface CandidatureCardProps {
   candidature: Candidature;
-  onViewDetails?: (id: string) => void;
+  onViewDetails?: (candidature: Candidature) => void;
   onSendEmail?: (candidature: Candidature) => void;
 }
 
@@ -26,13 +25,19 @@ const CandidatureCard = ({ candidature, onViewDetails, onSendEmail }: Candidatur
   const renderStars = (note?: number) => {
     if (!note) return null;
     
+    const starRating = (note / 10) * 5; // Convert score out of 10 to stars out of 5
+    const fullStars = Math.floor(starRating);
+    const hasHalfStar = starRating % 1 >= 0.5;
+    
     return (
       <div className="flex items-center space-x-1">
         {[...Array(5)].map((_, i) => (
           <Star 
             key={i} 
             className={`h-4 w-4 ${
-              i < note ? 'text-yellow-400 fill-current' : 'text-gray-300'
+              i < fullStars ? 'text-yellow-400 fill-current' : 
+              i === fullStars && hasHalfStar ? 'text-yellow-400 fill-current' :
+              'text-gray-300'
             }`} 
           />
         ))}
@@ -102,12 +107,15 @@ const CandidatureCard = ({ candidature, onViewDetails, onSendEmail }: Candidatur
           {/* Actions */}
           <div className="flex items-center justify-between pt-2">
             <div className="flex space-x-2">
-              <Link to={`/candidature/${candidature.id}`}>
-                <Button size="sm" variant="outline" className="flex items-center space-x-1">
-                  <Eye className="h-4 w-4" />
-                  <span>Voir</span>
-                </Button>
-              </Link>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="flex items-center space-x-1"
+                onClick={() => onViewDetails?.(candidature)}
+              >
+                <Eye className="h-4 w-4" />
+                <span>Voir</span>
+              </Button>
               
               {candidature.lien_linkedin && (
                 <Button 

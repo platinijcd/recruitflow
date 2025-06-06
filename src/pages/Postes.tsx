@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Plus, MapPin, Building, Users, Eye } from 'lucide-react';
+import { Search, Filter, Plus, MapPin, Building, Users, Eye, Briefcase } from 'lucide-react';
 import { usePosts } from '@/hooks/usePosts';
 import { useCandidates } from '@/hooks/useCandidates';
 import { Link } from 'react-router-dom';
@@ -44,12 +44,8 @@ const Postes = () => {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Postes</h1>
-          <p className="text-gray-600 mt-1">Gérez tous vos postes ouverts</p>
-        </div>
+      {/* Bouton d'action */}
+      <div className="flex justify-end">
         <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
           <Plus className="h-4 w-4 mr-2" />
           Créer un poste
@@ -57,30 +53,29 @@ const Postes = () => {
       </div>
 
       {/* Filtres */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Filter className="h-5 w-5" />
-            <span>Filtres</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
+      <Card className="rounded-xl">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Filtres:</span>
+            </div>
+            
+            <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Rechercher par titre ou description..."
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 rounded-lg"
               />
             </div>
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="w-48 rounded-lg">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
-              <SelectContent className="bg-white">
+              <SelectContent className="bg-white rounded-lg">
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Open">Ouvert</SelectItem>
                 <SelectItem value="Close">Fermé</SelectItem>
@@ -90,7 +85,7 @@ const Postes = () => {
             <Button variant="outline" onClick={() => {
               setSearchTerm('');
               setStatusFilter('all');
-            }}>
+            }} className="rounded-lg">
               Réinitialiser
             </Button>
           </div>
@@ -123,9 +118,15 @@ const Postes = () => {
                       <span>{post.location}</span>
                     </div>
                   )}
-                  {post.department && (
+                  {post.enterprise && (
                     <div className="flex items-center space-x-1">
                       <Building className="h-4 w-4" />
+                      <span>{post.enterprise}</span>
+                    </div>
+                  )}
+                  {post.department && (
+                    <div className="flex items-center space-x-1">
+                      <Briefcase className="h-4 w-4" />
                       <span>{post.department}</span>
                     </div>
                   )}

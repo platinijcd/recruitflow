@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CandidatureCard from '@/components/CandidatureCard';
+import CandidatureDetailDialog from '@/components/CandidatureDetailDialog';
 import { Search, Filter, Download, Plus } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
@@ -13,6 +14,8 @@ const Candidatures = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [posteFilter, setPosteFilter] = useState<string>('all');
+  const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: posts = [], isLoading: postsLoading } = usePosts();
@@ -33,55 +36,53 @@ const Candidatures = () => {
     // Ici, appel webhook n8n pour envoyer l'email
   };
 
+  const handleViewDetails = (candidature: any) => {
+    setSelectedCandidate(candidature);
+    setIsDialogOpen(true);
+  };
+
   if (candidatesLoading || postsLoading) {
     return <div className="p-6">Chargement...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Candidatures</h1>
-          <p className="text-gray-600 mt-1">Gérez toutes vos candidatures reçues</p>
-        </div>
-        <div className="flex space-x-3">
-          <Button variant="outline">
-            <Download className="h-4 w-4 mr-2" />
-            Exporter
-          </Button>
-          <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter candidature
-          </Button>
-        </div>
+      {/* Bouton d'action */}
+      <div className="flex justify-end space-x-3">
+        <Button variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Exporter
+        </Button>
+        <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+          <Plus className="h-4 w-4 mr-2" />
+          Ajouter candidature
+        </Button>
       </div>
 
       {/* Filtres */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Filter className="h-5 w-5" />
-            <span>Filtres</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
+      <Card className="rounded-xl">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Filtres:</span>
+            </div>
+            
+            <div className="relative w-64">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Rechercher par nom, email, poste..."
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 rounded-lg"
               />
             </div>
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="w-48 rounded-lg">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
-              <SelectContent className="bg-white">
+              <SelectContent className="bg-white rounded-lg">
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="To Be Reviewed">À réviser</SelectItem>
                 <SelectItem value="Relevant">Pertinent</SelectItem>
@@ -90,10 +91,10 @@ const Candidatures = () => {
             </Select>
 
             <Select value={posteFilter} onValueChange={setPosteFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="w-48 rounded-lg">
                 <SelectValue placeholder="Poste" />
               </SelectTrigger>
-              <SelectContent className="bg-white">
+              <SelectContent className="bg-white rounded-lg">
                 <SelectItem value="all">Tous les postes</SelectItem>
                 {posts.map(poste => (
                   <SelectItem key={poste.id} value={poste.id}>{poste.title}</SelectItem>
@@ -105,7 +106,7 @@ const Candidatures = () => {
               setSearchTerm('');
               setStatusFilter('all');
               setPosteFilter('all');
-            }}>
+            }} className="rounded-lg">
               Réinitialiser
             </Button>
           </div>
@@ -133,6 +134,7 @@ const Candidatures = () => {
               competences: candidature.skills ? candidature.skills.split(',') : undefined,
               experience_annees: undefined
             }}
+            onViewDetails={() => handleViewDetails(candidature)}
             onSendEmail={handleSendEmail}
           />
         ))}
@@ -156,6 +158,13 @@ const Candidatures = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog des détails */}
+      <CandidatureDetailDialog
+        candidature={selectedCandidate}
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
     </div>
   );
 };

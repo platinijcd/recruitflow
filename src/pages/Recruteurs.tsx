@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Search, Mail, Phone, MoreVertical } from 'lucide-react';
+import { Plus, Search, Mail, Phone, MoreVertical, Filter } from 'lucide-react';
 import { useRecruiters } from '@/hooks/useRecruiters';
 
 const Recruteurs = () => {
@@ -21,13 +21,12 @@ const Recruteurs = () => {
   const { data: recruiters = [], isLoading } = useRecruiters();
 
   const filteredRecruiters = recruiters.filter(recruiter => 
-    recruiter.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    recruiter.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    recruiter.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     recruiter.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName?.[0] || ''}${lastName?.[0] || ''}`.toUpperCase();
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   const getRoleColor = (role: string) => {
@@ -45,35 +44,31 @@ const Recruteurs = () => {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Recruteurs</h1>
-          <p className="text-gray-600 mt-1">Gérez votre équipe de recrutement</p>
-        </div>
+      {/* Bouton d'action */}
+      <div className="flex justify-end">
         <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
           <Plus className="h-4 w-4 mr-2" />
           Ajouter un recruteur
         </Button>
       </div>
 
-      {/* Barre de recherche */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Search className="h-5 w-5" />
-            <span>Rechercher</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Rechercher par nom ou email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
+      {/* Filtres */}
+      <Card className="rounded-xl">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Rechercher:</span>
+            </div>
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher par nom ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 rounded-lg"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -101,12 +96,12 @@ const Recruteurs = () => {
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-10 w-10">
                         <AvatarFallback className="bg-recruit-blue text-white">
-                          {getInitials(recruiter.first_name, recruiter.last_name)}
+                          {getInitials(recruiter.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="font-semibold text-gray-900">
-                          {recruiter.first_name} {recruiter.last_name}
+                          {recruiter.name}
                         </p>
                         <p className="text-sm text-gray-600">{recruiter.email}</p>
                       </div>

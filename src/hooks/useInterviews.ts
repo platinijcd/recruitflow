@@ -15,7 +15,7 @@ export const useInterviews = () => {
           *,
           candidates (name, email),
           posts (title),
-          recruiters (first_name, last_name)
+          recruiters (name)
         `)
         .order('scheduled_at', { ascending: true });
       
