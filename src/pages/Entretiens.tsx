@@ -65,64 +65,69 @@ const Entretiens = () => {
 
   return (
     <div className="space-y-4">
-      {/* Filtres et boutons sur la même ligne */}
+      {/* Section Filtres */}
+      <Card className="rounded-xl">
+        <CardContent className="p-4">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <Filter className="h-4 w-4 text-gray-500" />
+              <span className="text-sm font-medium text-gray-700">Filtres:</span>
+            </div>
+            
+            <div className="relative w-48">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 rounded-lg"
+              />
+            </div>
+            
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40 rounded-lg">
+                <SelectValue placeholder="Statut" />
+              </SelectTrigger>
+              <SelectContent className="bg-white rounded-lg">
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="Scheduled">Programmé</SelectItem>
+                <SelectItem value="Done">Terminé</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button variant="outline" onClick={() => {
+              setSearchTerm('');
+              setStatusFilter('all');
+            }} className="rounded-lg">
+              Réinitialiser
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Section Vues et Bouton d'ajout */}
       <Card className="rounded-xl">
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filtres:</span>
-              </div>
-              
-              <div className="relative w-48">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Rechercher..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 rounded-lg"
-                />
-              </div>
-              
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40 rounded-lg">
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
-                <SelectContent className="bg-white rounded-lg">
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="Scheduled">Programmé</SelectItem>
-                  <SelectItem value="Done">Terminé</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Button variant="outline" onClick={() => {
-                setSearchTerm('');
-                setStatusFilter('all');
-              }} className="rounded-lg">
-                Réinitialiser
+            <div className="flex items-center space-x-2">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-lg"
+              >
+                <List className="h-4 w-4 mr-2" />
+                Liste
               </Button>
-
-              <div className="flex items-center space-x-2 ml-4">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-lg"
-                >
-                  <List className="h-4 w-4 mr-2" />
-                  Liste
-                </Button>
-                <Button
-                  variant={viewMode === 'calendar' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('calendar')}
-                  className="rounded-lg"
-                >
-                  <CalendarDays className="h-4 w-4 mr-2" />
-                  Calendrier
-                </Button>
-              </div>
+              <Button
+                variant={viewMode === 'calendar' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('calendar')}
+                className="rounded-lg"
+              >
+                <CalendarDays className="h-4 w-4 mr-2" />
+                Calendrier
+              </Button>
             </div>
 
             <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">

@@ -18,11 +18,10 @@ export type Database = {
           degrees: Json[] | null
           desired_position: string | null
           email: string
-          evaluation_status: Database["public"]["Enums"]["evaluation_status"]
           experiences: Json[] | null
           id: string
           interview_date: string | null
-          interviewer_id: string | null
+          interview_id: string | null
           linkedin_url: string | null
           name: string
           phone: string | null
@@ -41,11 +40,10 @@ export type Database = {
           degrees?: Json[] | null
           desired_position?: string | null
           email: string
-          evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
           experiences?: Json[] | null
           id?: string
           interview_date?: string | null
-          interviewer_id?: string | null
+          interview_id?: string | null
           linkedin_url?: string | null
           name?: string
           phone?: string | null
@@ -64,11 +62,10 @@ export type Database = {
           degrees?: Json[] | null
           desired_position?: string | null
           email?: string
-          evaluation_status?: Database["public"]["Enums"]["evaluation_status"]
           experiences?: Json[] | null
           id?: string
           interview_date?: string | null
-          interviewer_id?: string | null
+          interview_id?: string | null
           linkedin_url?: string | null
           name?: string
           phone?: string | null
@@ -81,10 +78,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "candidates_interviewer_id_fkey"
-            columns: ["interviewer_id"]
+            foreignKeyName: "candidates_interview_id_fkey"
+            columns: ["interview_id"]
             isOneToOne: false
-            referencedRelation: "recruiters"
+            referencedRelation: "interviews"
             referencedColumns: ["id"]
           },
           {
@@ -119,36 +116,36 @@ export type Database = {
       }
       interviews: {
         Row: {
-          candidate_id: string | null
+          candidate_id: string
           created_at: string
           feedback: string | null
           id: string
-          interviews_status: Database["public"]["Enums"]["interviews_status"]
+          interview_status: Database["public"]["Enums"]["interviews_status"]
           location: string | null
-          post_id: string | null
-          recruiter_id: string | null
+          post_id: string
+          recruiter_id: string
           scheduled_at: string
         }
         Insert: {
-          candidate_id?: string | null
+          candidate_id: string
           created_at?: string
           feedback?: string | null
           id?: string
-          interviews_status?: Database["public"]["Enums"]["interviews_status"]
+          interview_status?: Database["public"]["Enums"]["interviews_status"]
           location?: string | null
-          post_id?: string | null
-          recruiter_id?: string | null
+          post_id: string
+          recruiter_id: string
           scheduled_at: string
         }
         Update: {
-          candidate_id?: string | null
+          candidate_id?: string
           created_at?: string
           feedback?: string | null
           id?: string
-          interviews_status?: Database["public"]["Enums"]["interviews_status"]
+          interview_status?: Database["public"]["Enums"]["interviews_status"]
           location?: string | null
-          post_id?: string | null
-          recruiter_id?: string | null
+          post_id?: string
+          recruiter_id?: string
           scheduled_at?: string
         }
         Relationships: [
@@ -346,7 +343,7 @@ export type Database = {
       application_status: "To Be Reviewed" | "Relevant" | "Rejectable"
       candidate_match: "Exact Match" | "AI" | "No Match"
       evaluation_status: "Not Started" | "Scheduled" | "Hired" | "Rejected"
-      interviews_status: "Scheduled" | "Done"
+      interviews_status: "Scheduled" | "Retained" | "Rejected"
       Post_status: "Open" | "Close"
     }
     CompositeTypes: {
@@ -466,7 +463,7 @@ export const Constants = {
       application_status: ["To Be Reviewed", "Relevant", "Rejectable"],
       candidate_match: ["Exact Match", "AI", "No Match"],
       evaluation_status: ["Not Started", "Scheduled", "Hired", "Rejected"],
-      interviews_status: ["Scheduled", "Done"],
+      interviews_status: ["Scheduled", "Retained", "Rejected"],
       Post_status: ["Open", "Close"],
     },
   },
