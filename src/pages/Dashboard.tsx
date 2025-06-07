@@ -1,38 +1,34 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Users, 
-  FileText, 
-  Calendar, 
-  TrendingUp,
-  Plus,
-  Eye,
-  MoreVertical,
-  Filter
-} from 'lucide-react';
+import { Users, FileText, Calendar, TrendingUp, Plus, Eye, MoreVertical, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePosts } from '@/hooks/usePosts';
 import { useCandidates } from '@/hooks/useCandidates';
 import { useInterviews } from '@/hooks/useInterviews';
 import { useState } from 'react';
-
 const Dashboard = () => {
   const [timeFilter, setTimeFilter] = useState<string>('all');
   const [candidatesTimeFilter, setCandidatesTimeFilter] = useState<string>('all');
-  const { data: posts = [], isLoading: postsLoading } = usePosts();
-  const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
-  const { data: interviews = [], isLoading: interviewsLoading } = useInterviews();
-
+  const {
+    data: posts = [],
+    isLoading: postsLoading
+  } = usePosts();
+  const {
+    data: candidates = [],
+    isLoading: candidatesLoading
+  } = useCandidates();
+  const {
+    data: interviews = [],
+    isLoading: interviewsLoading
+  } = useInterviews();
   const now = new Date();
   const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
   const getFilteredCandidates = () => {
     switch (candidatesTimeFilter) {
       case '24h':
@@ -54,9 +50,7 @@ const Dashboard = () => {
         return candidates;
     }
   };
-
   const filteredCandidates = getFilteredCandidates();
-
   const stats = {
     totalCandidatures: candidates.length,
     last24h: candidates.filter(c => {
@@ -70,18 +64,14 @@ const Dashboard = () => {
       return interviewDate > now;
     }).length
   };
-
   const upcomingInterviews = interviews.filter(i => {
     const interviewDate = new Date(i.scheduled_at);
     return interviewDate > now;
   }).slice(0, 5);
-
   if (postsLoading || candidatesLoading || interviewsLoading) {
     return <div className="p-6">Chargement...</div>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       {/* Statistiques avec icônes bleues plus grandes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <Card>
@@ -133,15 +123,7 @@ const Dashboard = () => {
         </Card>
 
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <Users className="h-12 w-12 text-recruit-blue" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.last24h}</p>
-                <p className="text-sm text-gray-600">Dernières 24h</p>
-              </div>
-            </div>
-          </CardContent>
+          
         </Card>
       </div>
 
@@ -165,17 +147,13 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredCandidates.slice(0, 5).map((candidature) => (
-              <div key={candidature.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            {filteredCandidates.slice(0, 5).map(candidature => <div key={candidature.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
                       <h3 className="font-semibold text-lg text-gray-900">{candidature.name}</h3>
-                      <Badge className={candidature.application_status === 'To Be Reviewed' ? 'bg-recruit-orange text-white' : 
-                                     candidature.application_status === 'Relevant' ? 'bg-recruit-green text-white' :
-                                     'bg-recruit-red text-white'}>
-                        {candidature.application_status === 'To Be Reviewed' ? 'À évaluer' : 
-                         candidature.application_status === 'Relevant' ? 'Pertinent' : 'Rejeté'}
+                      <Badge className={candidature.application_status === 'To Be Reviewed' ? 'bg-recruit-orange text-white' : candidature.application_status === 'Relevant' ? 'bg-recruit-green text-white' : 'bg-recruit-red text-white'}>
+                        {candidature.application_status === 'To Be Reviewed' ? 'À évaluer' : candidature.application_status === 'Relevant' ? 'Pertinent' : 'Rejeté'}
                       </Badge>
                     </div>
                     <p className="text-gray-600 mt-1">{candidature.desired_position}</p>
@@ -198,8 +176,7 @@ const Dashboard = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </CardContent>
       </Card>
@@ -218,8 +195,7 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {upcomingInterviews.map((interview) => (
-              <div key={interview.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+            {upcomingInterviews.map(interview => <div key={interview.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3">
@@ -234,7 +210,10 @@ const Dashboard = () => {
                     <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
                       <span>Recruteur: {interview.recruiters?.name || 'Non assigné'}</span>
                       <span>•</span>
-                      <span>Programmé le {new Date(interview.scheduled_at).toLocaleDateString('fr-FR')} à {new Date(interview.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>Programmé le {new Date(interview.scheduled_at).toLocaleDateString('fr-FR')} à {new Date(interview.scheduled_at).toLocaleTimeString('fr-FR', {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</span>
                     </div>
                   </div>
                   
@@ -250,13 +229,10 @@ const Dashboard = () => {
                     </Button>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
