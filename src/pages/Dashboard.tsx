@@ -112,13 +112,7 @@ const Dashboard = () => {
 
         <Card>
           <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <Calendar className="h-12 w-12 text-recruit-blue" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.entretiensAVenir}</p>
-                <p className="text-sm text-gray-600">Entretiens à venir</p>
-              </div>
-            </div>
+            
           </CardContent>
         </Card>
 
