@@ -4,7 +4,6 @@ import {
   LayoutDashboard, 
   Users, 
   FileText, 
-  Calendar, 
   Search, 
   UserCheck
 } from 'lucide-react';
@@ -27,11 +26,6 @@ const Navigation = () => {
       path: '/postes',
       icon: FileText,
       label: 'Postes'
-    },
-    {
-      path: '/entretiens',
-      icon: Calendar,
-      label: 'Entretiens'
     },
     {
       path: '/recruteurs',
