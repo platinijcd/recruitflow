@@ -126,6 +126,47 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
           <div className="space-y-4">
             <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
             
+            {/* Candidature Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Candidature</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <span className="font-medium">Poste souhaité: </span>
+                  <span>{candidate.desired_position}</span>
+                </div>
+                <div>
+                  <span className="font-medium">Poste: </span>
+                  <span>{getPost()?.title || 'Non spécifié'}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <span className="font-medium">Statut: </span>
+                  {isEditing ? (
+                    <div className="flex items-center space-x-2">
+                      <Select value={editedStatus} onValueChange={setEditedStatus}>
+                        <SelectTrigger className="w-48">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="To Be Reviewed">À réviser</SelectItem>
+                          <SelectItem value="Relevant">Pertinent</SelectItem>
+                          <SelectItem value="Rejectable">À rejeter</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" onClick={handleSave}>Sauvegarder</Button>
+                      <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>Annuler</Button>
+                    </div>
+                  ) : (
+                    <Badge>
+                      {candidate.application_status === 'To Be Reviewed' ? 'À réviser' : 
+                       candidate.application_status === 'Relevant' ? 'Pertinent' : 'À rejeter'}
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
             {candidate.relevance_score && (
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Score de pertinence</h3>
@@ -141,11 +182,11 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
             )}
 
             <div className="flex space-x-3">
-              {candidate.cv_link && (
+              {candidate.cv_url && (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => window.open(candidate.cv_link, '_blank')}
+                  onClick={() => window.open(candidate.cv_url, '_blank')}
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Voir CV
@@ -164,47 +205,6 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
             </div>
           </div>
 
-          {/* Candidature Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Candidature</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <span className="font-medium">Poste souhaité: </span>
-                <span>{candidate.desired_position}</span>
-              </div>
-              <div>
-                <span className="font-medium">Poste: </span>
-                <span>{getPost()?.title || 'Non spécifié'}</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <span className="font-medium">Statut: </span>
-                {isEditing ? (
-                  <div className="flex items-center space-x-2">
-                    <Select value={editedStatus} onValueChange={setEditedStatus}>
-                      <SelectTrigger className="w-48">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="To Be Reviewed">À réviser</SelectItem>
-                        <SelectItem value="Relevant">Pertinent</SelectItem>
-                        <SelectItem value="Rejectable">À rejeter</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button size="sm" onClick={handleSave}>Sauvegarder</Button>
-                    <Button size="sm" variant="outline" onClick={() => setIsEditing(false)}>Annuler</Button>
-                  </div>
-                ) : (
-                  <Badge>
-                    {candidate.application_status === 'To Be Reviewed' ? 'À réviser' : 
-                     candidate.application_status === 'Relevant' ? 'Pertinent' : 'À rejeter'}
-                  </Badge>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Contact Section */}
           <Card>
             <CardHeader>
@@ -218,10 +218,10 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
                 <Mail className="h-4 w-4 text-gray-500" />
                 <span>{candidate.email}</span>
               </div>
-              {candidate.phone_number && (
+              {candidate.phone && (
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  <span>{candidate.phone_number}</span>
+                  <span>{candidate.phone}</span>
                 </div>
               )}
             </CardContent>
@@ -277,7 +277,7 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
                 <div>
                   <h4 className="font-semibold mb-2">Certifications</h4>
                   <div className="flex flex-wrap gap-2">
-                    {candidate.certifications.map((cert: string, index: number) => (
+                    {(candidate.certifications as string[]).map((cert: string, index: number) => (
                       <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                         <Award className="h-3 w-3" />
                         <span>{cert}</span>
@@ -291,7 +291,7 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
                 <div>
                   <h4 className="font-semibold mb-2">Compétences</h4>
                   <div className="flex flex-wrap gap-2">
-                    {candidate.skills.map((skill: string, index: number) => (
+                    {(candidate.skills as string[]).map((skill: string, index: number) => (
                       <Badge key={index} variant="secondary" className="flex items-center space-x-1">
                         <Briefcase className="h-3 w-3" />
                         <span>{skill}</span>
@@ -323,8 +323,10 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
                 </div>
                 <div>
                   <span className="font-medium">Statut: </span>
-                  <Badge className={interview.interviews_status === 'Scheduled' ? 'bg-recruit-blue text-white' : 'bg-recruit-green text-white'}>
-                    {interview.interviews_status === 'Scheduled' ? 'Programmé' : 'Terminé'}
+                  <Badge className={interview.interview_status === 'Scheduled' ? 'bg-recruit-blue text-white' : 
+                                   interview.interview_status === 'Retained' ? 'bg-recruit-green text-white' : 'bg-red-500 text-white'}>
+                    {interview.interview_status === 'Scheduled' ? 'Programmé' : 
+                     interview.interview_status === 'Retained' ? 'Retenu' : 'Rejeté'}
                   </Badge>
                 </div>
                 <div>

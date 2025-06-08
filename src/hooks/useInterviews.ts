@@ -13,7 +13,7 @@ export const useInterviews = () => {
         .from('interviews')
         .select(`
           *,
-          candidates (name, email),
+          candidates (name, email, phone),
           posts (title),
           recruiters (name)
         `)
@@ -38,6 +38,45 @@ export const useCreateInterview = () => {
       
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interviews'] });
+    }
+  });
+};
+
+export const useUpdateInterview = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Interview> }) => {
+      const { data, error } = await supabase
+        .from('interviews')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interviews'] });
+    }
+  });
+};
+
+export const useDeleteInterview = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('interviews')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviews'] });

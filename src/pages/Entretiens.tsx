@@ -24,7 +24,8 @@ const Entretiens = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'bg-recruit-blue text-white';
-      case 'Done': return 'bg-recruit-green text-white';
+      case 'Retained': return 'bg-recruit-green text-white';
+      case 'Rejected': return 'bg-red-500 text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
@@ -32,7 +33,8 @@ const Entretiens = () => {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'Programmé';
-      case 'Done': return 'Terminé';
+      case 'Retained': return 'Retenu';
+      case 'Rejected': return 'Rejeté';
       default: return status;
     }
   };
@@ -42,7 +44,7 @@ const Entretiens = () => {
                          interview.recruiters?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interview.posts?.title?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || interview.interviews_status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || interview.interview_status === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -60,7 +62,7 @@ const Entretiens = () => {
   };
 
   if (isLoading) {
-    return <div className="p-6">Chargement...</div>;
+    return <div className="p-6">Chargement des entretiens...</div>;
   }
 
   return (
@@ -91,7 +93,8 @@ const Entretiens = () => {
               <SelectContent className="bg-white rounded-lg">
                 <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="Scheduled">Programmé</SelectItem>
-                <SelectItem value="Done">Terminé</SelectItem>
+                <SelectItem value="Retained">Retenu</SelectItem>
+                <SelectItem value="Rejected">Rejeté</SelectItem>
               </SelectContent>
             </Select>
 
@@ -142,7 +145,7 @@ const Entretiens = () => {
         /* Vue Liste */
         <Card>
           <CardHeader>
-            <CardTitle>Liste des entretiens</CardTitle>
+            <CardTitle>Liste des entretiens ({filteredInterviews.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -164,15 +167,15 @@ const Entretiens = () => {
                       <div className="flex items-center space-x-2">
                         <User className="h-4 w-4 text-gray-500" />
                         <span className="font-medium">
-                          {interview.candidates?.name || 'N/A'}
+                          {interview.candidates?.name || 'Candidat non trouvé'}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      {interview.posts?.title || 'N/A'}
+                      {interview.posts?.title || 'Poste non spécifié'}
                     </TableCell>
                     <TableCell>
-                      {interview.recruiters?.name || 'N/A'}
+                      {interview.recruiters?.name || 'Recruteur non assigné'}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
@@ -200,8 +203,8 @@ const Entretiens = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(interview.interviews_status)}>
-                        {getStatusLabel(interview.interviews_status)}
+                      <Badge className={getStatusColor(interview.interview_status)}>
+                        {getStatusLabel(interview.interview_status)}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -214,7 +217,7 @@ const Entretiens = () => {
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        {interview.interviews_status === 'Done' && (
+                        {interview.interview_status === 'Retained' && (
                           <Button size="sm" variant="outline">
                             {interview.feedback ? 'Voir feedback' : 'Ajouter feedback'}
                           </Button>
@@ -267,9 +270,9 @@ const Entretiens = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg text-gray-900">
-                            {interview.candidates?.name || 'N/A'}
+                            {interview.candidates?.name || 'Candidat non trouvé'}
                           </h3>
-                          <p className="text-gray-600">{interview.posts?.title || 'N/A'}</p>
+                          <p className="text-gray-600">{interview.posts?.title || 'Poste non spécifié'}</p>
                           <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
                             <div className="flex items-center space-x-1">
                               <Clock className="h-4 w-4" />
@@ -286,12 +289,12 @@ const Entretiens = () => {
                             </div>
                             <div className="flex items-center space-x-1">
                               <User className="h-4 w-4" />
-                              <span>{interview.recruiters?.name || 'N/A'}</span>
+                              <span>{interview.recruiters?.name || 'Recruteur non assigné'}</span>
                             </div>
                           </div>
                         </div>
-                        <Badge className={getStatusColor(interview.interviews_status)}>
-                          {getStatusLabel(interview.interviews_status)}
+                        <Badge className={getStatusColor(interview.interview_status)}>
+                          {getStatusLabel(interview.interview_status)}
                         </Badge>
                       </div>
                     </div>
