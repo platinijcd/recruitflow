@@ -1,279 +1,260 @@
-import { useState } from 'react';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CalendarDays, Users, Briefcase, Clock, TrendingUp, User, Eye, Phone, Mail, MapPin } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { 
+  Users, 
+  FileText, 
+  Calendar, 
+  TrendingUp,
+  Plus,
+  Eye,
+  MoreVertical,
+  Filter
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { usePosts } from '@/hooks/usePosts';
 import { useCandidates } from '@/hooks/useCandidates';
 import { useInterviews } from '@/hooks/useInterviews';
-import { usePosts } from '@/hooks/usePosts';
-import { useRecruiters } from '@/hooks/useRecruiters';
-import CandidateDetailPage from '@/components/CandidateDetailPage';
+import { useState } from 'react';
 
 const Dashboard = () => {
-  const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  
+  const [timeFilter, setTimeFilter] = useState<string>('all');
+  const [candidatesTimeFilter, setCandidatesTimeFilter] = useState<string>('all');
+  const { data: posts = [], isLoading: postsLoading } = usePosts();
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: interviews = [], isLoading: interviewsLoading } = useInterviews();
-  const { data: posts = [], isLoading: postsLoading } = usePosts();
-  const { data: recruiters = [], isLoading: recruitersLoading } = useRecruiters();
 
-  const isLoading = candidatesLoading || interviewsLoading || postsLoading || recruitersLoading;
+  const now = new Date();
+  const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const totalCandidates = candidates.length;
-  const relevantCandidates = candidates.filter(c => c.application_status === 'Relevant').length;
-  const openPosts = posts.filter(post => post.post_status === 'Open').length;
-  const scheduledInterviews = interviews.filter(interview => interview.interview_status === 'Scheduled').length;
-
-  const recentCandidates = candidates
-    .sort((a, b) => new Date(b.application_date || '').getTime() - new Date(a.application_date || '').getTime())
-    .slice(0, 5);
-
-  const upcomingInterviews = interviews
-    .filter(interview => {
-      const interviewDate = new Date(interview.scheduled_at);
-      const today = new Date();
-      return interviewDate >= today && interview.interview_status === 'Scheduled';
-    })
-    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
-    .slice(0, 5);
-
-  const handleViewCandidate = (candidate: any) => {
-    setSelectedCandidate(candidate);
-    setIsDetailOpen(true);
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'To Be Reviewed': return 'bg-yellow-500 text-white';
-      case 'Relevant': return 'bg-recruit-green text-white';
-      case 'Rejectable': return 'bg-red-500 text-white';
-      case 'Scheduled': return 'bg-recruit-blue text-white';
-      case 'Retained': return 'bg-recruit-green text-white';
-      case 'Rejected': return 'bg-red-500 text-white';
-      default: return 'bg-gray-500 text-white';
+  const getFilteredCandidates = () => {
+    switch (candidatesTimeFilter) {
+      case '24h':
+        return candidates.filter(c => {
+          const applicationDate = new Date(c.application_date || '');
+          return applicationDate >= last24Hours;
+        });
+      case 'week':
+        return candidates.filter(c => {
+          const applicationDate = new Date(c.application_date || '');
+          return applicationDate >= startOfWeek;
+        });
+      case 'month':
+        return candidates.filter(c => {
+          const applicationDate = new Date(c.application_date || '');
+          return applicationDate >= startOfMonth;
+        });
+      default:
+        return candidates;
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'To Be Reviewed': return 'À réviser';
-      case 'Relevant': return 'Pertinent';
-      case 'Rejectable': return 'À rejeter';
-      case 'Scheduled': return 'Programmé';
-      case 'Retained': return 'Retenu';
-      case 'Rejected': return 'Rejeté';
-      default: return status;
-    }
+  const filteredCandidates = getFilteredCandidates();
+
+  const stats = {
+    totalCandidatures: candidates.length,
+    last24h: candidates.filter(c => {
+      const applicationDate = new Date(c.application_date || '');
+      return applicationDate >= last24Hours;
+    }).length,
+    aEvaluer: candidates.filter(c => c.application_status === 'To Be Reviewed').length,
+    pertinentes: candidates.filter(c => c.application_status === 'Relevant').length,
+    entretiensAVenir: interviews.filter(i => {
+      const interviewDate = new Date(i.scheduled_at);
+      return interviewDate > now;
+    }).length
   };
 
-  if (isLoading) {
-    return <div className="p-6">Chargement du tableau de bord...</div>;
+  const upcomingInterviews = interviews.filter(i => {
+    const interviewDate = new Date(i.scheduled_at);
+    return interviewDate > now;
+  }).slice(0, 5);
+
+  if (postsLoading || candidatesLoading || interviewsLoading) {
+    return <div className="p-6">Chargement...</div>;
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Tableau de bord</h1>
-        <p className="text-gray-600">Vue d'ensemble de vos activités de recrutement</p>
+      {/* Statistiques avec icônes bleues plus grandes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Users className="h-12 w-12 text-recruit-blue" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalCandidatures}</p>
+                <p className="text-sm text-gray-600">Total candidatures</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <FileText className="h-12 w-12 text-recruit-blue" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.aEvaluer}</p>
+                <p className="text-sm text-gray-600">À évaluer</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <TrendingUp className="h-12 w-12 text-recruit-blue" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.pertinentes}</p>
+                <p className="text-sm text-gray-600">Pertinentes</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Calendar className="h-12 w-12 text-recruit-blue" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.entretiensAVenir}</p>
+                <p className="text-sm text-gray-600">Entretiens à venir</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Users className="h-12 w-12 text-recruit-blue" />
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.last24h}</p>
+                <p className="text-sm text-gray-600">Dernières 24h</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Users className="h-5 w-5 text-recruit-blue" />
-              <span>Candidatures</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{totalCandidates}</div>
-            <p className="text-sm text-gray-600">{relevantCandidates} candidatures pertinentes</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Briefcase className="h-5 w-5 text-recruit-blue" />
-              <span>Postes ouverts</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{openPosts}</div>
-            <p className="text-sm text-gray-600">Postes actuellement disponibles</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <CalendarDays className="h-5 w-5 text-recruit-blue" />
-              <span>Entretiens</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{scheduledInterviews}</div>
-            <p className="text-sm text-gray-600">Entretiens programmés</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-recruit-blue" />
-              <span>Taux de conversion</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{(relevantCandidates / totalCandidates * 100).toFixed(1)}%</div>
-            <p className="text-sm text-gray-600">Candidatures pertinentes / Total</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Grille principale */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Candidatures récentes */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Candidatures récentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentCandidates.map((candidate) => (
-                <div key={candidate.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+      {/* Candidatures récentes avec filtre intégré */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl">Candidatures récentes</CardTitle>
+            <Select value={candidatesTimeFilter} onValueChange={setCandidatesTimeFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Période" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                <SelectItem value="all">Toutes les candidatures</SelectItem>
+                <SelectItem value="24h">Dernières 24h</SelectItem>
+                <SelectItem value="week">Cette semaine</SelectItem>
+                <SelectItem value="month">Ce mois</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {filteredCandidates.slice(0, 5).map((candidature) => (
+              <div key={candidature.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{candidate.name}</span>
+                    <div className="flex items-center space-x-3">
+                      <h3 className="font-semibold text-lg text-gray-900">{candidature.name}</h3>
+                      <Badge className={candidature.application_status === 'To Be Reviewed' ? 'bg-recruit-orange text-white' : 
+                                     candidature.application_status === 'Relevant' ? 'bg-recruit-green text-white' :
+                                     'bg-recruit-red text-white'}>
+                        {candidature.application_status === 'To Be Reviewed' ? 'À évaluer' : 
+                         candidature.application_status === 'Relevant' ? 'Pertinent' : 'Rejeté'}
+                      </Badge>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{candidate.desired_position}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mt-2">
-                      <div className="flex items-center space-x-1">
-                        <Mail className="h-3 w-3" />
-                        <span>{candidate.email}</span>
-                      </div>
-                      {candidate.phone && (
-                        <div className="flex items-center space-x-1">
-                          <Phone className="h-3 w-3" />
-                          <span>{candidate.phone}</span>
-                        </div>
-                      )}
+                    <p className="text-gray-600 mt-1">{candidature.desired_position}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
+                      <span>{candidature.email}</span>
+                      <span>•</span>
+                      <span>Reçu le {new Date(candidature.application_date || '').toLocaleDateString('fr-FR')}</span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Badge className={getStatusColor(candidate.application_status)}>
-                      {getStatusLabel(candidate.application_status)}
-                    </Badge>
-                    <Button size="sm" variant="outline" onClick={() => handleViewCandidate(candidate)}>
-                      <Eye className="h-3 w-3" />
+                  
+                  <div className="flex space-x-2">
+                    <Link to={`/candidatures`}>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir détails
+                      </Button>
+                    </Link>
+                    <Button size="sm" variant="ghost">
+                      <MoreVertical className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
-              ))}
-              
-              {recentCandidates.length === 0 && (
-                <div className="text-center py-4">
-                  <p className="text-gray-500">Aucune candidature récente</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Entretiens à venir */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Entretiens à venir</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {upcomingInterviews.map((interview) => (
-                <div key={interview.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-500" />
-                      <span className="font-medium">{interview.candidates?.name || 'Candidat non trouvé'}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">{interview.posts?.title || 'Poste non spécifié'}</p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mt-2">
-                      <div className="flex items-center space-x-1">
-                        <CalendarDays className="h-3 w-3" />
-                        <span>{new Date(interview.scheduled_at).toLocaleDateString('fr-FR')}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="h-3 w-3" />
-                        <span>{new Date(interview.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
-                      </div>
-                      {interview.location && (
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="h-3 w-3" />
-                          <span>{interview.location}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <Badge className={getStatusColor(interview.interview_status)}>
-                    {getStatusLabel(interview.interview_status)}
-                  </Badge>
-                </div>
-              ))}
-              
-              {upcomingInterviews.length === 0 && (
-                <div className="text-center py-4">
-                  <p className="text-gray-500">Aucun entretien programmé</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Métriques de performance */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Métriques de performance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Métrique</TableHead>
-                <TableHead>Valeur</TableHead>
-                <TableHead>Objectif</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell>Taux de conversion</TableCell>
-                <TableCell>{(relevantCandidates / totalCandidates * 100).toFixed(1)}%</TableCell>
-                <TableCell>50%</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Temps moyen de recrutement</TableCell>
-                <TableCell>30 jours</TableCell>
-                <TableCell>45 jours</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Satisfaction des candidats</TableCell>
-                <TableCell>4.5/5</TableCell>
-                <TableCell>4/5</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Dialog des détails */}
-      <CandidateDetailPage
-        candidate={selectedCandidate}
-        isOpen={isDetailOpen}
-        onClose={() => setIsDetailOpen(false)}
-      />
+      {/* Entretiens programmés */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl">Entretiens programmés</CardTitle>
+            <Link to="/entretiens">
+              <Button variant="outline" size="sm">
+                Voir tous les entretiens
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {upcomingInterviews.map((interview) => (
+              <div key={interview.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3">
+                      <h3 className="font-semibold text-lg text-gray-900">
+                        {interview.candidates?.name || 'Candidat non spécifié'}
+                      </h3>
+                      <Badge className="bg-recruit-blue text-white">
+                        {interview.interviews_status}
+                      </Badge>
+                    </div>
+                    <p className="text-gray-600 mt-1">{interview.posts?.title || 'Poste non spécifié'}</p>
+                    <div className="flex items-center space-x-4 text-sm text-gray-500 mt-2">
+                      <span>Recruteur: {interview.recruiters?.name || 'Non assigné'}</span>
+                      <span>•</span>
+                      <span>Programmé le {new Date(interview.scheduled_at).toLocaleDateString('fr-FR')} à {new Date(interview.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-2">
+                    <Link to={`/entretiens`}>
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir détails
+                      </Button>
+                    </Link>
+                    <Button size="sm" variant="ghost">
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
