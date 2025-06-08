@@ -1,4 +1,3 @@
-
 export interface Candidature {
   id: string;
   nom: string;
@@ -52,7 +51,7 @@ export interface Entretien {
   post_id?: string;
   scheduled_at: string;
   location?: string;
-  interviews_status: 'Scheduled' | 'Done';
+  interview_id?: string;
   feedback?: string;
   created_at?: string;
   candidates?: { name: string; email: string };

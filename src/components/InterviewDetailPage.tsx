@@ -22,7 +22,7 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
     scheduled_at: interview?.scheduled_at || '',
     location: interview?.location || '',
     feedback: interview?.feedback || '',
-    interviews_status: interview?.interviews_status || 'Scheduled'
+    interview_id: interview?.interview_id || 'Scheduled'
   });
 
   if (!interview) return null;
@@ -34,7 +34,8 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'bg-recruit-blue text-white';
-      case 'Done': return 'bg-recruit-green text-white';
+      case 'Retained': return 'bg-recruit-green text-white';
+      case 'Rejected': return 'bg-red-500 text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
@@ -42,7 +43,8 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'Scheduled': return 'Programmé';
-      case 'Done': return 'Terminé';
+      case 'Retained': return 'Retenu';
+      case 'Rejected': return 'Rejeté';
       default: return status;
     }
   };
@@ -53,7 +55,7 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
     setIsEditing(false);
   };
 
-  const canEdit = interview.interviews_status === 'Scheduled';
+  const canEdit = interview.interview_id === 'Scheduled';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -147,18 +149,19 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
                 <div>
                   <label className="font-medium text-sm text-gray-700 mb-2 block">Statut</label>
                   {isEditing ? (
-                    <Select value={editData.interviews_status} onValueChange={(value) => setEditData({...editData, interviews_status: value})}>
+                    <Select value={editData.interview_id} onValueChange={(value) => setEditData({...editData, interview_id: value})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Scheduled">Programmé</SelectItem>
-                        <SelectItem value="Done">Terminé</SelectItem>
+                        <SelectItem value="Retained">Retenu</SelectItem>
+                        <SelectItem value="Rejected">Rejeté</SelectItem>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Badge className={getStatusColor(interview.interviews_status)}>
-                      {getStatusLabel(interview.interviews_status)}
+                    <Badge className={getStatusColor(interview.interview_id || 'Unknown')}>
+                      {getStatusLabel(interview.interview_id || 'Unknown')}
                     </Badge>
                   )}
                 </div>

@@ -130,8 +130,8 @@ const RecruiterDetailPage = ({ recruiter, isOpen, onClose }: RecruiterDetailPage
                           {interview.posts?.title || 'Poste non spécifié'}
                         </TableCell>
                         <TableCell>
-                          <Badge className={getStatusColor(interview.interview_status)}>
-                            {getStatusLabel(interview.interview_status)}
+                          <Badge className={getStatusColor(interview.interview_id || 'Unknown')}>
+                            {getStatusLabel(interview.interview_id || 'Unknown')}
                           </Badge>
                         </TableCell>
                         <TableCell>

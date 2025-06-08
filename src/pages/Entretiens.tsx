@@ -44,7 +44,7 @@ const Entretiens = () => {
                          interview.recruiters?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          interview.posts?.title?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === 'all' || interview.interview_status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || interview.interview_id === statusFilter;
     
     return matchesSearch && matchesStatus;
   });
@@ -203,8 +203,8 @@ const Entretiens = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(interview.interview_status)}>
-                        {getStatusLabel(interview.interview_status)}
+                      <Badge className={getStatusColor(interview.interview_id || 'Unknown')}>
+                        {getStatusLabel(interview.interview_id || 'Unknown')}
                       </Badge>
                     </TableCell>
                     <TableCell>
@@ -217,7 +217,7 @@ const Entretiens = () => {
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
                         </Button>
-                        {interview.interview_status === 'Retained' && (
+                        {interview.interview_id === 'Retained' && (
                           <Button size="sm" variant="outline">
                             {interview.feedback ? 'Voir feedback' : 'Ajouter feedback'}
                           </Button>
@@ -293,8 +293,8 @@ const Entretiens = () => {
                             </div>
                           </div>
                         </div>
-                        <Badge className={getStatusColor(interview.interview_status)}>
-                          {getStatusLabel(interview.interview_status)}
+                        <Badge className={getStatusColor(interview.interview_id || 'Unknown')}>
+                          {getStatusLabel(interview.interview_id || 'Unknown')}
                         </Badge>
                       </div>
                     </div>
