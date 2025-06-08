@@ -11,12 +11,7 @@ export const useInterviews = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('interviews')
-        .select(`
-          *,
-          candidates (name, email, phone),
-          posts (title),
-          recruiters (name)
-        `)
+        .select(`*`)
         .order('scheduled_at', { ascending: true });
       
       if (error) throw error;
