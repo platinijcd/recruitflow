@@ -9,7 +9,6 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import Candidatures from "./pages/Candidatures";
 import Postes from "./pages/Postes";
-import Entretiens from "./pages/Entretiens";
 import Recherche from "./pages/Recherche";
 import Recruteurs from "./pages/Recruteurs";
 import NotFound from "./pages/NotFound";
@@ -31,7 +30,6 @@ const App = () => (
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/candidatures" element={<Candidatures />} />
                 <Route path="/postes" element={<Postes />} />
-                <Route path="/entretiens" element={<Entretiens />} />
                 <Route path="/recherche" element={<Recherche />} />
                 <Route path="/recruteurs" element={<Recruteurs />} />
                 <Route path="*" element={<NotFound />} />

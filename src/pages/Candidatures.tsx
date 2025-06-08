@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CandidatureCard from '@/components/CandidatureCard';
 import CandidateDetailPage from '@/components/CandidateDetailPage';
+import AddCandidateForm from '@/components/AddCandidateForm';
 import { Search, Filter, Plus } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
@@ -16,6 +17,7 @@ const Candidatures = () => {
   const [posteFilter, setPosteFilter] = useState<string>('all');
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: posts = [], isLoading: postsLoading } = usePosts();
@@ -95,7 +97,10 @@ const Candidatures = () => {
               </Button>
             </div>
 
-            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+            <Button 
+              className="bg-recruit-blue hover:bg-recruit-blue-dark"
+              onClick={() => setIsAddFormOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Ajouter candidature
             </Button>
@@ -153,6 +158,12 @@ const Candidatures = () => {
         candidate={selectedCandidate}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+      />
+
+      {/* Formulaire d'ajout */}
+      <AddCandidateForm
+        isOpen={isAddFormOpen}
+        onClose={() => setIsAddFormOpen(false)}
       />
     </div>
   );

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,12 +8,14 @@ import { Search, Filter, Plus, MapPin, Building, Users, Eye, Briefcase } from 'l
 import { usePosts } from '@/hooks/usePosts';
 import { useCandidates } from '@/hooks/useCandidates';
 import PostDetailPage from '@/components/PostDetailPage';
+import AddPostForm from '@/components/AddPostForm';
 
 const Postes = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   
   const { data: posts = [], isLoading: postsLoading } = usePosts();
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
@@ -90,7 +91,10 @@ const Postes = () => {
               </Button>
             </div>
 
-            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+            <Button 
+              className="bg-recruit-blue hover:bg-recruit-blue-dark"
+              onClick={() => setIsAddFormOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Créer un poste
             </Button>
@@ -194,6 +198,12 @@ const Postes = () => {
         post={selectedPost}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+      />
+
+      {/* Formulaire d'ajout */}
+      <AddPostForm
+        isOpen={isAddFormOpen}
+        onClose={() => setIsAddFormOpen(false)}
       />
     </div>
   );

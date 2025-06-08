@@ -1,75 +1,41 @@
 
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  Calendar, 
-  Search, 
-  UserCheck
-} from 'lucide-react';
+import { Users, Briefcase, Search, User, BarChart3 } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
 
-  const menuItems = [
-    {
-      path: '/',
-      icon: LayoutDashboard,
-      label: 'Tableau de bord'
-    },
-    {
-      path: '/candidatures',
-      icon: Users,
-      label: 'Candidatures'
-    },
-    {
-      path: '/postes',
-      icon: FileText,
-      label: 'Postes'
-    },
-    {
-      path: '/entretiens',
-      icon: Calendar,
-      label: 'Entretiens'
-    },
-    {
-      path: '/recruteurs',
-      icon: UserCheck,
-      label: 'Recruteurs'
-    },
-    {
-      path: '/recherche',
-      icon: Search,
-      label: 'Recherche LinkedIn'
-    }
+  const navItems = [
+    { path: '/', label: 'Dashboard', icon: BarChart3 },
+    { path: '/candidatures', label: 'Candidatures', icon: Users },
+    { path: '/postes', label: 'Postes', icon: Briefcase },
+    { path: '/recherche', label: 'Recherche', icon: Search },
+    { path: '/recruteurs', label: 'Recruteurs', icon: User },
   ];
 
   return (
-    <nav className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
+    <nav className="w-64 bg-white shadow-sm min-h-screen">
       <div className="p-6">
-        <ul className="space-y-2">
-          {menuItems.map((item) => {
+        <h2 className="text-xl font-bold text-recruit-blue mb-6">Navigation</h2>
+        <div className="space-y-2">
+          {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
-            
             return (
-              <li key={item.path}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-recruit-blue text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
+                  location.pathname === item.path
+                    ? 'bg-recruit-blue text-white'
+                    : 'text-gray-700 hover:bg-recruit-gray-light'
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="font-medium">{item.label}</span>
+              </Link>
             );
           })}
-        </ul>
+        </div>
       </div>
     </nav>
   );

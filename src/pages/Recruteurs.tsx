@@ -15,11 +15,13 @@ import {
 import { Plus, Search, Phone, Filter, Eye } from 'lucide-react';
 import { useRecruiters } from '@/hooks/useRecruiters';
 import RecruiterDetailPage from '@/components/RecruiterDetailPage';
+import AddRecruiterForm from '@/components/AddRecruiterForm';
 
 const Recruteurs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRecruiter, setSelectedRecruiter] = useState<any>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const { data: recruiters = [], isLoading } = useRecruiters();
 
   const filteredRecruiters = recruiters.filter(recruiter => 
@@ -96,7 +98,10 @@ const Recruteurs = () => {
               </div>
             </div>
 
-            <Button className="bg-recruit-blue hover:bg-recruit-blue-dark">
+            <Button 
+              className="bg-recruit-blue hover:bg-recruit-blue-dark"
+              onClick={() => setIsAddFormOpen(true)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un recruteur
             </Button>
@@ -184,6 +189,12 @@ const Recruteurs = () => {
         recruiter={selectedRecruiter}
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+      />
+
+      {/* Formulaire d'ajout */}
+      <AddRecruiterForm
+        isOpen={isAddFormOpen}
+        onClose={() => setIsAddFormOpen(false)}
       />
     </div>
   );
