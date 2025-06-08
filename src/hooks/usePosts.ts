@@ -55,3 +55,42 @@ export const useCreatePost = () => {
     }
   });
 };
+
+export const useUpdatePost = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Post> }) => {
+      const { data, error } = await supabase
+        .from('posts')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+};
+
+export const useDeletePost = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    }
+  });
+};

@@ -3,64 +3,88 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Search, Linkedin, UserPlus, ExternalLink, Info } from 'lucide-react';
-import type { LinkedInProfile } from '@/types';
+import { toast } from 'sonner';
+
+interface LinkedInProfile {
+  fullName: string;
+  headline: string;
+  summary?: string;
+  profilePicture?: string;
+  location: string;
+  profileURL: string;
+  username: string;
+}
+
+interface SearchResponse {
+  success: boolean;
+  message: string;
+  data: {
+    total: number;
+    items: LinkedInProfile[];
+  };
+}
 
 const Recherche = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState({
     keywords: '',
-    location: '',
-    experience: '',
-    company: '',
-    title: ''
+    location: ''
   });
   
-  const [searchResults, setSearchResults] = useState<LinkedInProfile[]>([
-    {
-      nom: 'Alice Developer',
-      titre_poste: 'Senior Full Stack Developer',
-      entreprise: 'TechCorp',
-      lieu: 'Paris, France',
-      lien_linkedin: 'https://linkedin.com/in/alice-developer',
-      experience_annees: 6,
-      competences: ['React', 'Node.js', 'TypeScript', 'AWS', 'Docker']
-    },
-    {
-      nom: 'Bob Designer',
-      titre_poste: 'Lead UX Designer',
-      entreprise: 'DesignStudio',
-      lieu: 'Lyon, France',
-      lien_linkedin: 'https://linkedin.com/in/bob-designer',
-      experience_annees: 8,
-      competences: ['Figma', 'Design System', 'User Research', 'Prototyping']
-    },
-    {
-      nom: 'Claire Project',
-      titre_poste: 'Senior Project Manager',
-      entreprise: 'AgileCompany',
-      lieu: 'Marseille, France',
-      lien_linkedin: 'https://linkedin.com/in/claire-project',
-      experience_annees: 7,
-      competences: ['Scrum Master', 'Agile', 'Team Leadership', 'Stakeholder Management']
-    }
-  ]);
+  const [searchResults, setSearchResults] = useState<LinkedInProfile[]>([]);
 
   const handleSearch = async () => {
+    if (!searchCriteria.keywords && !searchCriteria.location) {
+      toast.error('Veuillez renseigner au moins un critère de recherche');
+      return;
+    }
+
     setIsSearching(true);
-    console.log('Recherche avec critères:', searchCriteria);
     
-    setTimeout(() => {
+    try {
+      const params = new URLSearchParams();
+      if (searchCriteria.keywords) params.append('keyword', searchCriteria.keywords);
+      if (searchCriteria.location) params.append('location', searchCriteria.location);
+
+      const response = await fetch(
+        `https://polite-wrongly-phoenix.ngrok-free.app/webhook/114f1a40-b072-4038-9775-837b26ed1042?${params.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+
+      const data: SearchResponse[] = await response.json();
+      
+      if (data[0]?.success && data[0]?.data?.items) {
+        setSearchResults(data[0].data.items);
+        toast.success(`${data[0].data.items.length} profils trouvés`);
+      } else {
+        setSearchResults([]);
+        toast.error(data[0]?.message || 'Aucun résultat trouvé');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      toast.error('Erreur lors de la recherche. Veuillez réessayer.');
+      setSearchResults([]);
+    } finally {
       setIsSearching(false);
-    }, 2000);
+    }
   };
 
   const handleAddToDatabase = (profile: LinkedInProfile) => {
-    console.log('Ajout du profil à la base:', profile.nom);
+    console.log('Ajout du profil à la base:', profile.fullName);
+    toast.success(`Profil de ${profile.fullName} ajouté à la base de données`);
   };
 
   const getInitials = (nom: string) => {
@@ -102,7 +126,7 @@ const Recherche = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               placeholder="Mots-clés (ex: React, Node.js)"
               value={searchCriteria.keywords}
@@ -113,32 +137,6 @@ const Recherche = () => {
               placeholder="Localisation (ex: Paris, France)"
               value={searchCriteria.location}
               onChange={(e) => setSearchCriteria({...searchCriteria, location: e.target.value})}
-            />
-            
-            <Select value={searchCriteria.experience} onValueChange={(value) => setSearchCriteria({...searchCriteria, experience: value})}>
-              <SelectTrigger>
-                <SelectValue placeholder="Années d'expérience" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="0-2">0-2 ans</SelectItem>
-                <SelectItem value="3-5">3-5 ans</SelectItem>
-                <SelectItem value="5-10">5-10 ans</SelectItem>
-                <SelectItem value="10+">10+ ans</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              placeholder="Entreprise actuelle"
-              value={searchCriteria.company}
-              onChange={(e) => setSearchCriteria({...searchCriteria, company: e.target.value})}
-            />
-            
-            <Input
-              placeholder="Titre du poste"
-              value={searchCriteria.title}
-              onChange={(e) => setSearchCriteria({...searchCriteria, title: e.target.value})}
             />
           </div>
           
@@ -163,7 +161,7 @@ const Recherche = () => {
             
             <Button 
               variant="outline"
-              onClick={() => setSearchCriteria({keywords: '', location: '', experience: '', company: '', title: ''})}
+              onClick={() => setSearchCriteria({keywords: '', location: ''})}
             >
               Réinitialiser
             </Button>
@@ -190,36 +188,21 @@ const Recherche = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex space-x-4">
                       <Avatar className="h-12 w-12">
-                        <AvatarImage src={profile.photo_url} />
+                        <AvatarImage src={profile.profilePicture} />
                         <AvatarFallback className="bg-recruit-blue text-white">
-                          {getInitials(profile.nom)}
+                          {getInitials(profile.fullName)}
                         </AvatarFallback>
                       </Avatar>
                       
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-900">{profile.nom}</h3>
-                        <p className="text-recruit-blue font-medium">{profile.titre_poste}</p>
-                        <p className="text-gray-600">{profile.entreprise} • {profile.lieu}</p>
+                        <h3 className="font-semibold text-lg text-gray-900">{profile.fullName}</h3>
+                        <p className="text-recruit-blue font-medium">{profile.headline}</p>
+                        <p className="text-gray-600">{profile.location}</p>
                         
-                        {profile.experience_annees && (
-                          <p className="text-sm text-gray-500 mt-1">
-                            {profile.experience_annees} ans d'expérience
+                        {profile.summary && (
+                          <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                            {profile.summary}
                           </p>
-                        )}
-                        
-                        {profile.competences && profile.competences.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {profile.competences.slice(0, 5).map((competence, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {competence}
-                              </Badge>
-                            ))}
-                            {profile.competences.length > 5 && (
-                              <Badge variant="secondary" className="text-xs">
-                                +{profile.competences.length - 5}
-                              </Badge>
-                            )}
-                          </div>
                         )}
                       </div>
                     </div>
@@ -228,7 +211,7 @@ const Recherche = () => {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => window.open(profile.lien_linkedin, '_blank')}
+                        onClick={() => window.open(profile.profileURL, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4 mr-1" />
                         LinkedIn
