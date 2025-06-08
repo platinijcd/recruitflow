@@ -112,7 +112,7 @@ const Candidatures = () => {
                 id: candidature.id,
                 nom: candidature.name || '',
                 email: candidature.email,
-                telephone: candidature.phone_number || '',
+                telephone: candidature.phone || '',
                 lien_linkedin: candidature.linkedin_url || undefined,
                 poste_souhaite: candidature.desired_position || '',
                 statut: candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
@@ -120,7 +120,7 @@ const Candidatures = () => {
                 date_reception: candidature.application_date || '',
                 note: candidature.relevance_score || undefined,
                 commentaire_evaluateur: candidature.score_justification || undefined,
-                competences: Array.isArray(candidature.skills) ? candidature.skills : undefined,
+                competences: Array.isArray(candidature.skills) ? candidature.skills as string[] : undefined,
                 experience_annees: undefined
               }}
               onViewDetails={() => handleViewDetails(candidature)}

@@ -5,11 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Edit, Trash2, FileText, Linkedin, Mail, Phone, Star, User, Briefcase, Award, Calendar, UserCheck } from 'lucide-react';
+import { X, Edit, Trash2, FileText, Linkedin, Mail, Phone, Star, User, Briefcase, Award } from 'lucide-react';
 import { useUpdateCandidate } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
 import { useRecruiters } from '@/hooks/useRecruiters';
-import { useInterviews } from '@/hooks/useInterviews';
 import { supabase } from '@/integrations/supabase/client';
 
 interface CandidateDetailPageProps {
@@ -26,7 +25,6 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
   const { mutate: updateCandidate } = useUpdateCandidate();
   const { data: posts = [] } = usePosts();
   const { data: recruiters = [] } = useRecruiters();
-  const { data: interviews = [] } = useInterviews();
 
   if (!candidate) return null;
 
@@ -36,10 +34,6 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
 
   const getRecruiter = () => {
     return recruiters.find(recruiter => recruiter.id === candidate.interviewer_id);
-  };
-
-  const getCandidateInterview = () => {
-    return interviews.find(interview => interview.candidate_id === candidate.id);
   };
 
   const renderStars = (score?: number) => {
@@ -88,8 +82,6 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
       console.error('Erreur lors de la suppression:', error);
     }
   };
-
-  const interview = getCandidateInterview();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -218,10 +210,10 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
                 <Mail className="h-4 w-4 text-gray-500" />
                 <span>{candidate.email}</span>
               </div>
-              {candidate.phone_number && (
+              {candidate.phone && (
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  <span>{candidate.phone_number}</span>
+                  <span>{candidate.phone}</span>
                 </div>
               )}
             </CardContent>
@@ -302,44 +294,6 @@ const CandidateDetailPage = ({ candidate, isOpen, onClose }: CandidateDetailPage
               )}
             </CardContent>
           </Card>
-
-          {/* Entretien Section */}
-          {interview && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="h-5 w-5 text-recruit-blue" />
-                  <span>Entretien</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <span className="font-medium">Recruteur: </span>
-                  <span>{interview.recruiters?.name || 'Non assigné'}</span>
-                </div>
-                <div>
-                  <span className="font-medium">Date d'entretien: </span>
-                  <span>{new Date(interview.scheduled_at).toLocaleDateString('fr-FR')}</span>
-                </div>
-                <div>
-                  <span className="font-medium">Statut: </span>
-                  <Badge className={interview.interviews_status === 'Scheduled' ? 'bg-recruit-blue text-white' : 'bg-recruit-green text-white'}>
-                    {interview.interviews_status === 'Scheduled' ? 'Programmé' : 'Terminé'}
-                  </Badge>
-                </div>
-                <div>
-                  <span className="font-medium">Lieu: </span>
-                  <span>{interview.location || 'Non spécifié'}</span>
-                </div>
-                {interview.feedback && (
-                  <div>
-                    <span className="font-medium">Feedback: </span>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg mt-1">{interview.feedback}</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         {/* Delete Confirmation Dialog */}
