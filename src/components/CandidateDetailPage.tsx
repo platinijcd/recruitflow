@@ -1,16 +1,18 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Edit, Trash2, FileText, Linkedin, Mail, Phone, Star, User, Briefcase, Award, Save, XIcon } from 'lucide-react';
+import { Edit, Trash2, FileText, Linkedin, Mail, Phone, User, Briefcase, Award, Save, ArrowLeft, Star } from 'lucide-react';
 import { useUpdateCandidate } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
 import { useRecruiters } from '@/hooks/useRecruiters';
 import { supabase } from '@/integrations/supabase/client';
 import StatusBadge from './StatusBadge';
+import CircleScore from './CircleScore';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Input } from '@/components/ui/input';
 
 interface CandidateDetailPageProps {
   candidate: any;
@@ -24,13 +26,34 @@ const CandidateDetailPage = ({
   onClose
 }: CandidateDetailPageProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedStatus, setEditedStatus] = useState(candidate?.application_status || 'To Be Reviewed');
-  const [editedPostId, setEditedPostId] = useState(candidate?.post_id || '');
+  const [editedCandidate, setEditedCandidate] = useState({
+    name: candidate?.name || '',
+    email: candidate?.email || '',
+    phone: candidate?.phone || '',
+    linkedin_url: candidate?.linkedin_url || '',
+    desired_position: candidate?.desired_position || '',
+    application_status: candidate?.application_status || 'To Be Reviewed',
+    post_id: candidate?.post_id || ''
+  });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const { mutate: updateCandidate } = useUpdateCandidate();
   const { data: posts = [] } = usePosts();
   const { data: recruiters = [] } = useRecruiters();
+
+  const renderScore = (score?: number) => {
+    if (!score) return null;
+    
+    return (
+      <div className="flex items-center space-x-4">
+        <CircleScore score={score} />
+        <div>
+          <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
+          <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
+        </div>
+      </div>
+    );
+  };
 
   if (!candidate) return null;
 
@@ -42,43 +65,24 @@ const CandidateDetailPage = ({
     return recruiters.find(recruiter => recruiter.id === candidate.interviewer_id);
   };
 
-  const renderStars = (score?: number) => {
-    if (!score) return null;
-    const starRating = (score / 10) * 5;
-    const fullStars = Math.floor(starRating);
-    const hasHalfStar = starRating % 1 >= 0.5;
-    
-    return (
-      <div className="flex items-center space-x-1">
-        {[...Array(5)].map((_, i) => (
-          <Star 
-            key={i} 
-            className={`h-5 w-5 ${
-              i < fullStars ? 'text-yellow-400 fill-current' : 
-              i === fullStars && hasHalfStar ? 'text-yellow-400 fill-current' : 
-              'text-gray-300'
-            }`} 
-          />
-        ))}
-        <span className="text-sm text-gray-600 ml-2">{score}/10</span>
-      </div>
-    );
-  };
-
   const handleSave = () => {
     updateCandidate({
       id: candidate.id,
-      updates: {
-        application_status: editedStatus,
-        post_id: editedPostId
-      }
+      updates: editedCandidate
     });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditedStatus(candidate?.application_status || 'To Be Reviewed');
-    setEditedPostId(candidate?.post_id || '');
+    setEditedCandidate({
+      name: candidate?.name || '',
+      email: candidate?.email || '',
+      phone: candidate?.phone || '',
+      linkedin_url: candidate?.linkedin_url || '',
+      desired_position: candidate?.desired_position || '',
+      application_status: candidate?.application_status || 'To Be Reviewed',
+      post_id: candidate?.post_id || ''
+    });
     setIsEditing(false);
   };
 
@@ -106,273 +110,316 @@ const CandidateDetailPage = ({
     return statusMap[status as keyof typeof statusMap] || status;
   };
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h1 className="text-2xl font-bold text-gray-900">Détails du candidat</h1>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setShowDeleteConfirm(true)} 
-            className="flex items-center space-x-2 text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span>Supprimer</span>
-          </Button>
-        </div>
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
 
-        <div className="p-6 space-y-6">
-          {/* Main Info */}
-          <div className="space-y-4">
-            <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
-            
-            <div className="flex space-x-3">
-              {candidate.cv_link && (
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('fr-FR');
+  };
+
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 pr-16 border-b">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900">Détails du candidat</h1>
+            </div>
+            <div className="flex items-center space-x-3">
+              {isEditing ? (
+                <>
+                  <Button onClick={handleSave} size="sm" className="flex items-center space-x-2">
+                    <Save className="h-4 w-4" />
+                    <span>Sauvegarder</span>
+                  </Button>
+                  <Button variant="outline" onClick={handleCancel} size="sm" className="flex items-center space-x-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    <span>Annuler</span>
+                  </Button>
+                </>
+              ) : (
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
-                  onClick={() => window.open(candidate.cv_link, '_blank')}
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center space-x-2"
                 >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Voir CV
+                  <Edit className="h-4 w-4" />
+                  <span>Modifier</span>
                 </Button>
               )}
-              {candidate.linkedin_url && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => window.open(candidate.linkedin_url, '_blank')}
-                >
-                  <Linkedin className="h-4 w-4 mr-2" />
-                  LinkedIn
-                </Button>
-              )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setShowDeleteConfirm(true)} 
+                className="flex items-center space-x-2 text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Supprimer</span>
+              </Button>
             </div>
           </div>
 
-          {/* Score de pertinence Section */}
-          {(candidate.relevance_score || candidate.score_justification) && (
+          <div className="p-5 space-y-5">
+            {/* Main Info */}
+            <div className="space-y-4">
+              {isEditing ? (
+                <Input
+                  value={editedCandidate.name}
+                  onChange={(e) => setEditedCandidate({...editedCandidate, name: e.target.value})}
+                  className="text-3xl font-bold"
+                  placeholder="Nom du candidat"
+                />
+              ) : (
+                <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
+              )}
+              
+              <div className="flex space-x-3">
+                {candidate.cv_link && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => window.open(candidate.cv_link, '_blank')}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Voir CV
+                  </Button>
+                )}
+                {isEditing ? (
+                  <Input
+                    value={editedCandidate.linkedin_url}
+                    onChange={(e) => setEditedCandidate({...editedCandidate, linkedin_url: e.target.value})}
+                    placeholder="URL LinkedIn"
+                    className="w-64"
+                  />
+                ) : candidate.linkedin_url && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => window.open(candidate.linkedin_url, '_blank')}
+                  >
+                    <Linkedin className="h-4 w-4 mr-2" />
+                    LinkedIn
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Score de pertinence */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Star className="h-5 w-5 text-recruit-blue" />
-                  <span>Score de pertinence</span>
+                <CardTitle className="flex items-center gap-2">
+                  Score de pertinence
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {candidate.relevance_score && (
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Score</h3>
-                    {renderStars(candidate.relevance_score)}
-                  </div>
-                )}
-                
-                {candidate.score_justification && (
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-semibold">Justification du score</h3>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{candidate.score_justification}</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <CircleScore score={candidate.relevance_score} />
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
+                        <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
+                      </div>
+                    </div>
+                    
+                    {candidate.score_justification && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">Justification:</p>
+                        <p className="text-sm bg-gray-50 p-3 rounded-lg">{candidate.score_justification}</p>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
-          )}
 
-          {/* Candidature Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Candidature</span>
-                {!isEditing && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setIsEditing(true)}
-                    className="flex items-center space-x-1"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <span className="font-medium">Poste souhaité: </span>
-                <span>{candidate.desired_position}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium">Poste: </span>
-                {isEditing ? (
-                  <Select value={editedPostId} onValueChange={setEditedPostId}>
-                    <SelectTrigger className="w-64">
-                      <SelectValue placeholder="Sélectionner un poste" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {posts.map(post => (
-                        <SelectItem key={post.id} value={post.id}>
-                          {post.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <span>{getPost()?.title || 'Non spécifié'}</span>
-                )}
-              </div>
-              
-              <div className="flex items-center space-x-3">
-                <span className="font-medium">Statut: </span>
-                {isEditing ? (
-                  <Select value={editedStatus} onValueChange={setEditedStatus}>
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="To Be Reviewed">À réviser</SelectItem>
-                      <SelectItem value="Relevant">Pertinent</SelectItem>
-                      <SelectItem value="Rejectable">À rejeter</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <StatusBadge statut={getStatusBadgeProps(candidate.application_status)} />
-                )}
-              </div>
-
-              {isEditing && (
-                <div className="flex space-x-2 pt-4">
-                  <Button size="sm" onClick={handleSave}>
-                    <Save className="h-4 w-4 mr-1" />
-                    Sauvegarder
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={handleCancel}>
-                    <XIcon className="h-4 w-4 mr-1" />
-                    Annuler
-                  </Button>
+            {/* Candidature Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Candidature</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <span className="font-medium">Poste souhaité: </span>
+                  {isEditing ? (
+                    <Select value={editedCandidate.post_id} onValueChange={(value) => setEditedCandidate({...editedCandidate, post_id: value})}>
+                      <SelectTrigger className="w-64">
+                        <SelectValue placeholder="Sélectionner un poste" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {posts.map(post => (
+                          <SelectItem key={post.id} value={post.id}>
+                            {post.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span>{getPost()?.title || 'Non spécifié'}</span>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+                
+                <div>
+                  <span className="font-medium">Statut: </span>
+                  {isEditing ? (
+                    <Select value={editedCandidate.application_status} onValueChange={(value) => setEditedCandidate({...editedCandidate, application_status: value})}>
+                      <SelectTrigger className="w-64">
+                        <SelectValue placeholder="Sélectionner un statut" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="To Be Reviewed">À réviser</SelectItem>
+                        <SelectItem value="Relevant">Pertinent</SelectItem>
+                        <SelectItem value="Rejectable">À rejeter</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <StatusBadge status={candidate.application_status} />
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Contact Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Mail className="h-5 w-5 text-recruit-blue" />
-                <span>Contact</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Mail className="h-4 w-4 text-gray-500" />
-                <span>{candidate.email}</span>
-              </div>
-              {candidate.phone && (
+            {/* Contact Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Mail className="h-5 w-5 text-recruit-blue" />
+                  <span>Contact</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Mail className="h-4 w-4 text-gray-500" />
+                  {isEditing ? (
+                    <Input
+                      value={editedCandidate.email}
+                      onChange={(e) => setEditedCandidate({...editedCandidate, email: e.target.value})}
+                      placeholder="Email"
+                      className="w-64"
+                    />
+                  ) : (
+                    <span>{candidate.email}</span>
+                  )}
+                </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  <span>{candidate.phone}</span>
+                  {isEditing ? (
+                    <Input
+                      value={editedCandidate.phone}
+                      onChange={(e) => setEditedCandidate({...editedCandidate, phone: e.target.value})}
+                      placeholder="Téléphone"
+                      className="w-64"
+                    />
+                  ) : (
+                    <span>{candidate.phone || 'Non spécifié'}</span>
+                  )}
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Informations Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-recruit-blue" />
-                <span>Informations</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {candidate.profile_summary && (
-                <div>
-                  <h4 className="font-semibold mb-2">Résumé du profil</h4>
-                  <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{candidate.profile_summary}</p>
-                </div>
-              )}
-
-              {candidate.experiences && candidate.experiences.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Expériences</h4>
-                  <div className="space-y-3">
-                    {candidate.experiences.map((exp: any, index: number) => (
-                      <div key={index} className="border-l-4 border-recruit-blue pl-4">
-                        <div className="font-medium">{exp.position}</div>
-                        <div className="text-sm text-gray-600">{exp.company} • {exp.duration}</div>
-                        {exp.missions && <div className="text-sm text-gray-700 mt-1">{exp.missions}</div>}
-                      </div>
-                    ))}
+            {/* Informations Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="h-5 w-5 text-recruit-blue" />
+                  <span>Informations</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {candidate.profile_summary && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Résumé du profil</h4>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{candidate.profile_summary}</p>
                   </div>
-                </div>
-              )}
+                )}
 
-              {candidate.degrees && candidate.degrees.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Diplômes</h4>
-                  <div className="space-y-2">
-                    {candidate.degrees.map((degree: any, index: number) => (
-                      <div key={index} className="border-l-4 border-recruit-green pl-4">
-                        <div className="font-medium">{degree.title}</div>
-                        <div className="text-sm text-gray-600">{degree.institution}</div>
-                        {degree.specialization && <div className="text-sm text-gray-700">{degree.specialization}</div>}
-                      </div>
-                    ))}
+                {candidate.experiences && candidate.experiences.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Expériences</h4>
+                    <div className="space-y-3">
+                      {candidate.experiences.map((exp: any, index: number) => (
+                        <div key={index} className="border-l-4 border-recruit-blue pl-4">
+                          <div className="font-medium">{exp.position}</div>
+                          <div className="text-sm text-gray-600">{exp.company} • {exp.duration}</div>
+                          {exp.missions && <div className="text-sm text-gray-700 mt-1">{exp.missions}</div>}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {candidate.certifications && candidate.certifications.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Certifications</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {candidate.certifications.map((cert: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                        <Award className="h-3 w-3" />
-                        <span>{cert}</span>
-                      </Badge>
-                    ))}
+                {candidate.degrees && candidate.degrees.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Diplômes</h4>
+                    <div className="space-y-2">
+                      {candidate.degrees.map((degree: any, index: number) => (
+                        <div key={index} className="border-l-4 border-recruit-green pl-4">
+                          <div className="font-medium">{degree.title}</div>
+                          <div className="text-sm text-gray-600">{degree.institution}</div>
+                          {degree.specialization && <div className="text-sm text-gray-700">{degree.specialization}</div>}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {candidate.skills && candidate.skills.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Compétences</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {candidate.skills.map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="flex items-center space-x-1">
-                        <Briefcase className="h-3 w-3" />
-                        <span>{skill}</span>
-                      </Badge>
-                    ))}
+                {candidate.certifications && candidate.certifications.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Certifications</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {candidate.certifications.map((cert: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                          <Award className="h-3 w-3" />
+                          <span>{cert}</span>
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                )}
 
-        {/* Delete Confirmation Dialog */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg max-w-md">
-              <h3 className="text-lg font-semibold mb-4">Confirmer la suppression</h3>
-              <p className="mb-6">Êtes-vous sûr de bien vouloir supprimer cette candidature ?</p>
-              <div className="flex space-x-3">
-                <Button onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                  Oui
-                </Button>
-                <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
-                  Annuler
-                </Button>
-              </div>
-            </div>
+                {candidate.skills && candidate.skills.length > 0 && (
+                  <div>
+                    <h4 className="font-semibold mb-2">Compétences</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {candidate.skills.map((skill: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="flex items-center space-x-1">
+                          <Briefcase className="h-3 w-3" />
+                          <span>{skill}</span>
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        )}
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de confirmation de suppression */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Êtes-vous sûr de vouloir supprimer ce candidat ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Toutes les données associées à ce candidat seront définitivement supprimées.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 

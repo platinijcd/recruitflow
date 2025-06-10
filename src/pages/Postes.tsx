@@ -58,8 +58,6 @@ const Postes = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filtres:</span>
               </div>
               
               <div className="relative w-48">
@@ -96,7 +94,7 @@ const Postes = () => {
               onClick={() => setIsAddFormOpen(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Créer un poste
+              Créer
             </Button>
           </div>
         </CardContent>

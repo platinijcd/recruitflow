@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,8 @@ import Candidatures from "./pages/Candidatures";
 import Postes from "./pages/Postes";
 import Recherche from "./pages/Recherche";
 import Recruteurs from "./pages/Recruteurs";
+import Interviews from "./pages/Interviews";
+import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -38,8 +39,10 @@ const App = () => (
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/candidatures" element={<Candidatures />} />
                         <Route path="/postes" element={<Postes />} />
-                        <Route path="/recherche" element={<Recherche />} />
+                        <Route path="/entretiens" element={<Interviews />} />
                         <Route path="/recruteurs" element={<Recruteurs />} />
+                        <Route path="/recherche" element={<Recherche />} />
+                        <Route path="/chat" element={<Chat />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,7 +54,8 @@ const Recherche = () => {
         {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
           }
         }
       );
@@ -66,17 +66,18 @@ const Recherche = () => {
 
       const data: SearchResponse[] = await response.json();
       
-      if (data[0]?.success && data[0]?.data?.items) {
+      if (data && data[0]?.success && Array.isArray(data[0]?.data?.items)) {
         setSearchResults(data[0].data.items);
-        toast.success(`${data[0].data.items.length} profils trouvés`);
+        toast.success(`${data[0].data.items.length} profils trouvés sur ${data[0].data.total.toLocaleString()} résultats totaux`);
       } else {
+        console.log('Réponse reçue mais format incorrect:', data);
         setSearchResults([]);
-        toast.error(data[0]?.message || 'Aucun résultat trouvé');
+        toast.error('Format de réponse incorrect');
       }
-    } catch (error) {
-      console.error('Erreur lors de la recherche:', error);
-      toast.error('Erreur lors de la recherche. Veuillez réessayer.');
+    } catch (jsonError) {
+      console.error('Erreur lors du parsing de la réponse:', jsonError);
       setSearchResults([]);
+      toast.error('Erreur lors de la lecture des résultats');
     } finally {
       setIsSearching(false);
     }
@@ -175,10 +176,6 @@ const Recherche = () => {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Résultats de recherche ({searchResults.length})</span>
-              <Badge variant="outline" className="flex items-center space-x-1">
-                <Linkedin className="h-4 w-4" />
-                <span>LinkedIn</span>
-              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -215,15 +212,6 @@ const Recherche = () => {
                       >
                         <ExternalLink className="h-4 w-4 mr-1" />
                         LinkedIn
-                      </Button>
-                      
-                      <Button 
-                        size="sm"
-                        onClick={() => handleAddToDatabase(profile)}
-                        className="bg-recruit-green hover:bg-recruit-green/90"
-                      >
-                        <UserPlus className="h-4 w-4 mr-1" />
-                        Ajouter
                       </Button>
                     </div>
                   </div>

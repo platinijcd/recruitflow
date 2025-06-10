@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,11 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { X, Briefcase, Calendar, MapPin, Building, Search, Edit, Trash2, Save, XIcon } from 'lucide-react';
+import { Edit, Trash2, User, Calendar, MapPin, Building, Search, Briefcase, Save, ArrowLeft } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { useUpdatePost, useDeletePost } from '@/hooks/usePosts';
 import { supabase } from '@/integrations/supabase/client';
-import CandidatureCard from './CandidatureCard';
+import CandidatureCard from '@/components/CandidatureCard';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface PostDetailPageProps {
   post: any;
@@ -27,7 +28,8 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
     description: post?.description || '',
     location: post?.location || '',
     enterprise: post?.enterprise || '',
-    department: post?.department || ''
+    department: post?.department || '',
+    post_status: post?.post_status || 'Open'
   });
 
   const { data: candidates = [] } = useCandidates();
@@ -46,10 +48,19 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
       case 'Open':
         return 'bg-recruit-green text-white';
       case 'Close':
-        return 'bg-recruit-red text-white';
+        return 'bg-red-500 text-white';
       default:
         return 'bg-gray-500 text-white';
     }
+  };
+
+  const toggleStatus = () => {
+    const newStatus = editedPost.post_status === 'Open' ? 'Close' : 'Open';
+    setEditedPost(prev => ({ ...prev, post_status: newStatus }));
+    updatePost({
+      id: post.id,
+      updates: { post_status: newStatus }
+    });
   };
 
   const handleSave = () => {
@@ -66,7 +77,8 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
       description: post?.description || '',
       location: post?.location || '',
       enterprise: post?.enterprise || '',
-      department: post?.department || ''
+      department: post?.department || '',
+      post_status: post?.post_status || 'Open'
     });
     setIsEditing(false);
   };
@@ -79,14 +91,27 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h1 className="text-2xl font-bold text-gray-900">Détails du poste</h1>
-          <div className="flex space-x-2">
-            {!isEditing && (
+        <div className="flex items-center justify-between p-6 pr-16 border-b">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-2xl font-bold text-gray-900">Détails du poste</h1>
+          </div>
+          <div className="flex items-center space-x-3">
+            {isEditing ? (
+              <>
+                <Button onClick={handleSave} size="sm" className="flex items-center space-x-2">
+                  <Save className="h-4 w-4" />
+                  <span>Sauvegarder</span>
+                </Button>
+                <Button variant="outline" onClick={handleCancel} size="sm" className="flex items-center space-x-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  <span>Annuler</span>
+                </Button>
+              </>
+            ) : (
               <Button 
-                variant="outline" 
+                variant="ghost" 
                 size="sm" 
                 onClick={() => setIsEditing(true)}
                 className="flex items-center space-x-2"
@@ -98,7 +123,7 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => setShowDeleteConfirm(true)}
+              onClick={() => setShowDeleteConfirm(true)} 
               className="flex items-center space-x-2 text-red-600 hover:text-red-700"
             >
               <Trash2 className="h-4 w-4" />
@@ -107,8 +132,8 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
           </div>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Post Info */}
+        <div className="p-5 space-y-5">
+          {/* Post Info Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -118,117 +143,105 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                {isEditing ? (
-                  <Input
-                    value={editedPost.title}
-                    onChange={(e) => setEditedPost({...editedPost, title: e.target.value})}
-                    placeholder="Titre du poste"
-                    className="text-2xl font-bold"
-                  />
-                ) : (
-                  <h2 className="text-2xl font-bold text-gray-900">{post.title}</h2>
-                )}
-              </div>
-              
-              {(post.description || isEditing) && (
-                <div>
-                  <span className="font-medium">Description: </span>
+                <h2 className="text-2xl font-semibold text-gray-900">
                   {isEditing ? (
-                    <Textarea
-                      value={editedPost.description}
-                      onChange={(e) => setEditedPost({...editedPost, description: e.target.value})}
-                      placeholder="Description du poste"
-                      className="mt-1"
-                      rows={4}
+                    <Input
+                      value={editedPost.title}
+                      onChange={(e) => setEditedPost({...editedPost, title: e.target.value})}
+                      placeholder="Titre du poste"
                     />
                   ) : (
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg mt-1">{post.description}</p>
+                    post.title
+                  )}
+                </h2>
+                <div className="flex items-center space-x-2 mt-2">
+                  <Badge 
+                    className={`${getStatusColor(editedPost.post_status)} cursor-pointer`}
+                    onClick={toggleStatus}
+                  >
+                    {editedPost.post_status === 'Open' ? 'Ouvert' : 'Fermé'}
+                  </Badge>
+                  {!isEditing && (
+                    <span className="text-xs text-gray-500">(Cliquer pour changer le statut)</span>
                   )}
                 </div>
-              )}
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <span className="font-medium text-sm">Date de création</span>
-                    <p className="text-sm text-gray-600">
-                      {post.created_at ? new Date(post.created_at).toLocaleDateString('fr-FR') : 'N/A'}
-                    </p>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-medium text-sm text-gray-700 mb-2 block">
+                    <Building className="h-4 w-4 inline mr-2" />
+                    Entreprise
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      value={editedPost.enterprise}
+                      onChange={(e) => setEditedPost({...editedPost, enterprise: e.target.value})}
+                      placeholder="Nom de l'entreprise"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{post.enterprise || 'Non spécifié'}</p>
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <span className="font-medium text-sm">Lieu</span>
-                    {isEditing ? (
-                      <Input
-                        value={editedPost.location}
-                        onChange={(e) => setEditedPost({...editedPost, location: e.target.value})}
-                        placeholder="Lieu"
-                        className="text-sm mt-1"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-600">{post.location || 'Non spécifié'}</p>
-                    )}
-                  </div>
+                <div>
+                  <label className="font-medium text-sm text-gray-700 mb-2 block">
+                    <MapPin className="h-4 w-4 inline mr-2" />
+                    Localisation
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      value={editedPost.location}
+                      onChange={(e) => setEditedPost({...editedPost, location: e.target.value})}
+                      placeholder="Localisation"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{post.location || 'Non spécifié'}</p>
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Building className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <span className="font-medium text-sm">Entreprise</span>
-                    {isEditing ? (
-                      <Input
-                        value={editedPost.enterprise}
-                        onChange={(e) => setEditedPost({...editedPost, enterprise: e.target.value})}
-                        placeholder="Entreprise"
-                        className="text-sm mt-1"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-600">{post.enterprise || 'Non spécifié'}</p>
-                    )}
-                  </div>
+                <div>
+                  <label className="font-medium text-sm text-gray-700 mb-2 block">
+                    <Briefcase className="h-4 w-4 inline mr-2" />
+                    Département
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      value={editedPost.department}
+                      onChange={(e) => setEditedPost({...editedPost, department: e.target.value})}
+                      placeholder="Département"
+                    />
+                  ) : (
+                    <p className="text-gray-900">{post.department || 'Non spécifié'}</p>
+                  )}
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Briefcase className="h-4 w-4 text-gray-500" />
-                  <div>
-                    <span className="font-medium text-sm">Département</span>
-                    {isEditing ? (
-                      <Input
-                        value={editedPost.department}
-                        onChange={(e) => setEditedPost({...editedPost, department: e.target.value})}
-                        placeholder="Département"
-                        className="text-sm mt-1"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-600">{post.department || 'Non spécifié'}</p>
-                    )}
-                  </div>
+                <div>
+                  <label className="font-medium text-sm text-gray-700 mb-2 block">
+                    <Calendar className="h-4 w-4 inline mr-2" />
+                    Date de création
+                  </label>
+                  <p className="text-gray-900">
+                    {post.created_at ? format(new Date(post.created_at), 'PPP', { locale: fr }) : 'Non spécifié'}
+                  </p>
                 </div>
               </div>
 
               <div>
-                <span className="font-medium">Statut: </span>
-                <Badge className={getStatusColor(post.post_status)}>
-                  {post.post_status === 'Open' ? 'Ouvert' : 'Fermé'}
-                </Badge>
+                <label className="font-medium text-sm text-gray-700 mb-2 block">Description</label>
+                {isEditing ? (
+                  <Textarea
+                    value={editedPost.description}
+                    onChange={(e) => setEditedPost({...editedPost, description: e.target.value})}
+                    placeholder="Description du poste"
+                    rows={6}
+                  />
+                ) : (
+                  <div className="bg-gray-50 p-3 rounded-lg whitespace-pre-wrap">
+                    {post.description || 'Aucune description disponible'}
+                  </div>
+                )}
               </div>
-
-              {isEditing && (
-                <div className="flex space-x-2 pt-4">
-                  <Button onClick={handleSave}>
-                    <Save className="h-4 w-4 mr-2" />
-                    Sauvegarder
-                  </Button>
-                  <Button variant="outline" onClick={handleCancel}>
-                    <XIcon className="h-4 w-4 mr-2" />
-                    Annuler
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
 
@@ -261,8 +274,8 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
                         telephone: candidate.phone || '',
                         lien_linkedin: candidate.linkedin_url || undefined,
                         poste_souhaite: candidate.desired_position || '',
-                        statut: candidate.application_status === 'To Be Reviewed' ? 'A évaluer' : 
-                               candidate.application_status === 'Relevant' ? 'Pertinent' : 'Rejeté',
+                        titre_poste: candidate.post?.title,
+                        statut: candidate.application_status,
                         date_reception: candidate.application_date || '',
                         note: candidate.relevance_score || undefined,
                         commentaire_evaluateur: candidate.score_justification || undefined,

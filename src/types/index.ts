@@ -1,13 +1,17 @@
+import type { Database } from '@/integrations/supabase/types';
+
+export type ApplicationStatus = Database['public']['Enums']['application_status'];
 
 export interface Candidature {
   id: string;
   nom: string;
   email: string;
-  telephone: string;
+  telephone?: string;
   lien_linkedin?: string;
-  poste_souhaite: string;
-  statut: 'A évaluer' | 'Pertinent' | 'Rejeté' | 'Entretien programmé';
-  date_reception: string;
+  poste_souhaite?: string;
+  titre_poste?: string;
+  statut: ApplicationStatus;
+  date_reception?: string;
   note?: number;
   commentaire_evaluateur?: string;
   competences?: string[];
@@ -53,7 +57,7 @@ export interface CandidateDB {
   phone?: string;
   linkedin_url?: string;
   desired_position?: string;
-  application_status: 'To Be Reviewed' | 'Relevant' | 'Rejectable';
+  application_status: ApplicationStatus;
   application_date?: string;
   relevance_score?: number;
   score_justification?: string;

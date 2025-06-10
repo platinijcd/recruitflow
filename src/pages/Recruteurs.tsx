@@ -84,8 +84,6 @@ const Recruteurs = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Rechercher:</span>
               </div>
               <div className="relative w-48">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -103,7 +101,7 @@ const Recruteurs = () => {
               onClick={() => setIsAddFormOpen(true)}
             >
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter un recruteur
+              Ajouter
             </Button>
           </div>
         </CardContent>

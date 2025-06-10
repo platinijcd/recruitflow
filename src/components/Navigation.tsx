@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Briefcase, Search, User, BarChart3 } from 'lucide-react';
+import { Users, Briefcase, Search, User, BarChart3, Calendar, MessageSquare } from 'lucide-react';
+
 const Navigation = () => {
   const location = useLocation();
   const navItems = [{
@@ -15,13 +16,24 @@ const Navigation = () => {
     label: 'Postes',
     icon: Briefcase
   }, {
-    path: '/recherche',
-    label: 'Recherche',
-    icon: Search
-  }, {
+    path: '/entretiens',
+    label: 'Entretiens',
+    icon: Calendar
+  }, 
+  {
     path: '/recruteurs',
     label: 'Recruteurs',
     icon: User
+  },
+  {
+    path: '/recherche',
+    label: 'Recherche',
+    icon: Search
+  },
+  {
+    path: '/chat',
+    label: 'Chat',
+    icon: MessageSquare
   }];
   return <nav className="w-64 bg-white shadow-sm min-h-screen">
       <div className="p-6">

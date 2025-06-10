@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Edit, User, Calendar, MapPin, Briefcase } from 'lucide-react';
+import { Edit, User, Calendar, MapPin, Briefcase, ArrowLeft } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import type { Database } from '@/integrations/supabase/types';
 
 interface InterviewDetailPageProps {
   interview: any;
@@ -22,7 +22,7 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
     scheduled_at: interview?.scheduled_at || '',
     location: interview?.location || '',
     feedback: interview?.feedback || '',
-    interviews_status: interview?.interviews_status || 'Scheduled'
+    interview_status: interview?.interview_status || 'Scheduled'
   });
 
   if (!interview) return null;
@@ -31,18 +31,20 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: Database['public']['Enums']['interviews_status']) => {
     switch (status) {
       case 'Scheduled': return 'bg-recruit-blue text-white';
-      case 'Done': return 'bg-recruit-green text-white';
+      case 'Retained': return 'bg-recruit-green text-white';
+      case 'Rejected': return 'bg-red-500 text-white';
       default: return 'bg-gray-500 text-white';
     }
   };
 
-  const getStatusLabel = (status: string) => {
+  const getStatusLabel = (status: Database['public']['Enums']['interviews_status']) => {
     switch (status) {
       case 'Scheduled': return 'Programmé';
-      case 'Done': return 'Terminé';
+      case 'Retained': return 'Retenu';
+      case 'Rejected': return 'Rejeté';
       default: return status;
     }
   };
@@ -53,35 +55,40 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
     setIsEditing(false);
   };
 
-  const canEdit = interview.interviews_status === 'Scheduled';
+  const canEdit = interview.interview_status === 'Scheduled';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-        {/* Header */}
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0" hideCloseButton>
         <div className="flex items-center justify-between p-6 border-b">
-          <h1 className="text-2xl font-bold text-gray-900">Fiche d'entretien</h1>
-          <div className="flex items-center space-x-3">
-            {canEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsEditing(!isEditing)}
-                className="flex items-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>Modifier</span>
-              </Button>
-            )}
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-5 w-5" />
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={onClose}
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Retour</span>
             </Button>
+            <h2 className="text-2xl font-bold">Détails de l'entretien</h2>
           </div>
+          {canEdit && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setIsEditing(!isEditing)}
+              className="flex items-center space-x-2"
+            >
+              <Edit className="h-4 w-4" />
+              <span>Modifier</span>
+            </Button>
+          )}
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-5 space-y-5">
           {/* Candidate and Recruiter Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Candidate Card */}
             <Card>
               <CardHeader>
@@ -109,14 +116,14 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <User className="h-5 w-5 text-recruit-green" />
+                  <User className="h-5 w-5 text-recruit-blue" />
                   <span>Recruteur</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-12 w-12">
-                    <AvatarFallback className="bg-recruit-green text-white">
+                    <AvatarFallback className="bg-recruit-blue text-white">
                       {getInitials(interview.recruiters?.name || '')}
                     </AvatarFallback>
                   </Avatar>
@@ -147,18 +154,19 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
                 <div>
                   <label className="font-medium text-sm text-gray-700 mb-2 block">Statut</label>
                   {isEditing ? (
-                    <Select value={editData.interviews_status} onValueChange={(value) => setEditData({...editData, interviews_status: value})}>
+                    <Select value={editData.interview_status} onValueChange={(value) => setEditData({...editData, interview_status: value})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Scheduled">Programmé</SelectItem>
-                        <SelectItem value="Done">Terminé</SelectItem>
+                        <SelectItem value="Retained">Retenu</SelectItem>
+                        <SelectItem value="Rejected">Rejeté</SelectItem>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <Badge className={getStatusColor(interview.interviews_status)}>
-                      {getStatusLabel(interview.interviews_status)}
+                    <Badge className={getStatusColor(interview.interview_status)}>
+                      {getStatusLabel(interview.interview_status)}
                     </Badge>
                   )}
                 </div>
@@ -166,19 +174,16 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
                 <div>
                   <label className="font-medium text-sm text-gray-700 mb-2 block">
                     <Calendar className="h-4 w-4 inline mr-2" />
-                    Date de l'entretien
+                    Date et heure
                   </label>
                   {isEditing ? (
                     <Input
                       type="datetime-local"
-                      value={editData.scheduled_at ? new Date(editData.scheduled_at).toISOString().slice(0, 16) : ''}
+                      value={editData.scheduled_at}
                       onChange={(e) => setEditData({...editData, scheduled_at: e.target.value})}
                     />
                   ) : (
-                    <p className="text-gray-900">
-                      {new Date(interview.scheduled_at).toLocaleDateString('fr-FR')} à{' '}
-                      {new Date(interview.scheduled_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
-                    </p>
+                    <p className="text-gray-900">{interview.scheduled_at}</p>
                   )}
                 </div>
 
@@ -194,7 +199,7 @@ const InterviewDetailPage = ({ interview, isOpen, onClose }: InterviewDetailPage
                       placeholder="Lieu de l'entretien"
                     />
                   ) : (
-                    <p className="text-gray-900">{interview.location || 'Non spécifié'}</p>
+                    <p className="text-gray-900">{interview.location || 'À définir'}</p>
                   )}
                 </div>
               </div>

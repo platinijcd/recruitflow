@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
@@ -11,7 +10,13 @@ export const useCandidates = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('candidates')
-        .select('*')
+        .select(`
+          *,
+          post:posts(
+            id,
+            title
+          )
+        `)
         .order('application_date', { ascending: false });
       
       if (error) throw error;
@@ -26,7 +31,13 @@ export const useCandidate = (id: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('candidates')
-        .select('*')
+        .select(`
+          *,
+          post:posts(
+            id,
+            title
+          )
+        `)
         .eq('id', id)
         .single();
       

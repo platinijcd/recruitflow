@@ -1,62 +1,59 @@
-
 import { Badge } from '@/components/ui/badge';
-import { Clock, CheckCircle, XCircle, Calendar } from 'lucide-react';
-import type { Candidature } from '@/types';
+import type { Database } from '@/integrations/supabase/types';
+
+type ApplicationStatus = Database['public']['Enums']['application_status'];
+type InterviewStatus = Database['public']['Enums']['interviews_status'];
 
 interface StatusBadgeProps {
-  statut: Candidature['statut'];
-  size?: 'sm' | 'md' | 'lg';
+  status: ApplicationStatus | InterviewStatus;
 }
 
-const StatusBadge = ({ statut, size = 'md' }: StatusBadgeProps) => {
-  const getStatusConfig = (status: Candidature['statut']) => {
+const StatusBadge = ({ status }: StatusBadgeProps) => {
+  const getStatusColor = (status: ApplicationStatus | InterviewStatus) => {
     switch (status) {
-      case 'A évaluer':
-        return {
-          color: 'bg-recruit-orange text-white',
-          icon: Clock,
-          label: 'À évaluer'
-        };
-      case 'Pertinent':
-        return {
-          color: 'bg-recruit-green text-white',
-          icon: CheckCircle,
-          label: 'Pertinent'
-        };
-      case 'Rejeté':
-        return {
-          color: 'bg-recruit-red text-white',
-          icon: XCircle,
-          label: 'Rejeté'
-        };
-      case 'Entretien programmé':
-        return {
-          color: 'bg-recruit-blue text-white',
-          icon: Calendar,
-          label: 'Entretien programmé'
-        };
+      // Interview statuses
+      case 'Scheduled':
+        return 'bg-recruit-blue text-white';
+      case 'Retained':
+        return 'bg-recruit-green text-white';
+      case 'Rejected':
+        return 'bg-red-500 text-white';
+      // Application statuses
+      case 'To Be Reviewed':
+        return 'bg-recruit-blue text-white';
+      case 'Relevant':
+        return 'bg-recruit-green text-white';
+      case 'Rejectable':
+        return 'bg-red-500 text-white';
       default:
-        return {
-          color: 'bg-gray-500 text-white',
-          icon: Clock,
-          label: status
-        };
+        return 'bg-gray-500 text-white';
     }
   };
 
-  const config = getStatusConfig(statut);
-  const Icon = config.icon;
-  
-  const sizeClasses = {
-    sm: 'px-2 py-1 text-xs',
-    md: 'px-3 py-1 text-sm',
-    lg: 'px-4 py-2 text-base'
+  const getStatusLabel = (status: ApplicationStatus | InterviewStatus) => {
+    switch (status) {
+      // Interview statuses
+      case 'Scheduled':
+        return 'Programmé';
+      case 'Retained':
+        return 'Retenu';
+      case 'Rejected':
+        return 'Rejeté';
+      // Application statuses
+      case 'To Be Reviewed':
+        return 'À réviser';
+      case 'Relevant':
+        return 'Pertinent';
+      case 'Rejectable':
+        return 'À rejeter';
+      default:
+        return status;
+    }
   };
 
   return (
-    <Badge className={`${config.color} ${sizeClasses[size]} flex items-center space-x-1 font-medium`}>
-      <Icon className="h-3 w-3" />
-      <span>{config.label}</span>
+    <Badge className={getStatusColor(status)}>
+      {getStatusLabel(status)}
     </Badge>
   );
 };
