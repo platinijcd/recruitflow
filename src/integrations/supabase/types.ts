@@ -95,26 +95,27 @@ export type Database = {
       }
       chat_messages: {
         Row: {
-          id: string
-          created_at: string
-          user_email: string
-          role: string
           content: string
+          created_at: string
+          id: string
+          role: string
+          user_email: string
         }
         Insert: {
-          id?: string
-          created_at?: string
-          user_email: string
-          role: string
           content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_email: string
         }
         Update: {
-          id?: string
-          created_at?: string
-          user_email?: string
-          role?: string
           content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_email?: string
         }
+        Relationships: []
       }
       documents: {
         Row: {

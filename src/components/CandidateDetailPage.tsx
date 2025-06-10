@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,19 +27,34 @@ const CandidateDetailPage = ({
 }: CandidateDetailPageProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCandidate, setEditedCandidate] = useState({
-    name: candidate?.name || '',
-    email: candidate?.email || '',
-    phone: candidate?.phone || '',
-    linkedin_url: candidate?.linkedin_url || '',
-    desired_position: candidate?.desired_position || '',
-    application_status: candidate?.application_status || 'To Be Reviewed',
-    post_id: candidate?.post_id || ''
+    name: '',
+    email: '',
+    phone: '',
+    linkedin_url: '',
+    desired_position: '',
+    application_status: 'To Be Reviewed',
+    post_id: ''
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const { mutate: updateCandidate } = useUpdateCandidate();
   const { data: posts = [] } = usePosts();
   const { data: recruiters = [] } = useRecruiters();
+
+  // Update editedCandidate when candidate prop changes
+  useEffect(() => {
+    if (candidate) {
+      setEditedCandidate({
+        name: candidate.name || '',
+        email: candidate.email || '',
+        phone: candidate.phone || '',
+        linkedin_url: candidate.linkedin_url || '',
+        desired_position: candidate.desired_position || '',
+        application_status: candidate.application_status || 'To Be Reviewed',
+        post_id: candidate.post_id || ''
+      });
+    }
+  }, [candidate]);
 
   const renderScore = (score?: number) => {
     if (!score) return null;
@@ -74,14 +89,15 @@ const CandidateDetailPage = ({
   };
 
   const handleCancel = () => {
+    // Reset to original values
     setEditedCandidate({
-      name: candidate?.name || '',
-      email: candidate?.email || '',
-      phone: candidate?.phone || '',
-      linkedin_url: candidate?.linkedin_url || '',
-      desired_position: candidate?.desired_position || '',
-      application_status: candidate?.application_status || 'To Be Reviewed',
-      post_id: candidate?.post_id || ''
+      name: candidate.name || '',
+      email: candidate.email || '',
+      phone: candidate.phone || '',
+      linkedin_url: candidate.linkedin_url || '',
+      desired_position: candidate.desired_position || '',
+      application_status: candidate.application_status || 'To Be Reviewed',
+      post_id: candidate.post_id || ''
     });
     setIsEditing(false);
   };
@@ -237,7 +253,7 @@ const CandidateDetailPage = ({
               </CardContent>
             </Card>
 
-            {/* Candidature Section */}
+            {/* Candidature Section - EDITABLE */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -285,7 +301,7 @@ const CandidateDetailPage = ({
               </CardContent>
             </Card>
 
-            {/* Contact Section */}
+            {/* Contact Section - READ ONLY */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -296,34 +312,16 @@ const CandidateDetailPage = ({
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Mail className="h-4 w-4 text-gray-500" />
-                  {isEditing ? (
-                    <Input
-                      value={editedCandidate.email}
-                      onChange={(e) => setEditedCandidate({...editedCandidate, email: e.target.value})}
-                      placeholder="Email"
-                      className="w-64"
-                    />
-                  ) : (
-                    <span>{candidate.email}</span>
-                  )}
+                  <span>{candidate.email}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  {isEditing ? (
-                    <Input
-                      value={editedCandidate.phone}
-                      onChange={(e) => setEditedCandidate({...editedCandidate, phone: e.target.value})}
-                      placeholder="Téléphone"
-                      className="w-64"
-                    />
-                  ) : (
-                    <span>{candidate.phone || 'Non spécifié'}</span>
-                  )}
+                  <span>{candidate.phone || 'Non spécifié'}</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Informations Section */}
+            {/* Informations Section - READ ONLY */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
