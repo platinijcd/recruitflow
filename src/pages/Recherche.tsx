@@ -7,6 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Search, Linkedin, UserPlus, ExternalLink, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 
 interface LinkedInProfile {
   fullName: string;
@@ -28,6 +30,7 @@ interface SearchResponse {
 }
 
 const Recherche = () => {
+  const { user } = useAuth();
   const [isSearching, setIsSearching] = useState(false);
   const [searchCriteria, setSearchCriteria] = useState({
     keywords: '',
@@ -35,6 +38,8 @@ const Recherche = () => {
   });
   
   const [searchResults, setSearchResults] = useState<LinkedInProfile[]>([]);
+  const { settings } = useAppSettings();
+  const linkedinScraperWebhook = settings.find(s => s.setting_key === 'linkedin_scraper_webhook')?.setting_value;
 
   const handleSearch = async () => {
     if (!searchCriteria.keywords && !searchCriteria.location) {
@@ -42,42 +47,74 @@ const Recherche = () => {
       return;
     }
 
+    if (!linkedinScraperWebhook) {
+      toast.error('LinkedIn scraper webhook URL not configured');
+      return;
+    }
+
     setIsSearching(true);
+    console.log('Starting LinkedIn search with webhook:', linkedinScraperWebhook);
     
     try {
       const params = new URLSearchParams();
       if (searchCriteria.keywords) params.append('keyword', searchCriteria.keywords);
       if (searchCriteria.location) params.append('location', searchCriteria.location);
 
-      const response = await fetch(
-        `https://polite-wrongly-phoenix.ngrok-free.app/webhook/114f1a40-b072-4038-9775-837b26ed1042?${params.toString()}`,
-        {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'ngrok-skip-browser-warning': 'true'
-          }
+      const url = `${linkedinScraperWebhook}?${params.toString()}`;
+      console.log('Full request URL:', url);
+      console.log('Request parameters:', Object.fromEntries(params.entries()));
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         }
-      );
+      }).catch(error => {
+        console.error('Network error during fetch:', error);
+        throw new Error(`Network error: ${error.message}`);
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+        const errorText = await response.text().catch(() => 'No error text available');
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP Error ${response.status}: ${errorText}`);
       }
 
-      const data: SearchResponse[] = await response.json();
-      
-      if (data && data[0]?.success && Array.isArray(data[0]?.data?.items)) {
+      let responseText;
+      try {
+        responseText = await response.text();
+        console.log('Raw response text:', responseText);
+      } catch (error) {
+        console.error('Error reading response text:', error);
+        throw new Error('Failed to read response text');
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('Parsed response data:', data);
+      } catch (error) {
+        console.error('JSON parse error:', error);
+        console.error('Invalid JSON text:', responseText);
+        throw new Error('Invalid JSON response');
+      }
+
+      if (Array.isArray(data) && data[0]?.success && Array.isArray(data[0]?.data?.items)) {
         setSearchResults(data[0].data.items);
         toast.success(`${data[0].data.items.length} profils trouvés sur ${data[0].data.total.toLocaleString()} résultats totaux`);
       } else {
-        console.log('Réponse reçue mais format incorrect:', data);
-        setSearchResults([]);
-        toast.error('Format de réponse incorrect');
+        console.error('Unexpected response format:', data);
+        throw new Error('Unexpected response format');
       }
-    } catch (jsonError) {
-      console.error('Erreur lors du parsing de la réponse:', jsonError);
+    } catch (error) {
+      console.error('Search error:', error);
       setSearchResults([]);
-      toast.error('Erreur lors de la lecture des résultats');
+      toast.error(`Erreur lors de la recherche: ${error.message}`);
     } finally {
       setIsSearching(false);
     }
