@@ -1,6 +1,7 @@
 # RecruitFlow  
 **React · TypeScript · Supabase · Tailwind CSS**
 
+![Slide 16_9 - 1](https://github.com/user-attachments/assets/583616d7-27fe-4f54-b88f-d7d04426f564)
 RecruitFlow is a comprehensive recruitment management platform built with React, TypeScript, and Supabase. It offers an all-in-one solution to manage applications, job posts, interviews, and the recruitment team, with advanced AI features and LinkedIn integration.
 
 ---
