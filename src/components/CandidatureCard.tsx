@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import StatusBadge from './StatusBadge';
+import CircleScore from './CircleScore';
 import { Eye, Mail, Phone } from 'lucide-react';
 import type { Candidature } from '@/types';
 import type { Database } from '@/integrations/supabase/types';
@@ -38,7 +39,12 @@ const CandidatureCard = ({ candidature, onViewDetails }: CandidatureCardProps) =
               </div>
             </div>
           </div>
-          <StatusBadge status={candidature.statut as Database['public']['Enums']['application_status']} />
+          <div className="flex items-center space-x-3">
+            {candidature.note !== undefined && (
+              <CircleScore score={candidature.note} size={35} />
+            )}
+            <StatusBadge status={candidature.statut as Database['public']['Enums']['application_status']} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>

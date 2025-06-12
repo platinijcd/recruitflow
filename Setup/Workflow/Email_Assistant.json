@@ -1,0 +1,1433 @@
+{
+  "name": "Hr Assistant Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        80
+      ],
+      "id": "ac4a9ba1-b678-435c-affe-7c3c4bd6d20c",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mEdJ8LAZCcg4rbbQ",
+          "name": "Gmail Clarium Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.subject }}\n{{ $json.text }}\n{{ $json.chatInput }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Postulation",
+              "description": "=Le texte contiens une intention de dépot de candidature ou de postuler."
+            },
+            {
+              "category": "Non Posutlation",
+              "description": "=Le texte ne contiens pas une intention de depot de candidature ou de postuler."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=Tu es un agent d'analyse de texte chargé de déterminer si le contenu fourni correspond à une **postulation à une offre d’emploi**.\n\nTa tâche est simple : analyser le texte dans son ensemble, repérer des **indicateurs explicites** ou **formulations courantes** liées à une démarche de candidature, puis classer le texte dans l'une des deux catégories suivantes :\n\n---\n\n### 1. Postulation\nLe texte est une postulation **si au moins une de ces conditions est remplie** :\n- Il contient des phrases telles que :\n  - \"Je souhaite postuler\"\n  - \"Je vous adresse ma candidature\"\n  - \"Veuillez trouver mon CV\"\n  - \"Je me permets de candidater\"\n  - \"Je postule pour le poste de...\"\n  - \"Je suis intéressé(e) par le poste de...\"\n  - \"En réponse à votre offre d’emploi\"\n- Il contient un **ton formel**, **adressé à un recruteur** ou à une entreprise.\n- Il mentionne des éléments typiques d’une candidature :\n  - Le **poste visé**\n  - Le **CV** ou la **lettre de motivation**\n  - Des **compétences ou expériences professionnelles**\n  - Une **motivation ou disponibilité**\n\n---\n\n### 2. Non-postulation\nLe texte **n’est pas une postulation** s’il s’agit :\n- D’une simple demande d’informations\n- D’un message sans intention claire de postuler\n- D’un échange informel ou sans rapport avec un emploi\n- D’un contenu promotionnel, personnel, ou général\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        100
+      ],
+      "id": "49d18b1e-eeed-4e0b-a4b6-d2ae9865868f",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        340,
+        200
+      ],
+      "id": "fb55e145-a2b3-4930-97e7-51be581f4d16",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f33fdcc7-8cbd-4407-a99a-6f43b2296be2",
+                    "leftValue": "attachment_0",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        340,
+        0
+      ],
+      "id": "708e3c7a-d136-4622-8b98-c9a2f2a4bd08",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        0
+      ],
+      "id": "27a9429c-8ba6-41b3-aa5b-f74f9cf83f80",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=attachment_0",
+        "name": "={{ $('Gmail Trigger').item.json.from.value[0].address }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1GK5a8OICla88RVVsVhGzDv1OwVGq9qeF",
+          "mode": "list",
+          "cachedResultName": "profils",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1GK5a8OICla88RVVsVhGzDv1OwVGq9qeF"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        600,
+        0
+      ],
+      "id": "cb1abf2c-7eb8-478f-bdf0-29ba4617cb7e",
+      "name": "upload",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SPKZyUCSiEsFSidd",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "4dcb0391-819b-49b4-b99c-e6456788ac05",
+      "name": "share",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SPKZyUCSiEsFSidd",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Email object: {{ $('Gmail Trigger').item.json.subject }}\n\nCurriculum: \n{{ $('Extract from File').item.json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"name\": \"Jean Dupont\",\n  \"phone_number\": \"+33 6 12 34 56 78\",\n  \"email\": \"jean.dupont@email.com\",\n  \"profile_summary\": \"Software developer with 5 years of experience in backend development in Java environments. Trained in computer science with AWS and Scrum certifications, he has    worked on complex projects using Agile methodology for major tech companies.\",\n  \"desired_position\": \"Java Backend Developer\",\n  \"education\": [\n    {\n      \"title\": \"Master in Computer Science\",\n      \"specialization\": \"Software Development\",\n      \"institution\": \"University of Paris\"\n    },\n    {\n      \"title\": \"Bachelor in Mathematics\",\n      \"specialization\": \"Computer Science\",\n      \"institution\": \"University of Lyon\"\n    }\n  ],\n  \"skills\": [\n    \"Java\",\n    \"Spring Boot\",\n    \"Docker\",\n    \"Git\",\n    \"Agile Methods\"\n  ],\n  \"languages\":[\n    \"english\",\n    \"french\"\n  ],\n  \"certifications\": [\n    \"AWS Certified Solutions Architect\",\n    \"Scrum Master PSM I\"\n  ],\n  \"work_experiences\": [\n    {\n      \"position\": \"Backend Developer\",\n      \"company\": \"Capgemini\",\n      \"duration\": \"3 years\",\n      \"missions\": \"Developed REST APIs in Java, continuous integration, participation in Agile ceremonies.\"\n    },\n    {\n      \"position\": \"Software Engineer\",\n      \"company\": \"Sopra Steria\",\n      \"duration\": \"2 years\",\n      \"missions\": \"Java application maintenance, incident management, collaboration with DevOps teams.\"\n    }\n  ]\n}\n",
+        "options": {
+          "systemPromptTemplate": "=You are an HR assistant specialized in recruitment and CV analysis. Your role is to review the content of a resume and the application objective in order to extract and assess the key information from a candidate's profile.\nYour goal is to facilitate the selection of relevant applications for a given position by objectively evaluating the alignment between the candidate's profile and the desired role.\n\n## Tasks to Perform\nFor each application, extract and generate the following elements based on the content of the CV and the objective of the application:\n- Full Name  \n- Phone Number  \n- Email Address (in lowercase)\n- Degrees: Mention the titles, majors, and institutions if available.  \n- Skills: List technical, functional, or soft skills.  \n- Certifications: List any obtained certifications. If none are available, write \"None\".  \n- Work Experience: Detail the main experiences, including job title, company, duration, and key responsibilities.  \n- Profile Summary: Write a clear paragraph of 2 to 3 sentences summarizing the candidate’s professional background, linking their skills, education, certifications, and experience with the targeted position.  \n- Desired Position: Infer this information from the subject line of the application email.(Translate it in english) \n- Relevance Score (out of 10): Evaluate how well the candidate's profile matches the targeted position.  \n- Score Explanation: Objectively justify this score by explaining the strengths and any gaps (e.g., skill mismatch or lack of specific experience).\n\n## Presentation Guidelines\n- Be structured, clear, and professional.  \n- Begin each sentence with a capital letter.  \n- Use capital letters for proper nouns (places, degrees, companies, etc.).  \n- If a piece of information is not available, write \"None\".\n- Please always write in english\n- Always output the email in lowercase.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        1480,
+        -80
+      ],
+      "id": "33a2d94b-035f-4e86-ae64-4abeb1be3ef1",
+      "name": "Extracteur"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3900,
+        -60
+      ],
+      "id": "badc99be-aa72-475f-b6b3-45c54a6d1853",
+      "name": "mark as read",
+      "webhookId": "7ab59325-0b92-449e-a4ef-ac90a7b7c07a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mEdJ8LAZCcg4rbbQ",
+          "name": "Gmail Clarium Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_1028932397184549389"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        4120,
+        -60
+      ],
+      "id": "0e57b0dd-d518-4ae2-9af3-979b1da4d706",
+      "name": "move email to folder",
+      "webhookId": "97a3bb04-1078-4acb-9b64-b3f500d37265",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mEdJ8LAZCcg4rbbQ",
+          "name": "Gmail Clarium Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        4340,
+        -60
+      ],
+      "id": "dc6c5dfa-4498-4415-adb4-c11467569db4",
+      "name": "remove from inbox",
+      "webhookId": "108b9e10-ebe7-4097-b7a6-8e3bbe904e94",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mEdJ8LAZCcg4rbbQ",
+          "name": "Gmail Clarium Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        140
+      ],
+      "id": "20b640bf-4f52-4d35-b6fa-1dc9906f1ebd",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tA7RYcxmQFbKz6KK",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"relevance_score\": {\n      \"type\": \"integer\",\n      \"minimum\": 0,\n      \"maximum\": 10\n    },\n    \"application_status\": {\n      \"type\": \"string\",\n      \"enum\": [\"Relevant\", \"To Be Reviewed\", \"Rejectable\"]\n    },\n    \"score_justification\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"relevance_score\", \"application_status\", \"score_justification\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        2340,
+        160
+      ],
+      "id": "16905388-bd35-421c-9fec-81c98fbd76e6",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Desired Position \n{{ $json.Desired_position }}\n\n## Applicant Informations\n\nWork Experience:  \n{{ $json.Work_experience }}\n\nEducation:  \n{{ $json.Education }}\n\nTechnical Skills:  \n{{ $json.Skills }}\n\nCertifications:  \n{{ $json.Certifications }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert HR evaluation agent. Your role is to analyze a candidate’s suitability for a specific position based on their CV and the subject line of their application.\n\nYour goal is to determine whether the profile is relevant for the targeted role by assigning an overall score out of 10, based on the candidate’s work experience, education, technical skills, and certifications. You must also objectively explain the reasoning behind your score.\n\n## Task:\n\nAssess whether the candidate has the real and concrete qualifications needed for the desired position (provided in the subject line of the application email).\n\nFollow each step below carefully to assign a final score.\n\n### Scoring by category:\n\n1. Work Experience (0 to 4 points)  \n- 0: No experience related to the position  \n- 1: Indirect or unrelated experience  \n- 2: Relevant but limited experience (6 months to 1 year)  \n- 3: Solid experience (1 to 2 years in similar roles)  \n- 4: Strong experience (> 3 years in similar roles)  \n\n2. Education (0 to 2 points)  \n- 0: No degree related to the position  \n- 1: Degree somewhat related to the position  \n- 2: Specialized degree directly aligned with the target role  \n\n3. Technical Skills (0 to 3 points)  \n- 0: No relevant technical skills for the role  \n- 1: Basic or self-taught skills that could be useful  \n- 2: Useful skills but lacking depth or experience  \n- 3: Clear mastery of the tools/technologies required for the role  \n\n4. Certifications (0 to 1 point)  \n- 0: No relevant certifications  \n- 1: At least one recognized certification, whether directly related or not  \n- 2: One or more certified qualifications directly linked to the role  \n\n### Final Score Calculation:\n\nAfter scoring each category, sum the points to produce a final score out of 10. The score must be a whole number and no more than 10. Also provide a clear, concise explanation of the score (max. 3 sentences), mentioning the candidate’s strengths and weaknesses.\n\n### Determining Candidate Status:\n\nBased on the score, assign one of the following statuses:  \n- Relevant: score ≥ 6  \n- To Be Reviewed: score between 3 and 5  \n- To Be Rejected: score < 3  \n\n## Expected Output:\n\n1. Final relevance score out of 10  \n2. Application Status: Relevant / To Be Reviewed / Rejectable  \n3. Justified explanation of the score  \n\n## Important Rules:\n\n- Use structured sentences with capital letters at the beginning.  \n- If a piece of information is missing, write \"None\".  \n- Conduct the analysis with rigor, impartiality, and professionalism.\n- application_status can only take one of these 3 outputs: (\"Relevant\", \"To Be Reviewed\", \"Rejectable\")\n- Always repsonse in english."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2140,
+        -80
+      ],
+      "id": "998a3216-3fbc-4eee-a452-f08eac1bba4f",
+      "name": "Evaluation"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger\n\nThis node is used to get incoming emails from **GMAIL**.",
+        "height": 1460,
+        "width": 500,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -700,
+        -580
+      ],
+      "id": "7df98209-e89d-498f-bd85-427113ec6d9c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Email Filter\n\nDetermine if the email is an application or not.",
+        "height": 1460,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -580
+      ],
+      "id": "36a4fe9e-8339-4e5a-9f53-24441e0fce3d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Check attachement\n\nCheck if there is an attachement in the email.",
+        "height": 1460,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -580
+      ],
+      "id": "7e32ac0b-8823-4282-8abd-22582956eacb",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Upload to Drive\n\nUpload, Share the curriculum to Google Drive. Then extract the data from the PDF To process it with AI.",
+        "height": 1460,
+        "width": 860,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -580
+      ],
+      "id": "1089f7b0-6390-4b07-87a0-0dfebd746947",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('upload').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1000,
+        0
+      ],
+      "id": "48d01aa3-cd82-4dc9-af98-ad732e1548ab",
+      "name": "Download",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "SPKZyUCSiEsFSidd",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Extrcator\n\nWe're using AI to scrape all the informations of an application from his cv.",
+        "height": 1460,
+        "width": 500,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        -580
+      ],
+      "id": "38f0c586-990f-4624-bcaf-05b624405cc9",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Append In Supabase without matching post",
+        "height": 680,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3300,
+        -580
+      ],
+      "id": "8395c7b6-75df-46a4-99e5-2831351b0ece",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Email Update",
+        "height": 1460,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3800,
+        -580
+      ],
+      "id": "9ba76bbd-bdd6-4a0b-a24a-50afeb097a3a",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df6b3ba6-5c18-4f5d-b86f-43aa4a70c21e",
+              "name": "Education",
+              "value": "={{ $json.output.education }}",
+              "type": "string"
+            },
+            {
+              "id": "5ff3354c-81f7-4184-befb-6a414973ad77",
+              "name": "Work_experience",
+              "value": "={{ $json.output.work_experiences }}",
+              "type": "string"
+            },
+            {
+              "id": "9acbb540-743d-48d0-8e6c-a6fb7491e9fa",
+              "name": "Certifications",
+              "value": "={{ $json.output.certifications }}",
+              "type": "string"
+            },
+            {
+              "id": "b5435235-ca9c-4fa1-931b-468c7d2b44ef",
+              "name": "Desired_position",
+              "value": "={{ $json.output.desired_position }}",
+              "type": "string"
+            },
+            {
+              "id": "5ae6f4d8-a421-4c5f-ad3d-aa9cec55c2dc",
+              "name": "Skills",
+              "value": "={{ $json.output.skills }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1780,
+        -80
+      ],
+      "id": "9d587bdd-dc7f-421c-92f2-d664031cabd5",
+      "name": "Turn to String"
+    },
+    {
+      "parameters": {
+        "content": "## Append In Supabase with matching post ID",
+        "height": 760,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3300,
+        120
+      ],
+      "id": "9df03512-e4dd-4a82-a7ae-ebb09888c9ca",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6e4124e1-e4a1-45bb-b2a4-c4ae20fefa82",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f8f6c835-a879-4443-8fa8-a4862fa31b92",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "1bdbac7a-ba4f-4b59-95d9-84183200317a",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "NULL",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        3020,
+        -80
+      ],
+      "id": "1fbfe533-5f8f-411e-b1a3-c4e98052ca46",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"title\": \"business analyst\",\n\t\"id\": \"8797668696\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3080,
+        380
+      ],
+      "id": "922a9dda-981d-4ffb-9c61-1eec2df64d0b",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Desired Position \n{{ $('Turn to String').item.json.Desired_position }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an hr assistant and your task is to match applicant's desired post with already existing posts in the supabase dataset.\nYou have access to the posts database on Supabase using the tool named 'get posts'. \nThis tool returns all currently open posts from the database, each with its `id`, `title`.\n\nFollow these intructions and always execute them in order to complete you task:\n1. Use the supabase tool to retrieve all the posts by using this query : (select=title,id). You will get a jsonn response that look like this : \n''''\n{\n  \"response\": [\n    {\n      \"title\": \"Web development\",\n      \"id\": \"7f791f5c-850b-4d29-a0b3-58996df33536\"\n    },\n    {\n      \"title\": \"Automation Expert\",\n      \"id\": \"57529622-105a-4670-8098-be26d4827517\"\n    }\n  ]\n}\n''''\nTitle is the post title and id is the generated id from the supabase dataset.\n2. After you get all the available posts, you will look for all the titles from the posts database and find the best match for the applicant desired post.\n3. After you found the best  matching post.Output only:\n- The `title` of the best matching post.\n- The `id` of that post.\n\n## Important rules:\n- Always follow the instructions and execute them in order. Do not do anything else outside what you have to do.\n- Always return null if you did not found any posts."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        2620,
+        -80
+      ],
+      "id": "252b391b-d1dd-40c5-96f0-951ea179558d",
+      "name": "Post Matcher"
+    },
+    {
+      "parameters": {
+        "tableId": "candidates",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Extracteur').item.json.output.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Extracteur').item.json.output.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Extracteur').item.json.output.phone_number.replaceAll('+', \"\") }}"
+            },
+            {
+              "fieldId": "experiences",
+              "fieldValue": "={{ $('Extracteur').item.json.output.work_experiences }}"
+            },
+            {
+              "fieldId": "degrees",
+              "fieldValue": "={{ $('Extracteur').item.json.output.education }}"
+            },
+            {
+              "fieldId": "skills",
+              "fieldValue": "={{ $('Extracteur').item.json.output.skills }}"
+            },
+            {
+              "fieldId": "certifications",
+              "fieldValue": "={{ $('Extracteur').item.json.output.certifications }}"
+            },
+            {
+              "fieldId": "profile_summary",
+              "fieldValue": "={{ $('Extracteur').item.json.output.profile_summary }}"
+            },
+            {
+              "fieldId": "desired_position",
+              "fieldValue": "={{ $('Extracteur').item.json.output.desired_position }}"
+            },
+            {
+              "fieldId": "relevance_score",
+              "fieldValue": "={{ $('Evaluation').item.json.output.Relevance_Score }}"
+            },
+            {
+              "fieldId": "score_justification",
+              "fieldValue": "={{ $('Evaluation').item.json.output.Score_Justification }}"
+            },
+            {
+              "fieldId": "application_status",
+              "fieldValue": "={{ $('Evaluation').item.json.output['Application_Status'] }}"
+            },
+            {
+              "fieldId": "cv_url",
+              "fieldValue": "={{ $('upload').item.json.webViewLink }}"
+            },
+            {
+              "fieldId": "post_id",
+              "fieldValue": "={{ $('Post Matcher').item.json.output.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3480,
+        480
+      ],
+      "id": "35c050a4-ba99-44bb-9396-ae45a2e8e1b2",
+      "name": "Create Candidate With post_id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TjjIyMYW0lXoF9uh",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "candidates",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Extracteur').item.json.output.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Extracteur').item.json.output.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Extracteur').item.json.output.phone_number.replaceAll('+', \"\") }}"
+            },
+            {
+              "fieldId": "experiences",
+              "fieldValue": "={{ $('Extracteur').item.json.output.work_experiences }}"
+            },
+            {
+              "fieldId": "degrees",
+              "fieldValue": "={{ $('Extracteur').item.json.output.education }}"
+            },
+            {
+              "fieldId": "skills",
+              "fieldValue": "={{ $('Extracteur').item.json.output.skills }}"
+            },
+            {
+              "fieldId": "certifications",
+              "fieldValue": "={{ $('Extracteur').item.json.output.certifications }}"
+            },
+            {
+              "fieldId": "profile_summary",
+              "fieldValue": "={{ $('Extracteur').item.json.output.profile_summary }}"
+            },
+            {
+              "fieldId": "desired_position",
+              "fieldValue": "={{ $('Extracteur').item.json.output.desired_position }}"
+            },
+            {
+              "fieldId": "relevance_score",
+              "fieldValue": "={{ $('Evaluation').item.json.output.Relevance_Score }}"
+            },
+            {
+              "fieldId": "score_justification",
+              "fieldValue": "={{ $('Evaluation').item.json.output.Score_Justification }}"
+            },
+            {
+              "fieldId": "application_status",
+              "fieldValue": "={{ $('Evaluation').item.json.output['Application_Status'] }}"
+            },
+            {
+              "fieldId": "cv_url",
+              "fieldValue": "={{ $('upload').item.json.webViewLink }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3480,
+        -380
+      ],
+      "id": "b1129612-365a-4fa8-ab8b-bc717f9dcbad",
+      "name": "Create Candidate no ID",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TjjIyMYW0lXoF9uh",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to get all available posts from the supabase posts database.\nYou will need to provide a PostREST filter query. \nThe PostREST filter query = \"select=title,id\"",
+        "operation": "getAll",
+        "tableId": "posts",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "={{ $fromAI('PostREST_filter_query', `this is the PostREST filter query you will need to fill this field with his default value`, 'string', \"select=title,id\") }}"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        2740,
+        180
+      ],
+      "id": "3eb4f657-3a28-4174-bfd6-0a83cab99774",
+      "name": "Get Posts",
+      "credentials": {
+        "supabaseApi": {
+          "id": "TjjIyMYW0lXoF9uh",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Look for matching posts for the candidate \n\n- If the applicant desired post match a post in the database we will add post_id to the record.",
+        "height": 1460,
+        "width": 760,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2520,
+        -580
+      ],
+      "id": "1d0bf603-888c-4843-970a-19b836981e98",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Evaluator\n\nGives a score to the application based on exps, skills, certifications..",
+        "height": 1460,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1940,
+        -580
+      ],
+      "id": "e893266a-3aa8-4448-abee-304c675e4de3",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwq-32b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        140
+      ],
+      "id": "e51848cc-fe5d-40a4-a373-273018e501cb",
+      "name": "qwen",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tA7RYcxmQFbKz6KK",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        20,
+        320
+      ],
+      "id": "cc0b9e33-f3b0-4815-aa2a-464510425c3a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "63EsCEjr23QRKIO0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2580,
+        180
+      ],
+      "id": "647348d1-92d4-4eb9-bcbf-139a4e942c6a",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "tA7RYcxmQFbKz6KK",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        140
+      ],
+      "id": "be8024ee-935a-4f99-88f2-d72cac62b248",
+      "name": "Auto-fixing Output Parser"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2900,
+        380
+      ],
+      "id": "f947fc40-a648-4e86-8538-05f3ec4330bd",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "63EsCEjr23QRKIO0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Gmail Trigger": [
+      {
+        "json": {
+          "id": "1975c2a677820290",
+          "threadId": "1975c2a677820290",
+          "labelIds": [
+            "UNREAD",
+            "SENT",
+            "INBOX"
+          ],
+          "sizeEstimate": 2565498,
+          "headers": {
+            "return-path": "Return-Path: <clariumsn@gmail.com>",
+            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45325205053sm3516915e9.23.2025.06.10.16.26.10\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:12 -0700 (PDT)",
+            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979698860.22358305575700022\"",
+            "from": "From: clariumsn@gmail.com",
+            "to": "To: clariumsn@gmail.com",
+            "subject": "Subject: Candidature au poste d'ingenieur Logiciel",
+            "message-id": "Message-ID: <521350a7-ce1b-d994-bb10-87239baedadf@gmail.com>",
+            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
+            "date": "Date: Tue, 10 Jun 2025 23:26:09 +0000",
+            "mime-version": "MIME-Version: 1.0"
+          },
+          "html": "Madame, Monsieur,\nSupport utilisateur, dépannage matériel et logiciel, réseaux.",
+          "text": "Madame, Monsieur, Support utilisateur, dépannage matériel et logiciel, réseaux.",
+          "textAsHtml": "<p>Madame, Monsieur, Support utilisateur, d&eacute;pannage mat&eacute;riel et logiciel, r&eacute;seaux.</p>",
+          "subject": "Candidature au poste d'ingenieur Logiciel",
+          "date": "2025-06-10T23:26:09.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "messageId": "<521350a7-ce1b-d994-bb10-87239baedadf@gmail.com>"
+        }
+      },
+      {
+        "json": {
+          "id": "1975c2a52c7d5995",
+          "threadId": "1975c2a52c7d5995",
+          "labelIds": [
+            "UNREAD",
+            "SENT",
+            "INBOX"
+          ],
+          "sizeEstimate": 345906,
+          "headers": {
+            "return-path": "Return-Path: <clariumsn@gmail.com>",
+            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a5323bee86sm13243401f8f.43.2025.06.10.16.26.04\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:05 -0700 (PDT)",
+            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979638670.5995508253936954\"",
+            "from": "From: clariumsn@gmail.com",
+            "to": "To: clariumsn@gmail.com",
+            "subject": "Subject: Candidature au poste de Technicien Support Informatique",
+            "message-id": "Message-ID: <7c410ad4-4702-31b3-546d-da35d3d59834@gmail.com>",
+            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
+            "date": "Date: Tue, 10 Jun 2025 23:26:03 +0000",
+            "mime-version": "MIME-Version: 1.0"
+          },
+          "html": "Madame, Monsieur,\nSupport utilisateur, dépannage matériel et logiciel, réseaux.",
+          "text": "Madame, Monsieur, Support utilisateur, dépannage matériel et logiciel, réseaux.",
+          "textAsHtml": "<p>Madame, Monsieur, Support utilisateur, d&eacute;pannage mat&eacute;riel et logiciel, r&eacute;seaux.</p>",
+          "subject": "Candidature au poste de Technicien Support Informatique",
+          "date": "2025-06-10T23:26:03.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "messageId": "<7c410ad4-4702-31b3-546d-da35d3d59834@gmail.com>"
+        }
+      },
+      {
+        "json": {
+          "id": "1975c2a3c72064d4",
+          "threadId": "1975c2a3c72064d4",
+          "labelIds": [
+            "UNREAD",
+            "SENT",
+            "INBOX"
+          ],
+          "sizeEstimate": 88340,
+          "headers": {
+            "return-path": "Return-Path: <clariumsn@gmail.com>",
+            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45325215e75sm3471625e9.27.2025.06.10.16.25.58\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:00 -0700 (PDT)",
+            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979584830.3993507856053562\"",
+            "from": "From: clariumsn@gmail.com",
+            "to": "To: clariumsn@gmail.com",
+            "subject": "Subject: Candidature au poste de developpeur web",
+            "message-id": "Message-ID: <35805486-51c1-2837-8a98-223371bdbf1e@gmail.com>",
+            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
+            "date": "Date: Tue, 10 Jun 2025 23:25:58 +0000",
+            "mime-version": "MIME-Version: 1.0"
+          },
+          "html": "Madame, Monsieur,\n\nC'est avec un vif intérêt que je vous soumets ma candidature pour le poste de Développeur Web / Logiciel au sein de votre entreprise. Votre annonce a particulièrement retenu mon attention car elle correspond parfaitement à mon parcours professionnel et à mes aspirations.",
+          "text": "Madame, Monsieur, C'est avec un vif intérêt que je vous soumets ma candidature\npour le poste de Développeur Web / Logiciel au sein de votre entreprise. Votre\nannonce a particulièrement retenu mon attention car elle correspond parfaitement\nà mon parcours professionnel et à mes aspirations.",
+          "textAsHtml": "<p>Madame, Monsieur, C&apos;est avec un vif int&eacute;r&ecirc;t que je vous soumets ma candidature<br/>pour le poste de D&eacute;veloppeur Web / Logiciel au sein de votre entreprise. Votre<br/>annonce a particuli&egrave;rement retenu mon attention car elle correspond parfaitement<br/>&agrave; mon parcours professionnel et &agrave; mes aspirations.</p>",
+          "subject": "Candidature au poste de developpeur web",
+          "date": "2025-06-10T23:25:58.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "messageId": "<35805486-51c1-2837-8a98-223371bdbf1e@gmail.com>"
+        }
+      },
+      {
+        "json": {
+          "id": "1975c2a26d9c6ca2",
+          "threadId": "1975c2a26d9c6ca2",
+          "labelIds": [
+            "UNREAD",
+            "SENT",
+            "INBOX"
+          ],
+          "sizeEstimate": 66545,
+          "headers": {
+            "return-path": "Return-Path: <clariumsn@gmail.com>",
+            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a532435b16sm13584012f8f.46.2025.06.10.16.25.54\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:25:55 -0700 (PDT)",
+            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979543200.8585406134692422\"",
+            "from": "From: clariumsn@gmail.com",
+            "to": "To: clariumsn@gmail.com",
+            "subject": "Subject: Candidature au poste de full stack developpeur",
+            "message-id": "Message-ID: <1370188e-ef41-b325-0029-1496f8dd1f70@gmail.com>",
+            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
+            "date": "Date: Tue, 10 Jun 2025 23:25:54 +0000",
+            "mime-version": "MIME-Version: 1.0"
+          },
+          "html": "Madame, Monsieur,\n\nJe me permets de vous adresser ma candidature pour le poste de Data Scientist que vous proposez actuellement. Votre annonce a particulièrement retenu mon attention car elle correspond parfaitement à mon parcours professionnel et à mes aspirations dans le domaine de la science des données.",
+          "text": "Madame, Monsieur, Je me permets de vous adresser ma candidature pour le poste de\nData Scientist que vous proposez actuellement. Votre annonce a particulièrement\nretenu mon attention car elle correspond parfaitement à mon parcours\nprofessionnel et à mes aspirations dans le domaine de la science des données.",
+          "textAsHtml": "<p>Madame, Monsieur, Je me permets de vous adresser ma candidature pour le poste de<br/>Data Scientist que vous proposez actuellement. Votre annonce a particuli&egrave;rement<br/>retenu mon attention car elle correspond parfaitement &agrave; mon parcours<br/>professionnel et &agrave; mes aspirations dans le domaine de la science des donn&eacute;es.</p>",
+          "subject": "Candidature au poste de full stack developpeur",
+          "date": "2025-06-10T23:25:54.000Z",
+          "to": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "from": {
+            "value": [
+              {
+                "address": "clariumsn@gmail.com",
+                "name": ""
+              }
+            ],
+            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
+            "text": "clariumsn@gmail.com"
+          },
+          "messageId": "<1370188e-ef41-b325-0029-1496f8dd1f70@gmail.com>"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Extracteur",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload": {
+      "main": [
+        [
+          {
+            "node": "share",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "share": {
+      "main": [
+        [
+          {
+            "node": "Download",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extracteur": {
+      "main": [
+        [
+          {
+            "node": "Turn to String",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mark as read": {
+      "main": [
+        [
+          {
+            "node": "move email to folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "move email to folder": {
+      "main": [
+        [
+          {
+            "node": "remove from inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extracteur",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Evaluation",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation": {
+      "main": [
+        [
+          {
+            "node": "Post Matcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Turn to String": {
+      "main": [
+        [
+          {
+            "node": "Evaluation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Create Candidate no ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Candidate With post_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Matcher": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate With post_id": {
+      "main": [
+        [
+          {
+            "node": "mark as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate no ID": {
+      "main": [
+        [
+          {
+            "node": "mark as read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Posts": {
+      "ai_tool": [
+        [
+          {
+            "node": "Post Matcher",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qwen": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Evaluation",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Post Matcher",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Post Matcher",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auto-fixing Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0c72a9c4-0b3b-48dc-a2a4-d1f298a66604",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f3bf0740e86805879ff06102b8c465db40713bc059e5e6e6903caae1305dc76"
+  },
+  "id": "Ks6WIBazdlR0X8tX",
+  "tags": []
+}

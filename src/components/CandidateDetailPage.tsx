@@ -13,6 +13,9 @@ import StatusBadge from './StatusBadge';
 import CircleScore from './CircleScore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
+import type { Database } from '@/integrations/supabase/types';
+
+type ApplicationStatus = Database['public']['Enums']['application_status'];
 
 interface CandidateDetailPageProps {
   candidate: any;
@@ -32,7 +35,7 @@ const CandidateDetailPage = ({
     phone: '',
     linkedin_url: '',
     desired_position: '',
-    application_status: 'To Be Reviewed',
+    application_status: 'To Be Reviewed' as ApplicationStatus,
     post_id: ''
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -50,7 +53,7 @@ const CandidateDetailPage = ({
         phone: candidate.phone || '',
         linkedin_url: candidate.linkedin_url || '',
         desired_position: candidate.desired_position || '',
-        application_status: candidate.application_status || 'To Be Reviewed',
+        application_status: candidate.application_status || 'To Be Reviewed' as ApplicationStatus,
         post_id: candidate.post_id || ''
       });
     }
@@ -61,7 +64,7 @@ const CandidateDetailPage = ({
     
     return (
       <div className="flex items-center space-x-4">
-        <CircleScore score={score} />
+        <CircleScore score={score} size={50} />
         <div>
           <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
           <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
@@ -96,7 +99,7 @@ const CandidateDetailPage = ({
       phone: candidate.phone || '',
       linkedin_url: candidate.linkedin_url || '',
       desired_position: candidate.desired_position || '',
-      application_status: candidate.application_status || 'To Be Reviewed',
+      application_status: candidate.application_status || 'To Be Reviewed' as ApplicationStatus,
       post_id: candidate.post_id || ''
     });
     setIsEditing(false);
@@ -232,10 +235,10 @@ const CandidateDetailPage = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {candidate.relevance_score && (
+                {candidate.relevance_score !== null && candidate.relevance_score !== undefined && (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <CircleScore score={candidate.relevance_score} />
+                      <CircleScore score={candidate.relevance_score} size={50} />
                       <div>
                         <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
                         <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
@@ -284,7 +287,7 @@ const CandidateDetailPage = ({
                 <div>
                   <span className="font-medium">Statut: </span>
                   {isEditing ? (
-                    <Select value={editedCandidate.application_status} onValueChange={(value) => setEditedCandidate({...editedCandidate, application_status: value})}>
+                    <Select value={editedCandidate.application_status} onValueChange={(value) => setEditedCandidate({...editedCandidate, application_status: value as ApplicationStatus})}>
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>

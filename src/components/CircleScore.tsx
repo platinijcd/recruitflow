@@ -1,59 +1,67 @@
+import React from 'react';
+
 interface CircleScoreProps {
   score: number;
   size?: number;
 }
 
-const CircleScore = ({ score, size = 60 }: CircleScoreProps) => {
-  // Convertir le score sur 10 en pourcentage
-  const percentage = (score / 10) * 100;
+const CircleScore: React.FC<CircleScoreProps> = ({ score, size = 40 }) => {
+  // Normalize score to be between 0 and 1 for the circle fill
+  const normalizedScore = score / 10;
   
-  // Calculer la circonférence du cercle
+  // Calculate color based on score
+  const getColor = (score: number) => {
+    if (score < 4) return '#ef4444'; // red
+    if (score > 6) return '#22c55e'; // green
+    return '#eab308'; // yellow
+  };
+
+  // Calculate the circle's circumference
   const radius = size / 2;
   const strokeWidth = size / 10;
-  const normalizedRadius = radius - (strokeWidth / 2);
+  const normalizedRadius = radius - strokeWidth / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
-  
-  // Calculer la longueur du stroke pour le remplissage
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-  
-  // Déterminer la couleur en fonction du pourcentage
-  const color = percentage >= 50 ? '#22C55E' : '#EF4444';
+  const strokeDashoffset = circumference - normalizedScore * circumference;
 
   return (
-    <div className="relative inline-flex items-center justify-center">
-      {/* Cercle de fond */}
-      <svg
-        height={size}
-        width={size}
-        className="transform -rotate-90"
-      >
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
+      {/* Background circle */}
+      <svg width={size} height={size}>
         <circle
-          stroke="#E5E7EB"
+          stroke="#e5e7eb"
           fill="transparent"
           strokeWidth={strokeWidth}
           r={normalizedRadius}
           cx={radius}
           cy={radius}
         />
-        {/* Cercle de progression */}
+      </svg>
+      
+      {/* Score circle */}
+      <svg
+        width={size}
+        height={size}
+        className="absolute top-0 left-0 transform -rotate-90"
+      >
         <circle
-          stroke={color}
+          stroke={getColor(score)}
           fill="transparent"
           strokeWidth={strokeWidth}
-          strokeDasharray={`${circumference} ${circumference}`}
+          strokeDasharray={circumference + ' ' + circumference}
           style={{ strokeDashoffset }}
           r={normalizedRadius}
           cx={radius}
           cy={radius}
-          className="transition-all duration-500 ease-out"
         />
       </svg>
-      {/* Texte du score */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-sm font-medium" style={{ color }}>
-          {Math.round(percentage)}%
-        </span>
-      </div>
+      
+      {/* Score text */}
+      <span 
+        className="absolute font-semibold text-gray-700"
+        style={{ fontSize: `${size / 3}px` }}
+      >
+        {score}
+      </span>
     </div>
   );
 };
