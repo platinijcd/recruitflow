@@ -77,3 +77,34 @@ CREATE TABLE public.recruiters (
   CONSTRAINT recruiters_pkey PRIMARY KEY (id)
 );
 """
+
+
+## Functions: 
+
+You will need to add 2 functions and triggers, functions will help perform specific actions when a trigger is it. The trigger can be an INSET, UPDATE, DELETE. We just need to specify the trigger type and the associated function.
+
+## Update Candidates Interview_id Fk when an interview in created for a candidate on candidate table
+
+- **Function**
+'''Sql
+BEGIN
+  UPDATE candidates
+  SET 
+    interview_id = NEW.id,
+    post_id = NEW.post_id
+  WHERE id = NEW.candidate_id;
+
+  RETURN NEW;
+END;
+
+'''
+
+## Update Update_date for setting row when edited on setting table
+- **Function**
+'''sql
+
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+'''
