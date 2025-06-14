@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Interview, InterviewFilters, InterviewStatus } from '@/types/interview';
@@ -76,7 +77,10 @@ export function useInterviews(filters: InterviewFilters = {}) {
     } catch (err: any) {
       console.error('Error in fetchInterviews:', err);
       setError(err);
-      toast.error('Erreur lors du chargement des entretiens');
+      // Only show toast error if it's a real error, not just empty data
+      if (err.code !== 'PGRST116') {
+        toast.error('Erreur lors du chargement des entretiens');
+      }
     } finally {
       setLoading(false);
     }
