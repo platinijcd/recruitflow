@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -16,7 +17,7 @@ import InterviewDetailsDialog from '@/components/InterviewDetailsDialog';
 import CreateInterviewDialog from '@/components/CreateInterviewDialog';
 import { useInterviews } from '@/hooks/useInterviews';
 import type { Interview, InterviewFilters, InterviewStatus } from '@/types/interview';
-import { Plus, Search, Eye, Calendar, User2, MapPin, Building } from 'lucide-react';
+import { Plus, Search, Eye, Calendar, User2, MapPin, Building, Clock } from 'lucide-react';
 import { withRefreshOnClose } from '@/components/hoc/withRefreshOnClose';
 
 const InterviewDetailsDialogWithRefresh = withRefreshOnClose(InterviewDetailsDialog);
@@ -125,6 +126,10 @@ export default function Interviews() {
                         <MapPin className="h-4 w-4" />
                         <span>{interview.location || 'À définir'}</span>
                       </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="h-4 w-4" />
+                        <span>Créé le {format(new Date(interview.created_at), 'PP', { locale: fr })}</span>
+                      </div>
                     </div>
                   </div>
                   <div className="flex justify-end pt-2">
@@ -157,4 +162,4 @@ export default function Interviews() {
       />
     </div>
   );
-} 
+}

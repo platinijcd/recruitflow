@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Users, Briefcase, Search, User, BarChart3, Calendar, MessageSquare } from 'lucide-react';
+import { Users, Briefcase, Search, User, BarChart3, Calendar, MessageSquare, Settings } from 'lucide-react';
 
 const Navigation = () => {
   const location = useLocation();
@@ -34,6 +34,11 @@ const Navigation = () => {
     path: '/chat',
     label: 'Chat',
     icon: MessageSquare
+  },
+  {
+    path: '/settings',
+    label: 'Settings',
+    icon: Settings
   }];
   return <nav className="w-64 bg-white shadow-sm min-h-screen">
       <div className="p-6">

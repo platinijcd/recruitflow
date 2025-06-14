@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,17 +24,31 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [editedPost, setEditedPost] = useState({
-    title: post?.title || '',
-    description: post?.description || '',
-    location: post?.location || '',
-    enterprise: post?.enterprise || '',
-    department: post?.department || '',
-    post_status: post?.post_status || 'Open'
+    title: '',
+    description: '',
+    location: '',
+    enterprise: '',
+    department: '',
+    post_status: 'Open'
   });
 
   const { data: candidates = [] } = useCandidates();
   const { mutate: updatePost } = useUpdatePost();
   const { mutate: deletePost } = useDeletePost();
+
+  // Update editedPost when post prop changes
+  useEffect(() => {
+    if (post) {
+      setEditedPost({
+        title: post.title || '',
+        description: post.description || '',
+        location: post.location || '',
+        enterprise: post.enterprise || '',
+        department: post.department || '',
+        post_status: post.post_status || 'Open'
+      });
+    }
+  }, [post]);
 
   if (!post) return null;
 
@@ -72,13 +86,14 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
   };
 
   const handleCancel = () => {
+    // Reset to original values
     setEditedPost({
-      title: post?.title || '',
-      description: post?.description || '',
-      location: post?.location || '',
-      enterprise: post?.enterprise || '',
-      department: post?.department || '',
-      post_status: post?.post_status || 'Open'
+      title: post.title || '',
+      description: post.description || '',
+      location: post.location || '',
+      enterprise: post.enterprise || '',
+      department: post.department || '',
+      post_status: post.post_status || 'Open'
     });
     setIsEditing(false);
   };
@@ -133,7 +148,7 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
         </div>
 
         <div className="p-5 space-y-5">
-          {/* Post Info Card */}
+          {/* Post Info Card - EDITABLE */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -245,7 +260,7 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
             </CardContent>
           </Card>
 
-          {/* Candidates Section */}
+          {/* Candidates Section - READ ONLY */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">

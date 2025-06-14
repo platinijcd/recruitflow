@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,9 @@ import StatusBadge from './StatusBadge';
 import CircleScore from './CircleScore';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
+import type { Database } from '@/integrations/supabase/types';
+
+type ApplicationStatus = Database['public']['Enums']['application_status'];
 
 interface CandidateDetailPageProps {
   candidate: any;
@@ -27,13 +30,13 @@ const CandidateDetailPage = ({
 }: CandidateDetailPageProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedCandidate, setEditedCandidate] = useState({
-    name: candidate?.name || '',
-    email: candidate?.email || '',
-    phone: candidate?.phone || '',
-    linkedin_url: candidate?.linkedin_url || '',
-    desired_position: candidate?.desired_position || '',
-    application_status: candidate?.application_status || 'To Be Reviewed',
-    post_id: candidate?.post_id || ''
+    name: '',
+    email: '',
+    phone: '',
+    linkedin_url: '',
+    desired_position: '',
+    application_status: 'To Be Reviewed' as ApplicationStatus,
+    post_id: ''
   });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
@@ -41,12 +44,27 @@ const CandidateDetailPage = ({
   const { data: posts = [] } = usePosts();
   const { data: recruiters = [] } = useRecruiters();
 
+  // Update editedCandidate when candidate prop changes
+  useEffect(() => {
+    if (candidate) {
+      setEditedCandidate({
+        name: candidate.name || '',
+        email: candidate.email || '',
+        phone: candidate.phone || '',
+        linkedin_url: candidate.linkedin_url || '',
+        desired_position: candidate.desired_position || '',
+        application_status: candidate.application_status || 'To Be Reviewed' as ApplicationStatus,
+        post_id: candidate.post_id || ''
+      });
+    }
+  }, [candidate]);
+
   const renderScore = (score?: number) => {
     if (!score) return null;
     
     return (
       <div className="flex items-center space-x-4">
-        <CircleScore score={score} />
+        <CircleScore score={score} size={50} />
         <div>
           <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
           <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
@@ -74,14 +92,15 @@ const CandidateDetailPage = ({
   };
 
   const handleCancel = () => {
+    // Reset to original values
     setEditedCandidate({
-      name: candidate?.name || '',
-      email: candidate?.email || '',
-      phone: candidate?.phone || '',
-      linkedin_url: candidate?.linkedin_url || '',
-      desired_position: candidate?.desired_position || '',
-      application_status: candidate?.application_status || 'To Be Reviewed',
-      post_id: candidate?.post_id || ''
+      name: candidate.name || '',
+      email: candidate.email || '',
+      phone: candidate.phone || '',
+      linkedin_url: candidate.linkedin_url || '',
+      desired_position: candidate.desired_position || '',
+      application_status: candidate.application_status || 'To Be Reviewed' as ApplicationStatus,
+      post_id: candidate.post_id || ''
     });
     setIsEditing(false);
   };
@@ -216,10 +235,10 @@ const CandidateDetailPage = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {candidate.relevance_score && (
+                {candidate.relevance_score !== null && candidate.relevance_score !== undefined && (
                   <div className="space-y-4">
                     <div className="flex items-center space-x-4">
-                      <CircleScore score={candidate.relevance_score} />
+                      <CircleScore score={candidate.relevance_score} size={50} />
                       <div>
                         <p className="text-sm font-medium text-gray-600">Score de pertinence</p>
                         <p className="text-xs text-gray-500">Sur une échelle de 0 à 10</p>
@@ -237,7 +256,7 @@ const CandidateDetailPage = ({
               </CardContent>
             </Card>
 
-            {/* Candidature Section */}
+            {/* Candidature Section - EDITABLE */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
@@ -268,7 +287,7 @@ const CandidateDetailPage = ({
                 <div>
                   <span className="font-medium">Statut: </span>
                   {isEditing ? (
-                    <Select value={editedCandidate.application_status} onValueChange={(value) => setEditedCandidate({...editedCandidate, application_status: value})}>
+                    <Select value={editedCandidate.application_status} onValueChange={(value) => setEditedCandidate({...editedCandidate, application_status: value as ApplicationStatus})}>
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
@@ -285,7 +304,7 @@ const CandidateDetailPage = ({
               </CardContent>
             </Card>
 
-            {/* Contact Section */}
+            {/* Contact Section - READ ONLY */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
@@ -296,34 +315,16 @@ const CandidateDetailPage = ({
               <CardContent className="space-y-3">
                 <div className="flex items-center space-x-3">
                   <Mail className="h-4 w-4 text-gray-500" />
-                  {isEditing ? (
-                    <Input
-                      value={editedCandidate.email}
-                      onChange={(e) => setEditedCandidate({...editedCandidate, email: e.target.value})}
-                      placeholder="Email"
-                      className="w-64"
-                    />
-                  ) : (
-                    <span>{candidate.email}</span>
-                  )}
+                  <span>{candidate.email}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="h-4 w-4 text-gray-500" />
-                  {isEditing ? (
-                    <Input
-                      value={editedCandidate.phone}
-                      onChange={(e) => setEditedCandidate({...editedCandidate, phone: e.target.value})}
-                      placeholder="Téléphone"
-                      className="w-64"
-                    />
-                  ) : (
-                    <span>{candidate.phone || 'Non spécifié'}</span>
-                  )}
+                  <span>{candidate.phone || 'Non spécifié'}</span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Informations Section */}
+            {/* Informations Section - READ ONLY */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">

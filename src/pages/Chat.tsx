@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAppSettings } from '@/hooks/useAppSettings';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
@@ -17,6 +18,8 @@ export default function Chat() {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
+  const { settings } = useAppSettings();
+  const chatWebhook = settings.find(s => s.setting_key === 'chat_ai_webhook')?.setting_value;
 
   // Fetch chat history on component mount
   useEffect(() => {
@@ -44,6 +47,11 @@ export default function Chat() {
   const sendMessage = async () => {
     if (!inputMessage.trim() || !user?.email) return;
 
+    if (!chatWebhook) {
+      toast.error('Chat webhook URL not configured');
+      return;
+    }
+
     const userMessage: InsertChatMessage = {
       role: 'user',
       content: inputMessage,
@@ -63,7 +71,7 @@ export default function Chat() {
       setIsLoading(true);
 
       // Send message to webhook
-      const url = `https://polite-wrongly-phoenix.ngrok-free.app/webhook/62939693-cdd8-49dc-b166-0adf05fd7282?message=${encodeURIComponent(inputMessage)}`;
+      const url = `${chatWebhook}?message=${encodeURIComponent(inputMessage)}`;
       console.log('Sending request to:', url);
 
       const response = await fetch(url, {
@@ -74,6 +82,10 @@ export default function Chat() {
           'ngrok-skip-browser-warning': 'true'
         },
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.text();
       console.log('Response:', data);
