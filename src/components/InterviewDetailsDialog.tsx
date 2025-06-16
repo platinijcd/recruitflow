@@ -1,3 +1,4 @@
+
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import {
@@ -97,10 +98,8 @@ const InterviewDetailsDialog = ({ interview, isOpen, onClose }: InterviewDetails
         <div className="mt-6 space-y-4">
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="font-semibold text-lg">
-                {interview.candidate_name}
-              </h3>
-              <p className="text-gray-600">Candidat</p>
+              <h3 className="font-semibold text-lg">Candidat</h3>
+              <p className="text-gray-600">{interview.candidate_name}</p>
             </div>
             {isEditing ? (
               <Select
@@ -173,6 +172,13 @@ const InterviewDetailsDialog = ({ interview, isOpen, onClose }: InterviewDetails
               )}
             </div>
           )}
+
+          {/* Created date at the bottom in grey */}
+          <div className="pt-4 border-t">
+            <p className="text-sm text-gray-500">
+              Créé le {format(new Date(interview.created_at), 'PPpp', { locale: fr })}
+            </p>
+          </div>
         </div>
 
         <DialogFooter className="mt-6 space-x-2">
@@ -221,4 +227,4 @@ const InterviewDetailsDialog = ({ interview, isOpen, onClose }: InterviewDetails
   );
 };
 
-export default InterviewDetailsDialog; 
+export default InterviewDetailsDialog;

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,12 @@ import AddPostForm from '@/components/AddPostForm';
 import { Plus, Search, Eye, MapPin, Building, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import type { Post } from '@/types';
 
 export default function Posts() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedPost, setSelectedPost] = useState<any | null>(null);
   const [isAddPostOpen, setIsAddPostOpen] = useState(false);
-  const { posts, loading, refetch } = usePosts();
+  const { data: posts = [], isLoading: loading, refetch } = usePosts();
 
   const filteredPosts = posts.filter(post =>
     searchQuery 
@@ -107,7 +107,7 @@ export default function Posts() {
       <AddPostForm
         isOpen={isAddPostOpen}
         onClose={() => setIsAddPostOpen(false)}
-        onSuccess={refetch}
+        onPostAdded={refetch}
       />
     </div>
   );

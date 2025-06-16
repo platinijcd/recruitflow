@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,12 @@ import AddRecruiterForm from '@/components/AddRecruiterForm';
 import { Plus, Search, Eye, Mail, Phone, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import type { Recruiter } from '@/types';
 
 export default function Recruiters() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRecruiter, setSelectedRecruiter] = useState<Recruiter | null>(null);
+  const [selectedRecruiter, setSelectedRecruiter] = useState<any | null>(null);
   const [isAddRecruiterOpen, setIsAddRecruiterOpen] = useState(false);
-  const { recruiters, loading, refetch } = useRecruiters();
+  const { data: recruiters = [], isLoading: loading, refetch } = useRecruiters();
 
   const filteredRecruiters = recruiters.filter(recruiter =>
     searchQuery 
@@ -107,7 +107,7 @@ export default function Recruiters() {
       <AddRecruiterForm
         isOpen={isAddRecruiterOpen}
         onClose={() => setIsAddRecruiterOpen(false)}
-        onSuccess={refetch}
+        onRecruiterAdded={refetch}
       />
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,13 +8,12 @@ import CandidatureCard from '@/components/CandidatureCard';
 import CandidatureDetailDialog from '@/components/CandidatureDetailDialog';
 import AddCandidateForm from '@/components/AddCandidateForm';
 import { Plus, Search } from 'lucide-react';
-import type { Candidate } from '@/types';
 
 export default function Candidates() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<any | null>(null);
   const [isAddCandidateOpen, setIsAddCandidateOpen] = useState(false);
-  const { candidates, loading, refetch } = useCandidates();
+  const { data: candidates = [], isLoading: loading, refetch } = useCandidates();
 
   // Filter and sort candidates
   const filteredCandidates = candidates.filter(candidate =>
@@ -56,7 +56,7 @@ export default function Candidates() {
           filteredCandidates.map((candidate) => (
             <CandidatureCard
               key={candidate.id}
-              candidate={candidate}
+              candidature={candidate}
               onViewDetails={() => setSelectedCandidate(candidate)}
             />
           ))
@@ -64,7 +64,7 @@ export default function Candidates() {
       </div>
 
       <CandidatureDetailDialog
-        candidate={selectedCandidate}
+        candidature={selectedCandidate}
         isOpen={!!selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
       />
@@ -72,7 +72,7 @@ export default function Candidates() {
       <AddCandidateForm
         isOpen={isAddCandidateOpen}
         onClose={() => setIsAddCandidateOpen(false)}
-        onSuccess={refetch}
+        onCandidateAdded={refetch}
       />
     </div>
   );

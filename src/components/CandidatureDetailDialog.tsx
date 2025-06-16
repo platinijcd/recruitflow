@@ -56,7 +56,7 @@ const CandidatureDetailDialog = ({ candidature, isOpen, onClose }: CandidatureDe
               <p className="text-gray-600">{candidature.desired_position}</p>
             </div>
             <StatusBadge 
-              statut={candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
+              status={candidature.application_status === 'To Be Reviewed' ? 'A évaluer' : 
                      candidature.application_status === 'Relevant' ? 'Pertinent' :
                      candidature.application_status === 'Rejectable' ? 'Rejeté' : 'Entretien programmé'}
             />

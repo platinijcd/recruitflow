@@ -63,7 +63,13 @@ export function useInterviews(filters: InterviewFilters = {}) {
       const { data, error } = await query;
 
       if (error) {
-        throw error;
+        console.error('Supabase error:', error);
+        throw new Error(`Error fetching interviews: ${error.message}`);
+      }
+
+      if (!data) {
+        setInterviews([]);
+        return;
       }
 
       const formattedInterviews: Interview[] = (data as unknown as DbInterview[]).map((interview) => ({
@@ -77,8 +83,9 @@ export function useInterviews(filters: InterviewFilters = {}) {
     } catch (err: any) {
       console.error('Error in fetchInterviews:', err);
       setError(err);
-      // Only show toast error if it's a real error, not just empty data
-      if (err.code !== 'PGRST116') {
+      
+      // Only show toast for real errors, not empty data
+      if (err.message && !err.message.includes('PGRST116')) {
         toast.error('Erreur lors du chargement des entretiens');
       }
     } finally {
