@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCandidates } from '@/hooks/useCandidates';
 import CandidatureCard from '@/components/CandidatureCard';
-import CandidatureDetailDialog from '@/components/CandidatureDetailDialog';
+import CandidateDetailPage from '@/components/CandidateDetailPage';
 import AddCandidateForm from '@/components/AddCandidateForm';
 import { Plus, Search } from 'lucide-react';
 
@@ -56,15 +56,29 @@ export default function Candidates() {
           filteredCandidates.map((candidate) => (
             <CandidatureCard
               key={candidate.id}
-              candidature={candidate}
+              candidature={{
+                id: candidate.id,
+                nom: candidate.name || '',
+                email: candidate.email,
+                telephone: candidate.phone || '',
+                lien_linkedin: candidate.linkedin_url || undefined,
+                poste_souhaite: candidate.desired_position || '',
+                titre_poste: candidate.post?.title,
+                statut: candidate.application_status,
+                date_reception: candidate.application_date || '',
+                note: candidate.relevance_score || undefined,
+                commentaire_evaluateur: candidate.score_justification || undefined,
+                competences: Array.isArray(candidate.skills) ? candidate.skills as string[] : undefined,
+                experience_annees: undefined
+              }}
               onViewDetails={() => setSelectedCandidate(candidate)}
             />
           ))
         )}
       </div>
 
-      <CandidatureDetailDialog
-        candidature={selectedCandidate}
+      <CandidateDetailPage
+        candidate={selectedCandidate}
         isOpen={!!selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
       />
@@ -72,7 +86,6 @@ export default function Candidates() {
       <AddCandidateForm
         isOpen={isAddCandidateOpen}
         onClose={() => setIsAddCandidateOpen(false)}
-        onCandidateAdded={refetch}
       />
     </div>
   );

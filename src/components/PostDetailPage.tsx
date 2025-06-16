@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Edit, Trash2, User, Calendar, MapPin, Building, Search, Briefcase, Save, ArrowLeft } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { useUpdatePost, useDeletePost } from '@/hooks/usePosts';
@@ -29,7 +31,7 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
     location: '',
     enterprise: '',
     department: '',
-    post_status: 'Open'
+    post_status: 'Open' as 'Open' | 'Close'
   });
 
   const { data: candidates = [] } = useCandidates();
@@ -68,8 +70,7 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
     }
   };
 
-  const toggleStatus = () => {
-    const newStatus = editedPost.post_status === 'Open' ? 'Close' : 'Open';
+  const handleStatusChange = (newStatus: 'Open' | 'Close') => {
     setEditedPost(prev => ({ ...prev, post_status: newStatus }));
     updatePost({
       id: post.id,
@@ -110,7 +111,16 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 pr-16 border-b">
           <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold text-gray-900">Détails du poste</h1>
+            {isEditing ? (
+              <Input
+                value={editedPost.title}
+                onChange={(e) => setEditedPost({...editedPost, title: e.target.value})}
+                className="text-2xl font-bold"
+                placeholder="Titre du poste"
+              />
+            ) : (
+              <h1 className="text-2xl font-bold text-gray-900">{post.title}</h1>
+            )}
           </div>
           <div className="flex items-center space-x-3">
             {isEditing ? (
@@ -151,37 +161,38 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
           {/* Post Info Card - EDITABLE */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Briefcase className="h-5 w-5 text-recruit-blue" />
-                <span>Informations du poste</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center space-x-2">
+                  <Briefcase className="h-5 w-5 text-recruit-blue" />
+                  <span>Informations du poste</span>
+                </CardTitle>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Statut:</span>
                   {isEditing ? (
-                    <Input
-                      value={editedPost.title}
-                      onChange={(e) => setEditedPost({...editedPost, title: e.target.value})}
-                      placeholder="Titre du poste"
-                    />
+                    <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        <SelectItem value="Open">Ouvert</SelectItem>
+                        <SelectItem value="Close">Fermé</SelectItem>
+                      </SelectContent>
+                    </Select>
                   ) : (
-                    post.title
-                  )}
-                </h2>
-                <div className="flex items-center space-x-2 mt-2">
-                  <Badge 
-                    className={`${getStatusColor(editedPost.post_status)} cursor-pointer`}
-                    onClick={toggleStatus}
-                  >
-                    {editedPost.post_status === 'Open' ? 'Ouvert' : 'Fermé'}
-                  </Badge>
-                  {!isEditing && (
-                    <span className="text-xs text-gray-500">(Cliquer pour changer le statut)</span>
+                    <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white">
+                        <SelectItem value="Open">Ouvert</SelectItem>
+                        <SelectItem value="Close">Fermé</SelectItem>
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
               </div>
-
+            </CardHeader>
+            <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="font-medium text-sm text-gray-700 mb-2 block">

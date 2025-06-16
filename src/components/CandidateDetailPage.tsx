@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -120,13 +121,8 @@ const CandidateDetailPage = ({
     }
   };
 
-  const getStatusBadgeProps = (status: string) => {
-    const statusMap = {
-      'To Be Reviewed': 'A évaluer',
-      'Relevant': 'Pertinent', 
-      'Rejectable': 'Rejeté'
-    };
-    return statusMap[status as keyof typeof statusMap] || status;
+  const getStatusBadgeProps = (status: ApplicationStatus) => {
+    return status;
   };
 
   const getInitials = (name: string) => {
@@ -197,11 +193,11 @@ const CandidateDetailPage = ({
               )}
               
               <div className="flex space-x-3">
-                {candidate.cv_link && (
+                {candidate.cv_url && (
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => window.open(candidate.cv_link, '_blank')}
+                    onClick={() => window.open(candidate.cv_url, '_blank')}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Voir CV

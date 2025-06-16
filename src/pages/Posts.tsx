@@ -107,7 +107,6 @@ export default function Posts() {
       <AddPostForm
         isOpen={isAddPostOpen}
         onClose={() => setIsAddPostOpen(false)}
-        onPostAdded={refetch}
       />
     </div>
   );
