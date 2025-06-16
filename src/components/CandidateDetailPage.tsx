@@ -267,7 +267,7 @@ const CandidateDetailPage = ({
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un poste" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white z-50">
                         {posts.map(post => (
                           <SelectItem key={post.id} value={post.id}>
                             {post.title}
@@ -287,7 +287,7 @@ const CandidateDetailPage = ({
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white z-50">
                         <SelectItem value="To Be Reviewed">À réviser</SelectItem>
                         <SelectItem value="Relevant">Pertinent</SelectItem>
                         <SelectItem value="Rejectable">À rejeter</SelectItem>

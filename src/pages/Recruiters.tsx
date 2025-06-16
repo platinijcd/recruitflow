@@ -6,19 +6,18 @@ import { Input } from "@/components/ui/input";
 import { useRecruiters } from '@/hooks/useRecruiters';
 import RecruiterDetailPage from '@/components/RecruiterDetailPage';
 import AddRecruiterForm from '@/components/AddRecruiterForm';
-import { Plus, Search, Eye, Mail, Phone, Calendar } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { Plus, Search, Eye, Mail, Phone, Building } from 'lucide-react';
 
 export default function Recruiters() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRecruiter, setSelectedRecruiter] = useState<any | null>(null);
   const [isAddRecruiterOpen, setIsAddRecruiterOpen] = useState(false);
-  const { data: recruiters = [], isLoading: loading, refetch } = useRecruiters();
+  const { data: recruiters = [], isLoading: loading } = useRecruiters();
 
   const filteredRecruiters = recruiters.filter(recruiter =>
     searchQuery 
-      ? recruiter.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      ? recruiter.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        recruiter.email?.toLowerCase().includes(searchQuery.toLowerCase())
       : true
   );
 
@@ -30,7 +29,7 @@ export default function Recruiters() {
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input
-              placeholder="Rechercher par nom"
+              placeholder="Rechercher par nom ou email"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -59,25 +58,24 @@ export default function Recruiters() {
                 <div className="flex flex-col h-full">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-2">{recruiter.name}</h3>
-                    {recruiter.role && (
-                      <p className="text-gray-600 mb-4">{recruiter.role}</p>
-                    )}
                     
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-gray-600">
                         <Mail className="h-4 w-4" />
-                        <span>{recruiter.email}</span>
+                        <span className="text-sm">{recruiter.email}</span>
                       </div>
                       {recruiter.phone && (
                         <div className="flex items-center gap-2 text-gray-600">
                           <Phone className="h-4 w-4" />
-                          <span>{recruiter.phone}</span>
+                          <span className="text-sm">{recruiter.phone}</span>
                         </div>
                       )}
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Calendar className="h-4 w-4" />
-                        <span>Créé le {format(new Date(recruiter.created_at), 'PP', { locale: fr })}</span>
-                      </div>
+                      {recruiter.role && (
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Building className="h-4 w-4" />
+                          <span className="text-sm">{recruiter.role}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                   
@@ -107,7 +105,6 @@ export default function Recruiters() {
       <AddRecruiterForm
         isOpen={isAddRecruiterOpen}
         onClose={() => setIsAddRecruiterOpen(false)}
-        onRecruiterAdded={refetch}
       />
     </div>
   );

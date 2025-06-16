@@ -168,27 +168,15 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Statut:</span>
-                  {isEditing ? (
-                    <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="Open">Ouvert</SelectItem>
-                        <SelectItem value="Close">Fermé</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white">
-                        <SelectItem value="Open">Ouvert</SelectItem>
-                        <SelectItem value="Close">Fermé</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
+                  <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-50">
+                      <SelectItem value="Open">Ouvert</SelectItem>
+                      <SelectItem value="Close">Fermé</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </CardHeader>
