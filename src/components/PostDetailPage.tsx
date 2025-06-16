@@ -70,20 +70,20 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
     }
   };
 
-  const handleStatusChange = (newStatus: 'Open' | 'Close') => {
-    setEditedPost(prev => ({ ...prev, post_status: newStatus }));
-    updatePost({
-      id: post.id,
-      updates: { post_status: newStatus }
-    });
-  };
-
   const handleSave = () => {
-    updatePost({
-      id: post.id,
-      updates: editedPost
-    });
-    setIsEditing(false);
+    updatePost(
+      {
+        id: post.id,
+        updates: editedPost
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          // Update the local post data to reflect changes immediately
+          Object.assign(post, editedPost);
+        }
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -168,15 +168,21 @@ const PostDetailPage = ({ post, isOpen, onClose }: PostDetailPageProps) => {
                 </CardTitle>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Statut:</span>
-                  <Select value={editedPost.post_status} onValueChange={handleStatusChange}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white z-50">
-                      <SelectItem value="Open">Ouvert</SelectItem>
-                      <SelectItem value="Close">Fermé</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isEditing ? (
+                    <Select value={editedPost.post_status} onValueChange={(value) => setEditedPost({...editedPost, post_status: value as 'Open' | 'Close'})}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white z-50">
+                        <SelectItem value="Open">Ouvert</SelectItem>
+                        <SelectItem value="Close">Fermé</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge className={getStatusColor(post.post_status)}>
+                      {post.post_status === 'Open' ? 'Ouvert' : 'Fermé'}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </CardHeader>

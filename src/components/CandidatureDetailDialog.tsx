@@ -20,8 +20,7 @@ interface CandidatureDetailDialogProps {
 const statusMap: Record<string, ApplicationStatus> = {
   'A évaluer': 'To Be Reviewed',
   'Pertinent': 'Relevant',
-  'Rejeté': 'Rejectable',
-  'Entretien programmé': 'Scheduled'
+  'Rejeté': 'Rejectable'
 };
 
 const CandidatureDetailDialog = ({ candidature, isOpen, onClose }: CandidatureDetailDialogProps) => {
@@ -96,7 +95,6 @@ const CandidatureDetailDialog = ({ candidature, isOpen, onClose }: CandidatureDe
                       <SelectItem value="To Be Reviewed">À évaluer</SelectItem>
                       <SelectItem value="Relevant">Pertinent</SelectItem>
                       <SelectItem value="Rejectable">À rejeter</SelectItem>
-                      <SelectItem value="Scheduled">Entretien programmé</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

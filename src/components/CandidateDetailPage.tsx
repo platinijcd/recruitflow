@@ -85,11 +85,19 @@ const CandidateDetailPage = ({
   };
 
   const handleSave = () => {
-    updateCandidate({
-      id: candidate.id,
-      updates: editedCandidate
-    });
-    setIsEditing(false);
+    updateCandidate(
+      {
+        id: candidate.id,
+        updates: editedCandidate
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          // Update the local candidate data to reflect changes immediately
+          Object.assign(candidate, editedCandidate);
+        }
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -203,14 +211,7 @@ const CandidateDetailPage = ({
                     Voir CV
                   </Button>
                 )}
-                {isEditing ? (
-                  <Input
-                    value={editedCandidate.linkedin_url}
-                    onChange={(e) => setEditedCandidate({...editedCandidate, linkedin_url: e.target.value})}
-                    placeholder="URL LinkedIn"
-                    className="w-64"
-                  />
-                ) : candidate.linkedin_url && (
+                {candidate.linkedin_url && (
                   <Button 
                     variant="outline" 
                     size="sm" 
