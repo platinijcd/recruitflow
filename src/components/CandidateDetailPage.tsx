@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -189,16 +188,7 @@ const CandidateDetailPage = ({
           <div className="p-5 space-y-5">
             {/* Main Info */}
             <div className="space-y-4">
-              {isEditing ? (
-                <Input
-                  value={editedCandidate.name}
-                  onChange={(e) => setEditedCandidate({...editedCandidate, name: e.target.value})}
-                  className="text-3xl font-bold"
-                  placeholder="Nom du candidat"
-                />
-              ) : (
-                <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
-              )}
+              <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
               
               <div className="flex space-x-3">
                 {candidate.cv_url && (
@@ -244,7 +234,7 @@ const CandidateDetailPage = ({
                     
                     {candidate.score_justification && (
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-600">Justification:</p>
+                        <p className="text-sm text-gray-600">Justification du score:</p>
                         <p className="text-sm bg-gray-50 p-3 rounded-lg">{candidate.score_justification}</p>
                       </div>
                     )}
