@@ -323,7 +323,7 @@ const CandidateDetailPage = ({
                 {candidate.profile_summary && (
                   <div>
                     <h4 className="font-semibold mb-2">Résumé du profil</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{candidate.profile_summary}</p>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg text-xs">{candidate.profile_summary}</p>
                   </div>
                 )}
 
