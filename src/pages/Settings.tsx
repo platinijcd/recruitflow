@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 
 export default function Settings() {
-  const { getWebhookSettings, updateSetting, isLoading } = useAppSettings();
+  const { getWebhookSettings, updateSetting, isLoading, settings } = useAppSettings();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
 

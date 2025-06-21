@@ -13,13 +13,12 @@ Here is what you need to run the app on your local computer:
    You can run this SQL directly in Supabase. If it doesn't work, ask the AI to generate a valid version from the same schema.
    You'll also need Authentication to be enabled.
 
-3. Setup the app with this [guide](lovable_install.md) or clone the repo on a lovable project.  
 
-4. Update the webhooks on the app’s settings page:  
+3. Update the webhooks on the app’s settings page:  
    1. Log in to the app.
    2. Navigate to the settings page.  
    3. Replace the webhook URLs as follows:  
       - `"chat_ai_webhook"`: This is the RAG agent webhook, used on the "chat" page.  
       - `"linkedin_scraper_webhook"`: This is the webhook for the LinkedIn profile scraper, used on the "Recherche" page.
 
-5. Enjoy!
+4. Enjoy!

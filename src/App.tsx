@@ -15,6 +15,7 @@ import Recruteurs from "./pages/Recruteurs";
 import Interviews from "./pages/Interviews";
 import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
+import Users from "./pages/Users";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -44,6 +45,7 @@ const App = () => (
                         <Route path="/recruteurs" element={<Recruteurs />} />
                         <Route path="/recherche" element={<Recherche />} />
                         <Route path="/chat" element={<Chat />} />
+                        <Route path="/users" element={<Users />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
