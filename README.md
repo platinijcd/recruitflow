@@ -92,6 +92,3 @@ RecruitFlow is a comprehensive recruitment management platform built with React,
 - n8n for workflow automation 
 - RApidAPI  via n8n for profile scraping  
 - Webhooks for AI services and search tools
-
-## Setup
- Check this folder for more details : [Setup Guide](Setup)

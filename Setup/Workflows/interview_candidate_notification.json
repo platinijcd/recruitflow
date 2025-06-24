@@ -1,0 +1,167 @@
+{
+  "name": "interview_candidate_notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e61526af-b07f-471d-bbbe-21ef8b2e6eb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -40,
+        80
+      ],
+      "id": "9c85ccf5-794b-4d58-bf0c-f22018a4cb9b",
+      "name": "Webhook",
+      "webhookId": "e61526af-b07f-471d-bbbe-21ef8b2e6eb1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json.body.email}}",
+        "subject": "=Votre candidature au poste de {{$json.body.post}} a été retenu.",
+        "message": "=<p>Bonjour {{$json.body.name}},</p>\n\n<p>Nous vous informons que votre candidature pour le poste de {{ $json.body.post }} a été retenue.</p>\n\n<p>Vous êtes convié à vous rendre à votre entretien prévu le {{ $json.body.interview_datetime }} à {{ $json.body.location }}.</p>\n\n<p>Sur place, vous serez mis en relation avec le recruteur {{ $json.body.recruiter_name }}.</p>\n\n<p>Nous vous remercions de ne pas vous présenter en retard.</p>\n\n<p>Bien à vous,<br>L'équipe recruitflow.</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        80
+      ],
+      "id": "73e52983-ea63-4a6e-9ec7-7cb8568124da",
+      "name": "Gmail",
+      "webhookId": "22632647-860a-45a9-8a0f-8c5ea9ce804d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uF0jtzL8iRYG5pW8",
+          "name": "Gmail account Clarium"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "interviews",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "candidate_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.ID }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "candidate_notified",
+              "fieldValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        540,
+        80
+      ],
+      "id": "064eb74f-f7a4-4555-ad2a-72e4612429fc",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "4DjZUAZLVswBTR7j",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Trigger\n\nThe supabase function trigger this webhook with all inforamtions related to the interview.",
+        "height": 460,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -160
+      ],
+      "id": "ff133724-3364-49de-9aab-00e195d03727",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Send email notification \n\nWe inform the candidate that his application has been accepted.",
+        "height": 460,
+        "width": 260,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        -160
+      ],
+      "id": "ea213e92-4efa-4bee-bf53-f6efe07d2078",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Update candidate_notified  \n\nWe make sure that the candidate did recevive an email by update a boolean row in supabase.",
+        "height": 460,
+        "width": 260,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -160
+      ],
+      "id": "9b5d2d66-3514-4bfc-a3ce-5fe2f4ad0e3e",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "73f85457-e3d3-4341-9a9d-f51a1ad2ebb6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f3bf0740e86805879ff06102b8c465db40713bc059e5e6e6903caae1305dc76"
+  },
+  "id": "FWm7tKfQpyJ8Ejhl",
+  "tags": []
+}

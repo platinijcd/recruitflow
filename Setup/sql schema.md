@@ -1,8 +1,14 @@
+# SQL Schema 
+ Here are all the tables used to run the application and store informations, you can find the code to create them and explanation about there usage.
 
--- Run each part one by one from top to bottom. 
--- Please refer to flowchart for more context and FK relatioships.
+**candidates**
+*Stores information about job candidates, including contact info, application details, and evaluation scores.*
+- **Key columns:**
+  - `relevance_score`: Integer score (0-10) representing how well the candidate matches the job.
+  - `application_status`: Status of the candidate's application (e.g., To Be Reviewed).
+  - `interview_id`: Links to the interview scheduled for the candidate.
 
-"""sql
+```sql
 CREATE TABLE public.candidates (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   name text NOT NULL DEFAULT 'NOT_NULL'::text,
@@ -11,8 +17,7 @@ CREATE TABLE public.candidates (
   linkedin_url text,
   cv_url text,
   application_date timestamp without time zone DEFAULT now(),
-
-desired_position text,
+  desired_position text,
   certifications ARRAY,
   profile_summary text,
   relevance_score integer CHECK (relevance_score >= 0 AND relevance_score <= 10),
@@ -29,7 +34,15 @@ desired_position text,
   CONSTRAINT candidates_interview_id_fkey FOREIGN KEY (interview_id) REFERENCES public.interviews(id),
   CONSTRAINT fk_post FOREIGN KEY (post_id) REFERENCES public.posts(id)
 );
+```
 
+**chat_messages**
+*Stores chat messages exchanged in the system, including sender info and message content.*
+- **Key columns:**
+  - `user_email`: Email of the user who sent the message.
+  - `role`: Role of the sender (e.g., assistant, user).
+
+```sql
 CREATE TABLE public.chat_messages (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
@@ -38,7 +51,16 @@ CREATE TABLE public.chat_messages (
   content text NOT NULL,
   CONSTRAINT chat_messages_pkey PRIMARY KEY (id)
 );
+```
 
+**interviews**
+*Contains scheduled interviews between candidates and recruiters for specific posts.*
+- **Key columns:**
+  - `candidate_id`: References the candidate being interviewed.
+  - `recruiter_id`: References the recruiter conducting the interview.
+  - `interview_status`: Status of the interview (e.g., Scheduled).
+
+```sql
 CREATE TABLE public.interviews (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   candidate_id uuid NOT NULL,
@@ -54,7 +76,15 @@ CREATE TABLE public.interviews (
   CONSTRAINT interviews_candidate_id_fkey FOREIGN KEY (candidate_id) REFERENCES public.candidates(id),
   CONSTRAINT interviews_post_id_fkey FOREIGN KEY (post_id) REFERENCES public.posts(id)
 );
+```
 
+**posts**
+*Represents job postings or open positions in the organization.*
+- **Key columns:**
+  - `title`: Title of the job post.
+  - `post_status`: Status of the post (e.g., Open).
+
+```sql
 CREATE TABLE public.posts (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   title text NOT NULL,
@@ -66,7 +96,15 @@ CREATE TABLE public.posts (
   enterprise text,
   CONSTRAINT posts_pkey PRIMARY KEY (id)
 );
+```
 
+**recruiters**
+*Stores information about recruiters who manage candidates and interviews.*
+- **Key columns:**
+  - `email`: Unique email address of the recruiter.
+  - `role`: Role or position of the recruiter in the organization.
+
+```sql
 CREATE TABLE public.recruiters (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   name text NOT NULL,
@@ -76,35 +114,4 @@ CREATE TABLE public.recruiters (
   created_at timestamp without time zone DEFAULT now(),
   CONSTRAINT recruiters_pkey PRIMARY KEY (id)
 );
-"""
-
-
-## Functions: 
-
-You will need to add 2 functions and triggers, functions will help perform specific actions when a trigger is it. The trigger can be an INSET, UPDATE, DELETE. We just need to specify the trigger type and the associated function.
-
-## Update Candidates Interview_id Fk when an interview in created for a candidate on candidate table
-
-- **Function**
-'''Sql
-BEGIN
-  UPDATE candidates
-  SET 
-    interview_id = NEW.id,
-    post_id = NEW.post_id
-  WHERE id = NEW.candidate_id;
-
-  RETURN NEW;
-END;
-
-'''
-
-## Update Update_date for setting row when edited on setting table
-- **Function**
-'''sql
-
-BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
-END;
-'''
+```
