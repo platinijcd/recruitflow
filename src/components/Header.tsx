@@ -1,4 +1,3 @@
-
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -21,7 +20,7 @@ const Header = () => {
   };
 
   return (
-    <Card className="rounded-none border-b border-gray-200 shadow-sm bg-white">
+    <Card className="rounded-none border-b border-gray-200 shadow-sm bg-white flex-shrink-0">
       <div className="px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">

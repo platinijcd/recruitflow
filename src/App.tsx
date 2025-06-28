@@ -31,22 +31,24 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/*" element={
               <ProtectedRoute>
-                <div className="min-h-screen bg-recruit-gray-light">
+                <div className="h-screen bg-recruit-gray-light flex flex-col overflow-hidden">
                   <Header />
-                  <div className="flex">
+                  <div className="flex flex-1 overflow-hidden">
                     <Navigation />
-                    <main className="flex-1 p-6">
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/candidatures" element={<Candidatures />} />
-                        <Route path="/postes" element={<Postes />} />
-                        <Route path="/entretiens" element={<Interviews />} />
-                        <Route path="/recruteurs" element={<Recruteurs />} />
-                        <Route path="/recherche" element={<Recherche />} />
-                        <Route path="/chat" element={<Chat />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
+                    <main className="flex-1 overflow-y-auto">
+                      <div className="p-6">
+                        <Routes>
+                          <Route path="/" element={<Dashboard />} />
+                          <Route path="/candidatures" element={<Candidatures />} />
+                          <Route path="/postes" element={<Postes />} />
+                          <Route path="/entretiens" element={<Interviews />} />
+                          <Route path="/recruteurs" element={<Recruteurs />} />
+                          <Route path="/recherche" element={<Recherche />} />
+                          <Route path="/chat" element={<Chat />} />
+                          <Route path="/settings" element={<Settings />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </div>
                     </main>
                   </div>
                 </div>
