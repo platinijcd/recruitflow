@@ -6,9 +6,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import CandidatureCard from '@/components/CandidatureCard';
 import CandidateDetailPage from '@/components/CandidateDetailPage';
 import AddCandidateForm from '@/components/AddCandidateForm';
-import { Search, Filter, Plus } from 'lucide-react';
+import { Search, Filter, Plus, RefreshCw } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
+import { useAppSettings } from '@/hooks/useAppSettings';
+import { toast } from 'sonner';
 
 const Candidatures = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,6 +22,9 @@ const Candidatures = () => {
   
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: posts = [], isLoading: postsLoading } = usePosts();
+  const { settings } = useAppSettings();
+  const emailAssistantWebhook = settings.find(s => s.setting_key === 'email_assistant')?.setting_value;
+  const [refreshing, setRefreshing] = useState(false);
 
   const filteredCandidatures = candidates.filter(candidature => {
     const matchesSearch = candidature.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -98,6 +103,31 @@ const Candidatures = () => {
                 className="w-full md:w-auto rounded-lg"
               >
                 Réinitialiser
+              </Button>
+
+              <Button
+                variant="ghost"
+                className="w-10 h-10 p-0 flex items-center justify-center"
+                title="Rafraîchir Email Assistant"
+                onClick={async () => {
+                  if (!emailAssistantWebhook) {
+                    toast.error('Webhook email_assistant non configuré');
+                    return;
+                  }
+                  setRefreshing(true);
+                  try {
+                    const response = await fetch(emailAssistantWebhook, { method: 'POST' });
+                    if (!response.ok) throw new Error('Erreur HTTP: ' + response.status);
+                    toast.success('Webhook Email Assistant déclenché');
+                  } catch (err) {
+                    toast.error('Erreur lors du déclenchement du webhook');
+                  } finally {
+                    setRefreshing(false);
+                  }
+                }}
+                disabled={refreshing}
+              >
+                <RefreshCw className={refreshing ? 'animate-spin' : ''} />
               </Button>
             </div>
           </div>
