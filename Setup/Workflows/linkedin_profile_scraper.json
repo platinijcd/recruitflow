@@ -1,5 +1,5 @@
 {
-  "name": "Profile Scraper",
+  "name": "linkedin_profile_scraper",
   "nodes": [
     {
       "parameters": {
@@ -39,10 +39,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1060,
-        -80
+        1240,
+        260
       ],
-      "id": "7883886c-dd8e-4063-8125-57d1054b6e20",
+      "id": "801fe34e-d09d-4f79-9a00-14df182683e9",
       "name": "Get Profiles"
     },
     {
@@ -75,10 +75,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        140,
-        -80
+        320,
+        260
       ],
-      "id": "ebbdc07a-7130-4633-a3ae-0c63fa6d73b0",
+      "id": "f5f3477c-0f3a-48a8-936c-f46f1c5f947d",
       "name": "Get geoloc"
     },
     {
@@ -90,10 +90,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -120,
-        -80
+        60,
+        260
       ],
-      "id": "0ae25aad-34c9-4829-9586-2a33c6270ad9",
+      "id": "60cd4375-cc7d-43c0-887a-192041953854",
       "name": "Webhook",
       "webhookId": "114f1a40-b072-4038-9775-837b26ed1042"
     },
@@ -105,10 +105,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.2,
       "position": [
-        1300,
-        -80
+        1480,
+        260
       ],
-      "id": "8cf79f46-8516-47db-8bf1-98e873f2e69f",
+      "id": "d57d2ba4-4846-4f65-bcfa-563d7bdf8269",
       "name": "Respond to Webhook"
     },
     {
@@ -127,10 +127,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        600,
-        -80
+        780,
+        260
       ],
-      "id": "2d254d8f-1d09-4ee1-a7fe-92a37874ef53",
+      "id": "5abef1f4-f97f-4427-87a2-d02c91b377f6",
       "name": "Aggregate"
     },
     {
@@ -141,10 +141,10 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        360,
-        -80
+        540,
+        260
       ],
-      "id": "35a63535-5745-48a1-9666-bcb0bffc6af7",
+      "id": "515a0559-0695-4857-97e0-e3fbf550e141",
       "name": "Split Out"
     },
     {
@@ -154,10 +154,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        820,
-        -80
+        1000,
+        260
       ],
-      "id": "b5c5df21-af0e-49cd-b9c1-3cc7f3448ac8",
+      "id": "dc980dbf-be85-4875-89cc-9c582d153c99",
       "name": "Code"
     },
     {
@@ -169,10 +169,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -180,
-        -340
+        0,
+        0
       ],
-      "id": "aa578528-f4af-4440-9e8c-4e7fb34c1cbb",
+      "id": "46eee14c-6324-4371-9f9a-6cf409c1491b",
       "name": "Sticky Note"
     },
     {
@@ -185,10 +185,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        80,
-        -340
+        260,
+        0
       ],
-      "id": "c057540a-3fe3-4b5b-9039-95c6a8c3d752",
+      "id": "a6badb0a-188d-45cd-a9f1-83fe1d27a7c3",
       "name": "Sticky Note1"
     },
     {
@@ -201,10 +201,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1000,
-        -340
+        1180,
+        0
       ],
-      "id": "0b07bee0-2c7e-4a1c-8342-cee2f1ccfa8d",
+      "id": "c699e580-f45c-4d6b-ab4c-266e2bb19162",
       "name": "Sticky Note2"
     },
     {
@@ -216,10 +216,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1240,
-        -340
+        1420,
+        0
       ],
-      "id": "31f5ed9e-8ca0-4dff-8b43-ef66a5900313",
+      "id": "182f1bef-81e8-41f9-874d-108295922048",
       "name": "Sticky Note3"
     }
   ],
@@ -292,14 +292,14 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "1b82e995-cc1b-456c-a8c2-17953f1d7076",
+  "versionId": "30555693-9f4f-4e7e-91d0-4c9bc60288c9",
   "meta": {
     "instanceId": "1f3bf0740e86805879ff06102b8c465db40713bc059e5e6e6903caae1305dc76"
   },
-  "id": "KoebEiY9AkHV7lCh",
+  "id": "x3e5MCNuzXn4WxyR",
   "tags": []
 }

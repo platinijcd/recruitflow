@@ -84,11 +84,19 @@ const CandidateDetailPage = ({
   };
 
   const handleSave = () => {
-    updateCandidate({
-      id: candidate.id,
-      updates: editedCandidate
-    });
-    setIsEditing(false);
+    updateCandidate(
+      {
+        id: candidate.id,
+        updates: editedCandidate
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          // Update the local candidate data to reflect changes immediately
+          Object.assign(candidate, editedCandidate);
+        }
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -120,13 +128,8 @@ const CandidateDetailPage = ({
     }
   };
 
-  const getStatusBadgeProps = (status: string) => {
-    const statusMap = {
-      'To Be Reviewed': 'A évaluer',
-      'Relevant': 'Pertinent', 
-      'Rejectable': 'Rejeté'
-    };
-    return statusMap[status as keyof typeof statusMap] || status;
+  const getStatusBadgeProps = (status: ApplicationStatus) => {
+    return status;
   };
 
   const getInitials = (name: string) => {
@@ -185,36 +188,20 @@ const CandidateDetailPage = ({
           <div className="p-5 space-y-5">
             {/* Main Info */}
             <div className="space-y-4">
-              {isEditing ? (
-                <Input
-                  value={editedCandidate.name}
-                  onChange={(e) => setEditedCandidate({...editedCandidate, name: e.target.value})}
-                  className="text-3xl font-bold"
-                  placeholder="Nom du candidat"
-                />
-              ) : (
-                <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
-              )}
+              <h1 className="text-3xl font-bold text-gray-900">{candidate.name}</h1>
               
               <div className="flex space-x-3">
-                {candidate.cv_link && (
+                {candidate.cv_url && (
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => window.open(candidate.cv_link, '_blank')}
+                    onClick={() => window.open(candidate.cv_url, '_blank')}
                   >
                     <FileText className="h-4 w-4 mr-2" />
                     Voir CV
                   </Button>
                 )}
-                {isEditing ? (
-                  <Input
-                    value={editedCandidate.linkedin_url}
-                    onChange={(e) => setEditedCandidate({...editedCandidate, linkedin_url: e.target.value})}
-                    placeholder="URL LinkedIn"
-                    className="w-64"
-                  />
-                ) : candidate.linkedin_url && (
+                {candidate.linkedin_url && (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -247,7 +234,7 @@ const CandidateDetailPage = ({
                     
                     {candidate.score_justification && (
                       <div className="space-y-2">
-                        <p className="text-sm text-gray-600">Justification:</p>
+                        <p className="text-sm text-gray-600">Justification du score:</p>
                         <p className="text-sm bg-gray-50 p-3 rounded-lg">{candidate.score_justification}</p>
                       </div>
                     )}
@@ -264,14 +251,20 @@ const CandidateDetailPage = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Desired Post (always read-only) */}
                 <div>
                   <span className="font-medium">Poste souhaité: </span>
+                  <span>{candidate.desired_position || 'Non spécifié'}</span>
+                </div>
+                {/* AI Matching Post (editable) */}
+                <div>
+                  <span className="font-medium">Poste Potentiel IA: </span>
                   {isEditing ? (
                     <Select value={editedCandidate.post_id} onValueChange={(value) => setEditedCandidate({...editedCandidate, post_id: value})}>
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un poste" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white z-50">
                         {posts.map(post => (
                           <SelectItem key={post.id} value={post.id}>
                             {post.title}
@@ -291,7 +284,7 @@ const CandidateDetailPage = ({
                       <SelectTrigger className="w-64">
                         <SelectValue placeholder="Sélectionner un statut" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white z-50">
                         <SelectItem value="To Be Reviewed">À réviser</SelectItem>
                         <SelectItem value="Relevant">Pertinent</SelectItem>
                         <SelectItem value="Rejectable">À rejeter</SelectItem>
@@ -336,7 +329,7 @@ const CandidateDetailPage = ({
                 {candidate.profile_summary && (
                   <div>
                     <h4 className="font-semibold mb-2">Résumé du profil</h4>
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{candidate.profile_summary}</p>
+                    <p className="text-gray-700 bg-gray-50 p-3 rounded-lg text-xs">{candidate.profile_summary}</p>
                   </div>
                 )}
 

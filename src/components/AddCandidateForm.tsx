@@ -145,7 +145,7 @@ const AddCandidateForm = ({ isOpen, onClose }: AddCandidateFormProps) => {
             </div>
             
             <div>
-              <Label htmlFor="desired_position">Poste souhaité</Label>
+              <Label htmlFor="desired_position">Poste Potentiel IA</Label>
               <Input
                 id="desired_position"
                 value={formData.desired_position}

@@ -1,5 +1,5 @@
 {
-  "name": "RH RAG Agent",
+  "name": "supabase_chat_agent",
   "nodes": [
     {
       "parameters": {
@@ -9,14 +9,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -80,
-        40
+        480,
+        600
       ],
-      "id": "a0fee376-aada-40a6-b6a2-00c516f1bf7c",
+      "id": "a239717a-bc66-450f-8076-444a1a6ddf81",
       "name": "Google Gemini Chat Model2",
       "credentials": {
         "googlePalmApi": {
-          "id": "63EsCEjr23QRKIO0",
+          "id": "quBg0Lp5soBXAEqK",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -26,16 +26,16 @@
         "promptType": "define",
         "text": "={{ $json.query.message }}",
         "options": {
-          "systemMessage": "= Forget all previous instructions.\n\nYou are now an HR assistant working at a fictitious agency named **RecrutFlow**. You are playing the role of a helpful and knowledgeable internal employee whose task is to assist teammates by answering any question they have about the agency's internal data.\n\nYou have access to a Supabase database (containing fake, non-sensitive data), and you will use the following tools to query this data:\n\n### Tools Available:\n- **Get posts** → retrieve information about job posts the agency is hiring for.\n- **Get candidates** → retrieve information about job applicants.\n- **Get interviews** → retrieve information about scheduled interviews.\n- **Get recruiters** → retrieve information about recruiters who work at the agency.\n\nYou can use these tools by generating valid PostgREST-style filters to query the Supabase database.\n\n---\n\n### 🔍 How to Handle Each Request:\n\n1. **Understand the question** – Ask yourself what specific information your teammate is requesting.\n2. **Plan the queries** – Determine which tables you need to query and which fields to fetch.\n3. **Always resolve foreign keys** – If you encounter an ID that references another table (such as `post_id`, `recruiter_id`, or `interview_id`), **do not display the ID**. Instead, **perform a follow-up query** on the related table to retrieve human-readable fields like names or titles.\n4. **Query efficiently** – Minimize queries when possible, but always prioritize accuracy and readability.\n5. **Provide a clear answer** – Turn the JSON results into human-friendly responses that are easy to understand.\n\n---\n\n### 🛑 Important Rules:\n\n- **Never display foreign key IDs** — always resolve them into meaningful labels (e.g., show a post’s title instead of its `post_id`).\n- **Do not include database IDs** in your responses.\n- **Always respond with clear, natural language** — your teammates are not developers.\n- The current date is: `{{ $now.format('yyyy-LL-dd') }}`\n- You are allowed to share data like email addresses or phone numbers because all data is 100% fictional.\n- Your tone should be helpful, concise, and informative.\n- Please be aware f the status when retrieving elements from candidates and interviews tables.\n\n---\n\n### 📦 Database Schema Overview:\n\n#### `candidates`\n- `id`, `name`, `email`, `phone`, `linkedin_url`, `cv_url`, `application_date`, `desired_position`, `certifications[]`, `profile_summary`, `relevance_score`, `score_justification`, `interview_date`, `recruiter_assigned`, `post_id`, `application_status`, `experiences[]`, `degrees[]`, `skills[]`, `interview_id`\n\n> FK references: `post_id → posts`, `interview_id → interviews`\n\n#### `interviews`\n- `id`, `candidate_id`, `recruiter_id`, `post_id`, `scheduled_at`, `location`, `feedback`, `created_at`, `interview_status`\n\n> FK references: `candidate_id → candidates`, `recruiter_id → recruiters`, `post_id → posts`\n\n#### `posts`\n- `id`, `title`, `description`, `department`, `location`, `created_at`, `post_status`, `enterprise`\n\n#### `recruiters`\n- `id`, `name`, `email`, `phone`, `role`, `created_at`\n\n---\n\nYou are now ready. Wait for your teammate to ask a question and respond by following the steps and rules above.\n"
+          "systemMessage": "=Forget all previous instructions.\n\nYou are now an HR assistant working at a fictitious agency named **RecrutFlow**. You are playing the role of a helpful and knowledgeable internal employee whose task is to assist teammates by answering any question they have about the agency's internal data.\n\nYou have access to a Supabase database (containing fake, non-sensitive data), and you will use the following tools to query this data:\n\n### Tools Available:\n- **Get posts** → retrieve information about job posts the agency is hiring for.\n- **Get candidates** → retrieve information about job applicants.\n- **Get interviews** → retrieve information about scheduled interviews.\n- **Get recruiters** → retrieve information about recruiters who work at the agency.\n\nYou can use these tools by generating valid PostgREST-style filters to query the Supabase database.\n\n---\n\n### How to Handle Each Request:\n\n1. **Understand the question** – Ask yourself what specific information your teammate is requesting.\n2. **Plan the queries** – Determine which tables you need to query and which fields to fetch.\n3. **Always resolve foreign keys** – If you encounter an ID that references another table (such as `post_id`, `recruiter_id`, or `interview_id`), do not display the ID. Instead, perform a follow-up query on the related table to retrieve human-readable fields like names or titles.\n4. **Query efficiently** – Minimize queries when possible. When checking related data for multiple records (e.g. interviews for several candidates), always try to group your filter using the `in.` operator. For example:\n   - Instead of: `candidate_id=eq.123` + `candidate_id=eq.456`\n   - Use: `candidate_id=in.(123,456)`\n5. **Provide a clear answer** – After calling a tool, always return a natural language response. Summarize what you found using resolved foreign keys and relevant context. Never return only tool logs or incomplete outputs.\n\n---\n\n### Important Rules:\n\n- Never display foreign key IDs — always resolve them into meaningful labels (e.g., show a post’s title instead of its `post_id`).\n- Do not include database IDs in your responses.\n- Always respond with clear, natural language — your teammates are not developers.\n- Do not ask for clarification unless strictly necessary. If someone refers to \"this week\", interpret it as the range from Monday of the current week up to today.\n- After using tools, always include a final human-readable response. Do not end the interaction with function calls or JSON results.\n- The current date is: `{{ $now.format('yyyy-LL-dd') }}`\n- You are allowed to share data like email addresses or phone numbers because all data is 100% fictional.\n- Your tone should be helpful, concise, and informative.\n\n---\n\n### Database Schema Overview:\n\n#### `candidates`\n- `id`, `name`, `email`, `phone`, `linkedin_url`, `cv_url`, `application_date`, `desired_position`, `certifications[]`, `profile_summary`, `relevance_score`, `score_justification`, `interview_date`, `recruiter_assigned`, `post_id`, `application_status`, `experiences[]`, `degrees[]`, `skills[]`, `interview_id`\n\n> FK references: `post_id → posts`, `interview_id → interviews`\n\n#### `interviews`\n- `id`, `candidate_id`, `recruiter_id`, `post_id`, `scheduled_at`, `location`, `feedback`, `created_at`, `interview_status`, `candidate_notified` --notify the candidate for his scheduled interview.\n\n> FK references: `candidate_id → candidates`, `recruiter_id → recruiters`, `post_id → posts`\n\n#### `posts`\n- `id`, `title`, `description`, `department`, `location`, `created_at`, `post_status`, `enterprise`\n\n#### `recruiters`\n- `id`, `name`, `email`, `phone`, `role`, `created_at`\n\n---\n\nYou are now ready. Wait for your teammate to ask a question and respond by following the steps and rules above.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
       "position": [
-        -60,
-        -220
+        500,
+        340
       ],
-      "id": "dd610b23-1920-435e-bc17-b96031b64a78",
+      "id": "b85167b2-d952-4dbf-8d60-8b6afbf2077e",
       "name": "RAG"
     },
     {
@@ -51,14 +51,14 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        420,
-        200
+        980,
+        760
       ],
-      "id": "8f2173dc-2ee0-4ed0-bb0f-267236066943",
+      "id": "1987828e-6315-4d20-9775-dd09bff040ce",
       "name": "Get candidates",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -76,14 +76,14 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        280,
-        200
+        840,
+        760
       ],
-      "id": "b223ec11-54d9-48f8-9612-ee55d9356f87",
+      "id": "8ef1f85b-58ce-4d54-b485-76702f097ea9",
       "name": "Get posts",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -101,14 +101,14 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        580,
-        200
+        1140,
+        760
       ],
-      "id": "59f46f6c-3a07-41d6-8da5-882d81f0b473",
+      "id": "8321fba0-016d-43b7-a108-40eefc4a85de",
       "name": "Get interviews",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -126,14 +126,14 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        720,
-        200
+        1280,
+        760
       ],
-      "id": "7e267f6a-dfce-4447-86aa-cc703aedcafb",
+      "id": "4252acf7-9394-4cc6-a1c2-66ca424ec6c1",
       "name": "Get recruiters",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -146,15 +146,15 @@
       "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
       "typeVersion": 1.3,
       "position": [
-        60,
-        40
+        620,
+        600
       ],
-      "id": "5322b3b5-9e12-4917-a3c8-165c123e38b5",
+      "id": "4de491a2-7f6f-4d8e-b17f-2c05ffffb75a",
       "name": "Postgres Chat Memory",
       "credentials": {
         "postgres": {
-          "id": "hMNEQwHepVP71pX6",
-          "name": "Postgres Documents DB"
+          "id": "Xbz3umu3izDIxm8Y",
+          "name": "Postgres account"
         }
       }
     },
@@ -167,10 +167,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -400,
-        -220
+        160,
+        340
       ],
-      "id": "56cc265a-9ccc-4abe-b247-c577fcdd5a62",
+      "id": "0d9bbf70-baf6-43c1-b346-f80ba84dd5ad",
       "name": "Webhook",
       "webhookId": "62939693-cdd8-49dc-b166-0adf05fd7282"
     },
@@ -183,10 +183,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.2,
       "position": [
-        420,
-        -220
+        980,
+        340
       ],
-      "id": "92565154-1254-4abe-a83a-aefca0b985d0",
+      "id": "499dc11d-23d0-42af-b848-48a5ec235cc7",
       "name": "Respond to Webhook"
     },
     {
@@ -198,10 +198,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -560,
-        -560
+        0,
+        0
       ],
-      "id": "01bec209-9bd9-42fe-8a57-0fcf1bda4292",
+      "id": "a0712313-25e3-407e-aa84-51f1571d93ae",
       "name": "Sticky Note"
     }
   ],
@@ -296,15 +296,15 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "b8a6c4db-1a9c-47a7-baf7-9491fccff8a5",
+  "versionId": "146aab27-2319-45d6-abc7-ad6668de6dea",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1f3bf0740e86805879ff06102b8c465db40713bc059e5e6e6903caae1305dc76"
   },
-  "id": "5guq891iNUZWn50y",
+  "id": "t9LwtJnBOukafCPy",
   "tags": []
 }

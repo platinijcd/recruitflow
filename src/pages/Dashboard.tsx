@@ -1,15 +1,16 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Briefcase, UserCheck, Clock, TrendingUp, Calendar } from 'lucide-react';
 import { useCandidates } from '@/hooks/useCandidates';
 import { usePosts } from '@/hooks/usePosts';
 import { useRecruiters } from '@/hooks/useRecruiters';
+import { useInterviews } from '@/hooks/useInterviews';
 
 const Dashboard = () => {
   const { data: candidates = [], isLoading: candidatesLoading } = useCandidates();
   const { data: posts = [], isLoading: postsLoading } = usePosts();
   const { data: recruiters = [], isLoading: recruitersLoading } = useRecruiters();
+  const { interviews = [], loading: interviewsLoading, error: interviewsError } = useInterviews();
 
   if (candidatesLoading || postsLoading || recruitersLoading) {
     return <div className="p-6">Chargement...</div>;
@@ -67,8 +68,8 @@ const Dashboard = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Candidats pertinents</p>
-                <p className="text-3xl font-bold text-recruit-orange">{candidaturesParStatut['Relevant']}</p>
+                <p className="text-sm font-medium text-gray-600">Total entretiens</p>
+                <p className="text-3xl font-bold text-recruit-orange">{interviews.length}</p>
               </div>
               <UserCheck className="h-8 w-8 text-recruit-orange" />
             </div>

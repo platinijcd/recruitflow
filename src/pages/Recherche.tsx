@@ -104,9 +104,16 @@ const Recherche = () => {
         throw new Error('Invalid JSON response');
       }
 
-      if (Array.isArray(data) && data[0]?.success && Array.isArray(data[0]?.data?.items)) {
-        setSearchResults(data[0].data.items);
-        toast.success(`${data[0].data.items.length} profils trouvés sur ${data[0].data.total.toLocaleString()} résultats totaux`);
+      if (Array.isArray(data) && data[0]?.success) {
+        const items = data[0]?.data?.items;
+        const total = data[0]?.data?.total ?? 0;
+        if (Array.isArray(items) && items.length > 0) {
+          setSearchResults(items);
+          toast.success(`${items.length} profils trouvés sur ${total.toLocaleString()} résultats totaux`);
+        } else {
+          setSearchResults([]);
+          toast.info('Aucun résultat trouvé');
+        }
       } else {
         console.error('Unexpected response format:', data);
         throw new Error('Unexpected response format');
@@ -208,7 +215,7 @@ const Recherche = () => {
       </Card>
 
       {/* Résultats de recherche */}
-      {searchResults.length > 0 && (
+      {(searchResults.length > 0) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -255,6 +262,17 @@ const Recherche = () => {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+      {/* Show a message if no results were found after a search */}
+      {(searchResults.length === 0 && !isSearching && (searchCriteria.keywords || searchCriteria.location)) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Aucun résultat trouvé</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Aucun profil ne correspond à votre recherche.</p>
           </CardContent>
         </Card>
       )}
