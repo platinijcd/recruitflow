@@ -17,6 +17,7 @@ import Chat from "./pages/Chat";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
                           <Route path="/recherche" element={<Recherche />} />
                           <Route path="/chat" element={<Chat />} />
                           <Route path="/settings" element={<Settings />} />
+                          <Route path="/notifications" element={<Notifications />} />
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </div>
