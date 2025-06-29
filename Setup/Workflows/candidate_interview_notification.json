@@ -1,0 +1,108 @@
+{
+  "name": "candidate_interview_notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e61526af-b07f-471d-bbbe-21ef8b2e6eb1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        60,
+        240
+      ],
+      "id": "57c0f2d7-8237-4b24-ad1e-d10cebf2cfe6",
+      "name": "Webhook",
+      "webhookId": "e61526af-b07f-471d-bbbe-21ef8b2e6eb1"
+    },
+    {
+      "parameters": {
+        "content": "## Trigger\n\nThe supabase function trigger this webhook with all inforamtions related to the interview.",
+        "height": 460,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f4cb556b-cc55-4f8c-b574-19104123de72",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Send email notification \n\nWe inform the candidate that his application has been accepted.",
+        "height": 460,
+        "width": 260,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        280,
+        0
+      ],
+      "id": "6e988d73-ce49-4d65-9456-e1f7eb7bc7c3",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{$json.body.email}}",
+        "subject": "=Votre candidature au poste de {{$json.body.post}} a été retenu.",
+        "message": "=<p>Bonjour {{$json.body.name}},</p>\n\n<p>Nous vous informons que votre candidature pour le poste de {{ $json.body.post }} a été retenue.</p>\n\n<p>Vous êtes convié à vous rendre à votre entretien prévu le {{ $json.body.interview_datetime }} à {{ $json.body.location }}.</p>\n\n<p>Sur place, vous serez mis en relation avec le recruteur {{ $json.body.recruiter_name }}.</p>\n\n<p>Nous vous remercions de ne pas vous présenter en retard.</p>\n\n<p>Bien à vous,<br>L'équipe recruitflow.</p>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        360,
+        240
+      ],
+      "id": "9562150a-8d21-4616-9c07-a8939495a293",
+      "name": "Send a message",
+      "webhookId": "22632647-860a-45a9-8a0f-8c5ea9ce804d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IbodgetRKDH7uhJB",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a0c8f49c-4147-4e2e-b3aa-18574e70345d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "70321941ab326cd9a72dc8dce66b32df5d1eaa2ba91b540c5e19290fe11f9d9f"
+  },
+  "id": "CiA6EAMVAvF6DxkW",
+  "tags": []
+}

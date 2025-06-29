@@ -1,0 +1,1314 @@
+{
+  "name": "hr_email_assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "52a8592c-2d61-4673-9d88-a7049dfd5532",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        80,
+        2200
+      ],
+      "id": "0f6e73f5-0236-4a01-a78d-f71c2076b9d1",
+      "name": "Webhook",
+      "webhookId": "52a8592c-2d61-4673-9d88-a7049dfd5532"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "posts",
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3480,
+        1760
+      ],
+      "id": "755ca05f-6867-420c-92e8-d57e893a28a9",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "id, title",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3700,
+        1760
+      ],
+      "id": "ddcd9ac8-a7a0-46f9-9661-a0c3740c9a05",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9ea82068-31fd-4d8c-8742-9637a74ce5e5",
+              "name": "Name lists",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3920,
+        1760
+      ],
+      "id": "1ce16320-88ab-470b-a2b0-320243d71536",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "tableId": "candidates",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.phone_number.replaceAll('+', \"\") }}"
+            },
+            {
+              "fieldId": "experiences",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.work_experiences }}"
+            },
+            {
+              "fieldId": "degrees",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.education }}"
+            },
+            {
+              "fieldId": "skills",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.skills }}"
+            },
+            {
+              "fieldId": "certifications",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.certifications }}"
+            },
+            {
+              "fieldId": "profile_summary",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.profile_summary }}"
+            },
+            {
+              "fieldId": "desired_position",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.desired_position }}"
+            },
+            {
+              "fieldId": "relevance_score",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.relevance_score }}"
+            },
+            {
+              "fieldId": "score_justification",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.score_justification }}"
+            },
+            {
+              "fieldId": "application_status",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.application_status }}"
+            },
+            {
+              "fieldId": "cv_url",
+              "fieldValue": "={{ $('upload1').item.json.webViewLink }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5000,
+        1820
+      ],
+      "id": "a1dd4099-d27c-464f-80f8-4c027cb51f4b",
+      "name": "Create Candidate without id",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.subject }}\n{{ $json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Postulation",
+              "description": "=Le texte contiens une intention de dépot de candidature ou de postuler."
+            },
+            {
+              "category": "Non Posutlation",
+              "description": "=Le texte ne contiens pas une intention de depot de candidature ou de postuler."
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "=Tu es un agent d'analyse de texte chargé de déterminer si le contenu fourni correspond à une **postulation à une offre d’emploi**.\n\nTa tâche est simple : analyser le texte dans son ensemble, repérer des **indicateurs explicites** ou **formulations courantes** liées à une démarche de candidature, puis classer le texte dans l'une des deux catégories suivantes :\n\n---\n\n### 1. Postulation\nLe texte est une postulation **si au moins une de ces conditions est remplie** :\n- Il contient des phrases telles que :\n  - \"Je souhaite postuler\"\n  - \"Je vous adresse ma candidature\"\n  - \"Veuillez trouver mon CV\"\n  - \"Je me permets de candidater\"\n  - \"Je postule pour le poste de...\"\n  - \"Je suis intéressé(e) par le poste de...\"\n  - \"En réponse à votre offre d’emploi\"\n- Il contient un **ton formel**, **adressé à un recruteur** ou à une entreprise.\n- Il mentionne des éléments typiques d’une candidature :\n  - Le **poste visé**\n  - Le **CV** ou la **lettre de motivation**\n  - Des **compétences ou expériences professionnelles**\n  - Une **motivation ou disponibilité**\n\n---\n\n### 2. Non-postulation\nLe texte **n’est pas une postulation** s’il s’agit :\n- D’une simple demande d’informations\n- D’un message sans intention claire de postuler\n- D’un échange informel ou sans rapport avec un emploi\n- D’un contenu promotionnel, personnel, ou général\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1,
+      "position": [
+        620,
+        2200
+      ],
+      "id": "35224e73-9ebd-4f0a-84ec-06ecafdf8456",
+      "name": "Text Classifier1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        2300
+      ],
+      "id": "22136ed3-277d-434b-9994-1ab0c995c3e8",
+      "name": "No Operation, do nothing1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f33fdcc7-8cbd-4407-a99a-6f43b2296be2",
+                    "leftValue": "attachment_0",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1040,
+        2100
+      ],
+      "id": "db98b47e-0f07-4430-82a1-b33722223405",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1900,
+        2100
+      ],
+      "id": "ec9631ba-3f1e-43ca-8ea3-ae58f9f20e0f",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=attachment_0",
+        "name": "={{ $('Gmail Trigger1').item.json.from.value[0].address }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1GK5a8OICla88RVVsVhGzDv1OwVGq9qeF",
+          "mode": "list",
+          "cachedResultName": "profils",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1GK5a8OICla88RVVsVhGzDv1OwVGq9qeF"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1300,
+        2100
+      ],
+      "id": "a3024d6a-6934-4451-acb6-d558c22a2785",
+      "name": "upload1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "b1ONY3xecMRhRsoA",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "anyone"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1500,
+        2100
+      ],
+      "id": "5eb88729-62c3-44b7-bea9-405686c27fd4",
+      "name": "share1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "b1ONY3xecMRhRsoA",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=Email object: {{ $('Gmail Trigger1').item.json.subject }}\n\nCurriculum: \n{{ $('Extract from File1').item.json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"name\": \"Jean Dupont\",\n  \"phone_number\": \"+33 6 12 34 56 78\",\n  \"email\": \"jean.dupont@email.com\",\n  \"profile_summary\": \"Software developer with 5 years of experience in backend development in Java environments. Trained in computer science with AWS and Scrum certifications, he has    worked on complex projects using Agile methodology for major tech companies.\",\n  \"desired_position\": \"Java Backend Developer\",\n  \"education\": [\n    {\n      \"title\": \"Master in Computer Science\",\n      \"specialization\": \"Software Development\",\n      \"institution\": \"University of Paris\"\n    },\n    {\n      \"title\": \"Bachelor in Mathematics\",\n      \"specialization\": \"Computer Science\",\n      \"institution\": \"University of Lyon\"\n    }\n  ],\n  \"skills\": [\n    \"Java\",\n    \"Spring Boot\",\n    \"Docker\",\n    \"Git\",\n    \"Agile Methods\"\n  ],\n  \"languages\":[\n    \"english\",\n    \"french\"\n  ],\n  \"certifications\": [\n    \"AWS Certified Solutions Architect\",\n    \"Scrum Master PSM I\"\n  ],\n  \"work_experiences\": [\n    {\n      \"position\": \"Backend Developer\",\n      \"company\": \"Capgemini\",\n      \"duration\": \"3 years\",\n      \"missions\": \"Developed REST APIs in Java, continuous integration, participation in Agile ceremonies.\"\n    },\n    {\n      \"position\": \"Software Engineer\",\n      \"company\": \"Sopra Steria\",\n      \"duration\": \"2 years\",\n      \"missions\": \"Java application maintenance, incident management, collaboration with DevOps teams.\"\n    }\n  ]\n}\n",
+        "options": {
+          "systemPromptTemplate": "=You are an HR assistant specialized in recruitment and CV analysis. Your role is to review the content of a resume and the application objective in order to extract and assess the key information from a candidate's profile.\nYour goal is to facilitate the selection of relevant applications for a given position by objectively evaluating the alignment between the candidate's profile and the desired role.\n\n## Tasks to Perform\nFor each application, extract and generate the following elements based on the content of the CV and the objective of the application:\n- Full Name  \n- Phone Number  \n- Email Address (in lowercase)\n- Degrees: Mention the titles, majors, and institutions if available.  \n- Skills: List technical, functional, or soft skills.  \n- Certifications: List any obtained certifications. If none are available, write \"None\".  \n- Work Experience: Detail the main experiences, including job title, company, duration, and key responsibilities.  \n- Profile Summary: Write a clear paragraph of 2 to 3 sentences summarizing the candidate’s professional background, linking their skills, education, certifications, and experience with the targeted position.  \n- Desired Position: Infer this information from the subject line of the application email.(Translate it in english) \n- Relevance Score (out of 10): Evaluate how well the candidate's profile matches the targeted position.  \n- Score Explanation: Objectively justify this score by explaining the strengths and any gaps (e.g., skill mismatch or lack of specific experience).\n\n## Presentation Guidelines\n- Be structured, clear, and professional.  \n- Begin each sentence with a capital letter.  \n- Use capital letters for proper nouns (places, degrees, companies, etc.).  \n- If a piece of information is not available, write \"None\".\n- Please always write in english\n- Always output the email in lowercase.\n- Only capitalize the first letters never the entire name.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        2180,
+        2020
+      ],
+      "id": "a2fe2190-2ff0-4f7e-a0ad-68ede24bf41d",
+      "name": "Extracteur1"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Gmail Trigger1').item.json.id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        5400,
+        2040
+      ],
+      "id": "e6d129a9-f7aa-4ed1-91a8-131f13d17369",
+      "name": "mark as read1",
+      "webhookId": "7ab59325-0b92-449e-a4ef-ac90a7b7c07a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IbodgetRKDH7uhJB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger1').item.json.id }}",
+        "labelIds": [
+          "Label_1028932397184549389"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        5620,
+        2040
+      ],
+      "id": "d0086f6b-158a-444d-8eb8-3d609aea1697",
+      "name": "move email to folder1",
+      "webhookId": "97a3bb04-1078-4acb-9b64-b3f500d37265",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IbodgetRKDH7uhJB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $('Gmail Trigger1').item.json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        5840,
+        2040
+      ],
+      "id": "85b92ce6-826e-42d9-a4c9-f02ba051abe2",
+      "name": "remove from inbox1",
+      "webhookId": "108b9e10-ebe7-4097-b7a6-8e3bbe904e94",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IbodgetRKDH7uhJB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-exp:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2260,
+        2240
+      ],
+      "id": "f3da6878-8b8e-4385-b4a7-d91d37a70060",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gWxVQXE0gtTLAfLY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"relevance_score\": {\n      \"type\": \"integer\",\n      \"minimum\": 0,\n      \"maximum\": 10\n    },\n    \"application_status\": {\n      \"type\": \"string\",\n      \"enum\": [\"Relevant\", \"To Be Reviewed\", \"Rejectable\"]\n    },\n    \"score_justification\": {\n      \"type\": \"string\"\n    }\n  },\n  \"required\": [\"relevance_score\", \"application_status\", \"score_justification\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        3040,
+        2260
+      ],
+      "id": "470fae18-5909-4818-8853-b755b2ba9ac8",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Desired Position \n{{ $json.Desired_position }}\n\n## Applicant Informations\n\nWork Experience:  \n{{ $json.Work_experience }}\n\nEducation:  \n{{ $json.Education }}\n\nTechnical Skills:  \n{{ $json.Skills }}\n\nCertifications:  \n{{ $json.Certifications }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an expert HR evaluation agent. Your role is to analyze a candidate’s suitability for a specific position based on their CV and the subject line of their application.\n\nYour goal is to determine whether the profile is relevant for the targeted role by assigning an overall score out of 10, based on the candidate’s work experience, education, technical skills, and certifications. You must also objectively explain the reasoning behind your score.\n\n## Task:\n\nAssess whether the candidate has the real and concrete qualifications needed for the desired position (provided in the subject line of the application email).\n\nFollow each step below carefully to assign a final score.\n\n### Scoring by category:\n\n1. Work Experience (0 to 4 points)  \n- 0: No experience related to the position  \n- 1: Indirect or unrelated experience  \n- 2: Relevant but limited experience (6 months to 1 year)  \n- 3: Solid experience (1 to 2 years in similar roles)  \n- 4: Strong experience (> 3 years in similar roles)  \n\n2. Education (0 to 2 points)  \n- 0: No degree related to the position  \n- 1: Degree somewhat related to the position  \n- 2: Specialized degree directly aligned with the target role  \n\n3. Technical Skills (0 to 3 points)  \n- 0: No relevant technical skills for the role  \n- 1: Basic or self-taught skills that could be useful  \n- 2: Useful skills but lacking depth or experience  \n- 3: Clear mastery of the tools/technologies required for the role  \n\n4. Certifications (0 to 1 point)  \n- 0: No relevant certifications  \n- 1: At least one recognized certification, whether directly related or not  \n- 2: One or more certified qualifications directly linked to the role  \n\n### Final Score Calculation:\n\nAfter scoring each category, sum the points to produce a final score out of 10. The score must be a whole number and no more than 10. Also provide a clear, concise explanation of the score (max. 3 sentences), mentioning the candidate’s strengths and weaknesses.\n\n### Determining Candidate Status:\n\nBased on the score, assign one of the following statuses:  \n- Relevant: score ≥ 6  \n- To Be Reviewed: score between 3 and 5  \n- To Be Rejected: score < 3  \n\n## Expected Output:\n\n1. Final relevance score out of 10  \n2. Application Status: Relevant / To Be Reviewed / Rejectable  \n3. Justified explanation of the score  \n\n## Important Rules:\n\n- Use structured sentences with capital letters at the beginning.  \n- If a piece of information is missing, write \"None\".  \n- Conduct the analysis with rigor, impartiality, and professionalism.\n- application_status can only take one of these 3 outputs: (\"Relevant\", \"To Be Reviewed\", \"Rejectable\")\n- Always repsonse in english."
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        2840,
+        2020
+      ],
+      "id": "136adfb1-0b0b-4a61-b3e9-f91c04a2645e",
+      "name": "Evaluation1"
+    },
+    {
+      "parameters": {
+        "content": "# Trigger\n\nThis node is used to get incoming emails from **GMAIL**.",
+        "height": 1460,
+        "width": 500,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1520
+      ],
+      "id": "49e6a720-8d14-4592-be10-816d82ac0eb7",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Email Filter\n\nDetermine if the email is an application or not.",
+        "height": 1460,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        520,
+        1520
+      ],
+      "id": "aaa2ad26-7217-4b44-bd79-94dd931ea235",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Check attachement\n\nCheck if there is an attachement in the email.",
+        "height": 1460,
+        "width": 260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1520
+      ],
+      "id": "52fe6f19-b679-495f-8e57-511c84d0ee61",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Upload to Drive\n\nUpload, Share the curriculum to Google Drive. Then extract the data from the PDF To process it with AI.",
+        "height": 1460,
+        "width": 860,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        1520
+      ],
+      "id": "ba19cd1a-0bf8-46a3-bd46-fa7fb9362939",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('upload1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1700,
+        2100
+      ],
+      "id": "de5b3224-dfaa-4e6b-a0ae-6a799f521ee7",
+      "name": "Download1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "b1ONY3xecMRhRsoA",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Extrcator\n\nWe're using AI to scrape all the informations of an application from his cv.",
+        "height": 1460,
+        "width": 500,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        1520
+      ],
+      "id": "daf2d75b-7b53-4a0e-8703-7d035b9045d4",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "## Append In Supabase without matching post",
+        "height": 680,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4800,
+        1520
+      ],
+      "id": "88366618-a3c6-4f8e-a1cb-a00f910b8190",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Email Update",
+        "height": 1460,
+        "width": 760,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        5300,
+        1520
+      ],
+      "id": "0ee0cbca-b3be-44cd-922f-bd1bb889cbb1",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "df6b3ba6-5c18-4f5d-b86f-43aa4a70c21e",
+              "name": "Education",
+              "value": "={{ $json.output.education }}",
+              "type": "string"
+            },
+            {
+              "id": "5ff3354c-81f7-4184-befb-6a414973ad77",
+              "name": "Work_experience",
+              "value": "={{ $json.output.work_experiences }}",
+              "type": "string"
+            },
+            {
+              "id": "9acbb540-743d-48d0-8e6c-a6fb7491e9fa",
+              "name": "Certifications",
+              "value": "={{ $json.output.certifications }}",
+              "type": "string"
+            },
+            {
+              "id": "b5435235-ca9c-4fa1-931b-468c7d2b44ef",
+              "name": "Desired_position",
+              "value": "={{ $json.output.desired_position }}",
+              "type": "string"
+            },
+            {
+              "id": "5ae6f4d8-a421-4c5f-ad3d-aa9cec55c2dc",
+              "name": "Skills",
+              "value": "={{ $json.output.skills }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2500,
+        2020
+      ],
+      "id": "47fee1b7-c459-4aaf-99f4-b477ada201dd",
+      "name": "Turn to String1"
+    },
+    {
+      "parameters": {
+        "content": "## Append In Supabase with matching post ID",
+        "height": 760,
+        "width": 480,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4800,
+        2220
+      ],
+      "id": "bbde28cc-08e5-41fd-a3bc-1d0cc1140eb5",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6e4124e1-e4a1-45bb-b2a4-c4ae20fefa82",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "f8f6c835-a879-4443-8fa8-a4862fa31b92",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "null",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "1bdbac7a-ba4f-4b59-95d9-84183200317a",
+              "leftValue": "={{ $json.output.id }}",
+              "rightValue": "NULL",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        4400,
+        2200
+      ],
+      "id": "ad38d4a3-2190-4d48-9bb0-828cd2a3f3cb",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "tableId": "candidates",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.phone_number.replaceAll('+', \"\") }}"
+            },
+            {
+              "fieldId": "experiences",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.work_experiences }}"
+            },
+            {
+              "fieldId": "degrees",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.education }}"
+            },
+            {
+              "fieldId": "skills",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.skills }}"
+            },
+            {
+              "fieldId": "certifications",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.certifications }}"
+            },
+            {
+              "fieldId": "profile_summary",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.profile_summary }}"
+            },
+            {
+              "fieldId": "desired_position",
+              "fieldValue": "={{ $('Extracteur1').item.json.output.desired_position }}"
+            },
+            {
+              "fieldId": "relevance_score",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.relevance_score }}"
+            },
+            {
+              "fieldId": "score_justification",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.score_justification }}"
+            },
+            {
+              "fieldId": "application_status",
+              "fieldValue": "={{ $('Evaluation1').item.json.output.application_status }}"
+            },
+            {
+              "fieldId": "cv_url",
+              "fieldValue": "={{ $('upload1').item.json.webViewLink }}"
+            },
+            {
+              "fieldId": "post_id",
+              "fieldValue": "={{ $('Post Matcher1').item.json.output.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5020,
+        2560
+      ],
+      "id": "3618362a-5f9d-4062-b734-a6d2368c27bb",
+      "name": "Create Candidate With post_id1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Look for matching posts for the candidate \n\n- If the applicant desired post match a post in the database we will add post_id to the record.",
+        "height": 1460,
+        "width": 1560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3220,
+        1520
+      ],
+      "id": "1e18d0f2-1b29-4610-9d98-501635a79a2a",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "## Evaluator\n\nGives a score to the application based on exps, skills, certifications..",
+        "height": 1460,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        1520
+      ],
+      "id": "04af53b8-e9d8-4bed-a65a-2c8cf0922f38",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "model": "qwen/qwq-32b:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        2240
+      ],
+      "id": "f6c7398a-cedd-4809-a73d-af04005a906f",
+      "name": "qwen1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gWxVQXE0gtTLAfLY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        720,
+        2420
+      ],
+      "id": "4481e04a-79a7-461f-9db5-75d739a382cd",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HoqHEHdcKqcSg8cq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "simple": false,
+        "filters": {
+          "readStatus": "unread",
+          "receivedAfter": "={{ $now.minus(2, 'hours') }}"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        2200
+      ],
+      "id": "41c94289-2186-4177-b7c1-c78b135a3fc4",
+      "name": "Gmail Trigger1",
+      "webhookId": "64e3906b-737f-4eed-a4a9-58183d73638c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "IbodgetRKDH7uhJB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"title\": \"business analyst\",\n\t\"id\": \"8797668696\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        4340,
+        2660
+      ],
+      "id": "2c164481-53e4-4f49-a22e-a7f17d645258",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=## Desired Position:\nJava developer\n\n## Available posts:\n{{ $json['Name lists'] }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an HR assistant. Your task is to match an applicant's desired post with already existing posts.\n\nFollow these instructions and always execute them in order to complete your task:\n\n1. Retrieve all currently open posts, each with its `title` and `id`.\n2. Look through all the post titles and find the best match for the applicant's desired post.\n3. After you find the best matching post, output only:\n   - The `title` of the best matching post.\n   - The `id` of that post.\n\nImportant rules:\n- Always follow the instructions and execute them in order. Do not do anything else outside what you have to do.\n- Always return `null` if you did not find any posts."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        3880,
+        2200
+      ],
+      "id": "972d37f3-0220-4584-a785-18705586d451",
+      "name": "Post Matcher1",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3840,
+        2520
+      ],
+      "id": "ac5c36f5-0adf-4ad9-b157-77de7eccc28d",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "gWxVQXE0gtTLAfLY",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
+      "typeVersion": 1,
+      "position": [
+        4160,
+        2420
+      ],
+      "id": "0b0907a8-f945-44ae-bf07-64dfd191adae",
+      "name": "Auto-fixing Output Parser1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        4160,
+        2660
+      ],
+      "id": "226f7f52-9300-4a6a-b594-44d8f098fe42",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HoqHEHdcKqcSg8cq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Gmail Trigger1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Post Matcher1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate without id": {
+      "main": [
+        [
+          {
+            "node": "mark as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "upload1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Extracteur1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload1": {
+      "main": [
+        [
+          {
+            "node": "share1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "share1": {
+      "main": [
+        [
+          {
+            "node": "Download1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extracteur1": {
+      "main": [
+        [
+          {
+            "node": "Turn to String1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "mark as read1": {
+      "main": [
+        [
+          {
+            "node": "move email to folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "move email to folder1": {
+      "main": [
+        [
+          {
+            "node": "remove from inbox1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extracteur1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluation1": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Turn to String1": {
+      "main": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create Candidate without id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Candidate With post_id1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Candidate With post_id1": {
+      "main": [
+        [
+          {
+            "node": "mark as read1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "qwen1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Evaluation1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Auto-fixing Output Parser1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Matcher1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Post Matcher1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Auto-fixing Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Post Matcher1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Auto-fixing Output Parser1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "84c1563c-fba0-4380-a038-6872678827de",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "70321941ab326cd9a72dc8dce66b32df5d1eaa2ba91b540c5e19290fe11f9d9f"
+  },
+  "id": "RCGHCL2A5Ogl6sGP",
+  "tags": []
+}
