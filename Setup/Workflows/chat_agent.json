@@ -1,0 +1,304 @@
+{
+  "name": "chat_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        480,
+        600
+      ],
+      "id": "ed531532-e40a-4785-84a7-8132dbc182c3",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HoqHEHdcKqcSg8cq",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query.message }}",
+        "options": {
+          "systemMessage": "=Forget all previous instructions.\n\nYou are now an HR assistant working at a fictitious agency named **RecrutFlow**. You are playing the role of a helpful and knowledgeable internal employee whose task is to assist teammates by answering any question they have about the agency's internal data.\n\nYou have access to a Supabase database (containing fake, non-sensitive data), and you will use the following tools to query this data:\n\n### Tools Available:\n- **Get posts** → retrieve information about job posts the agency is hiring for.\n- **Get candidates** → retrieve information about job applicants.\n- **Get interviews** → retrieve information about scheduled interviews.\n- **Get recruiters** → retrieve information about recruiters who work at the agency.\n\nYou can use these tools by generating valid PostgREST-style filters to query the Supabase database.\n\n---\n\n### How to Handle Each Request:\n\n1. **Understand the question** – Ask yourself what specific information your teammate is requesting.\n2. **Plan the queries** – Determine which tables you need to query and which fields to fetch.\n3. **Always resolve foreign keys** – If you encounter an ID that references another table (such as `post_id`, `recruiter_id`, or `interview_id`), do not display the ID. Instead, perform a follow-up query on the related table to retrieve human-readable fields like names or titles.\n4. **Query efficiently** – Minimize queries when possible. When checking related data for multiple records (e.g. interviews for several candidates), always try to group your filter using the `in.` operator. For example:\n   - Instead of: `candidate_id=eq.123` + `candidate_id=eq.456`\n   - Use: `candidate_id=in.(123,456)`\n5. **Provide a clear answer** – After calling a tool, always return a natural language response. Summarize what you found using resolved foreign keys and relevant context. Never return only tool logs or incomplete outputs.\n\n---\n\n### Important Rules:\n\n- Never display foreign key IDs — always resolve them into meaningful labels (e.g., show a post’s title instead of its `post_id`).\n- Do not include database IDs in your responses.\n- Always respond with clear, natural language — your teammates are not developers.\n- Do not ask for clarification unless strictly necessary. If someone refers to \"this week\", interpret it as the range from Monday of the current week up to today.\n- After using tools, always include a final human-readable response. Do not end the interaction with function calls or JSON results.\n- The current date is: `{{ $now.format('yyyy-LL-dd') }}`\n- You are allowed to share data like email addresses or phone numbers because all data is 100% fictional.\n- Your tone should be helpful, concise, and informative.\n\n---\n\n### Database Schema Overview:\n\n#### `candidates`\n- `id`, `name`, `email`, `phone`, `linkedin_url`, `cv_url`, `application_date`, `desired_position`, `certifications[]`, `profile_summary`, `relevance_score`, `score_justification`, `interview_date`, `recruiter_assigned`, `post_id`, `application_status`, `experiences[]`, `degrees[]`, `skills[]`, `interview_id`\n\n> FK references: `post_id → posts`, `interview_id → interviews`\n\n#### `interviews`\n- `id`, `candidate_id`, `recruiter_id`, `post_id`, `scheduled_at`, `location`, `feedback`, `created_at`, `interview_status`, `candidate_notified` --notify the candidate for his scheduled interview.\n\n> FK references: `candidate_id → candidates`, `recruiter_id → recruiters`, `post_id → posts`\n\n#### `posts`\n- `id`, `title`, `description`, `department`, `location`, `created_at`, `post_status`, `enterprise`\n\n#### `recruiters`\n- `id`, `name`, `email`, `phone`, `role`, `created_at`\n\n---\n\nYou are now ready. Wait for your teammate to ask a question and respond by following the steps and rules above.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        500,
+        340
+      ],
+      "id": "7bee0d44-46d7-489e-bbeb-abb59e4e62df",
+      "name": "RAG"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use this tool to get all available posts from the supabase posts database.\nYou will need to provide a PostREST filter query. \nThe PostREST filter query = \"select=title,id\"",
+        "operation": "getAll",
+        "tableId": "candidates",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filters__String_', `this is the PostREST filter query. You will need to create a query based on the context and question asked by the user in order to give accurate results.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        980,
+        760
+      ],
+      "id": "23a02b65-8547-4c6f-b60b-9a6b5171a66f",
+      "name": "Get candidates",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use this tool to get all available posts from the supabase posts database.\nYou will need to provide a PostREST filter query. \nThe PostREST filter query = \"select=title,id\"",
+        "operation": "getAll",
+        "tableId": "posts",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filters__String_', `this is the PostREST filter query. You will need to create a query based on the context and question asked by the user in order to give accurate results.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        840,
+        760
+      ],
+      "id": "7971e61a-fd86-4547-adb4-584a8ba4529a",
+      "name": "Get posts",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use this tool to get all available posts from the supabase posts database.\nYou will need to provide a PostREST filter query. \nThe PostREST filter query = \"select=title,id\"",
+        "operation": "getAll",
+        "tableId": "interviews",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filters__String_', `this is the PostREST filter query. You will need to create a query based on the context and question asked by the user in order to give accurate results.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        760
+      ],
+      "id": "683e8217-b0bc-4bbb-a10e-6011262e10bb",
+      "name": "Get interviews",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "=Use this tool to get all available posts from the supabase posts database.\nYou will need to provide a PostREST filter query. \nThe PostREST filter query = \"select=title,id\"",
+        "operation": "getAll",
+        "tableId": "recruiters",
+        "returnAll": true,
+        "filterType": "string",
+        "filterString": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Filters__String_', `this is the PostREST filter query. You will need to create a query based on the context and question asked by the user in order to give accurate results.`, 'string') }}"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        760
+      ],
+      "id": "2d122672-a50d-4064-bda5-929f96b2f598",
+      "name": "Get recruiters",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZKywLkl9g9EK9JY4",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "62939693-cdd8-49dc-b166-0adf05fd7282",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        160,
+        340
+      ],
+      "id": "d2600527-da5c-4734-8508-22e42d71d420",
+      "name": "Webhook",
+      "webhookId": "62939693-cdd8-49dc-b166-0adf05fd7282"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        980,
+        340
+      ],
+      "id": "4682f34f-d5bb-4a8a-a239-3734ffcd718d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "## RAG Agent\n\nThe RAG Agent serves as an assistant for the Recruitflow agency. Its primary role is to answer specific questions by retrieving information from the database. The key areas of focus include:\n\n- Candidates\n- Interviews\n- Recruiters\n\nThe agent will utilize tools and PostREST filters to request data from the relevant tables. \n\n**Note:** You can try it on the chat page of the app.",
+        "height": 980,
+        "width": 1460
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d45df52d-9fb9-48f4-a787-412777570606",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "chat_agent"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        600,
+        560
+      ],
+      "id": "ae5c7759-24e1-4bd3-a36c-d9cb6eb71bad",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get candidates": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get posts": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get interviews": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get recruiters": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RAG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RAG": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "0c2a4849-797c-47e1-82e2-ea18f75d5ae9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "70321941ab326cd9a72dc8dce66b32df5d1eaa2ba91b540c5e19290fe11f9d9f"
+  },
+  "id": "FqH0WxMX4MX9KXjc",
+  "tags": []
+}

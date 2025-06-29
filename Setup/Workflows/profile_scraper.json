@@ -1,0 +1,305 @@
+{
+  "name": "profile_scraper",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://linkedin-data-api.p.rapidapi.com/search-people",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "keywords",
+              "value": "={{ $('Webhook').item.json.query.keyword }}"
+            },
+            {
+              "name": "geo",
+              "value": "={{ $json.ids }}"
+            },
+            {
+              "name": "start",
+              "value": "0"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "linkedin-data-api.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "430ef02738mshc6b56902ed1cc2ap1e6a53jsn6d2310c3ecc1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        260
+      ],
+      "id": "44c12c2c-9ca7-4a5b-8329-ecc799f7e31c",
+      "name": "Get Profiles"
+    },
+    {
+      "parameters": {
+        "url": "https://linkedin-data-api.p.rapidapi.com/search-locations",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "keyword",
+              "value": "={{ $json.query.location }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-rapidapi-host",
+              "value": "linkedin-data-api.p.rapidapi.com"
+            },
+            {
+              "name": "x-rapidapi-key",
+              "value": "430ef02738mshc6b56902ed1cc2ap1e6a53jsn6d2310c3ecc1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        260
+      ],
+      "id": "783ebc6d-4cf7-4d3a-ba3c-afbd149a3293",
+      "name": "Get geoloc"
+    },
+    {
+      "parameters": {
+        "path": "114f1a40-b072-4038-9775-837b26ed1042",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        60,
+        260
+      ],
+      "id": "419c0f5b-523f-42ab-9639-40a7e3e0c90d",
+      "name": "Webhook",
+      "webhookId": "114f1a40-b072-4038-9775-837b26ed1042"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        1480,
+        260
+      ],
+      "id": "0f37aab9-cd37-4667-97bb-329392fad7b4",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "id"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        780,
+        260
+      ],
+      "id": "f3823e10-9601-4c2c-8122-e1efb348ce0f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        540,
+        260
+      ],
+      "id": "3394d48a-703e-4f8b-aeca-4b1129273265",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "const urnArray = $input.first().json.id;\n\n// Use regex to extract numbers and join them\nconst result = urnArray\n  .map(urn => {\n    const match = urn.match(/urn:li:geo:(\\d+)/);\n    return match ? match[1] : null;\n  })\n  .filter(Boolean) // Remove nulls\n  .join(',');\n\n// Return the result\nreturn [{ json: { ids: result } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        260
+      ],
+      "id": "13f8e9f5-ec4c-4b8e-b4ec-6bd31b007e21",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "content": "## Start Here\n\nWebhook with query parameters.\n\n- Keyword\n- Location",
+        "height": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c8439b14-92e7-4d17-8489-fb1f7b45ed25",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Query the API to retrieve location codes for location key parameter.\n\nAggregate the locations codes and add it to the profile scraping request.\n\nWe are using the same API for the locations and the profiles.\n\n[RapidAPI Linkedin Scraper](https://rapidapi.com/rockapis-rockapis-default/api/linkedin-data-api)",
+        "height": 560,
+        "width": 900,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        260,
+        0
+      ],
+      "id": "bc42d090-1969-4af6-88ce-e19a1e8d79c6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Send scraping request",
+        "height": 560,
+        "width": 220,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1180,
+        0
+      ],
+      "id": "607e3449-efc5-4796-a569-524396ad779e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Send Response to the app",
+        "height": 560,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1420,
+        0
+      ],
+      "id": "22edf222-7e00-480c-8e5e-965414010c1a",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get geoloc": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get geoloc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Profiles": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get Profiles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f636f2b-d825-41af-b8f2-b3a50d16ecf0",
+  "meta": {
+    "instanceId": "70321941ab326cd9a72dc8dce66b32df5d1eaa2ba91b540c5e19290fe11f9d9f"
+  },
+  "id": "WTrJorcBIrsvstF4",
+  "tags": []
+}
