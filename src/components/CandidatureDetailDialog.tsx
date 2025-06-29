@@ -106,7 +106,7 @@ const CandidatureDetailDialog = ({ candidature, isOpen, onClose }: CandidatureDe
                 )}
                 {candidature.poste_souhaite && (
                   <div className="text-sm">
-                    <span className="font-medium">Poste souhaité:</span>
+                    <span className="font-medium">Poste Potentiel IA:</span>
                     <span className="ml-2">{candidature.poste_souhaite}</span>
                   </div>
                 )}

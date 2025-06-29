@@ -59,9 +59,7 @@ export default function Settings() {
                 <div key={setting.id} className="space-y-2">
                   <div className="font-medium flex items-center gap-2">
                     {setting.setting_key}
-                    {setting.setting_key === 'email_assistant' && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Email Assistant</span>
-                    )}
+                    {setting.setting_key === 'email_assistant' }
                   </div>
                   {setting.setting_description && (
                     <div className="text-sm text-gray-500">

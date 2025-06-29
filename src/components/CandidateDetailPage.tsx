@@ -251,8 +251,14 @@ const CandidateDetailPage = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
+                {/* Desired Post (always read-only) */}
                 <div>
                   <span className="font-medium">Poste souhaité: </span>
+                  <span>{candidate.desired_position || 'Non spécifié'}</span>
+                </div>
+                {/* AI Matching Post (editable) */}
+                <div>
+                  <span className="font-medium">Poste Potentiel IA: </span>
                   {isEditing ? (
                     <Select value={editedCandidate.post_id} onValueChange={(value) => setEditedCandidate({...editedCandidate, post_id: value})}>
                       <SelectTrigger className="w-64">
