@@ -57,7 +57,10 @@ export default function Settings() {
             <div className="space-y-4">
               {webhookSettings.map((setting) => (
                 <div key={setting.id} className="space-y-2">
-                  <div className="font-medium">{setting.setting_key}</div>
+                  <div className="font-medium flex items-center gap-2">
+                    {setting.setting_key}
+                    {setting.setting_key === 'email_assistant' }
+                  </div>
                   {setting.setting_description && (
                     <div className="text-sm text-gray-500">
                       {setting.setting_description}

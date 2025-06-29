@@ -40,7 +40,7 @@ const Navigation = () => {
     label: 'Settings',
     icon: Settings
   }];
-  return <nav className="w-64 bg-white shadow-sm min-h-screen">
+  return <nav className="w-64 bg-white shadow-sm flex-shrink-0 overflow-y-auto">
       <div className="p-6">
         <h2 className="text-xl font-bold text-recruit-blue mb-6">
       </h2>

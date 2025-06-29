@@ -1,5 +1,5 @@
 {
-  "name": "Hr Assistant Supabase",
+  "name": "hr_email_assistant",
   "nodes": [
     {
       "parameters": {
@@ -21,15 +21,15 @@
       "type": "n8n-nodes-base.gmailTrigger",
       "typeVersion": 1.2,
       "position": [
-        -560,
-        80
+        160,
+        580
       ],
-      "id": "ac4a9ba1-b678-435c-affe-7c3c4bd6d20c",
+      "id": "f1dfa104-b145-415c-acb0-6d9d3de23f88",
       "name": "Gmail Trigger",
       "credentials": {
         "gmailOAuth2": {
-          "id": "mEdJ8LAZCcg4rbbQ",
-          "name": "Gmail Clarium Account"
+          "id": "uF0jtzL8iRYG5pW8",
+          "name": "Gmail account Clarium"
         }
       }
     },
@@ -55,10 +55,10 @@
       "type": "@n8n/n8n-nodes-langchain.textClassifier",
       "typeVersion": 1,
       "position": [
-        -80,
-        100
+        640,
+        600
       ],
-      "id": "49d18b1e-eeed-4e0b-a4b6-d2ae9865868f",
+      "id": "abdfb844-2ab2-4e43-a876-385b3b6a19ab",
       "name": "Text Classifier"
     },
     {
@@ -66,10 +66,10 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        340,
-        200
+        1060,
+        700
       ],
-      "id": "fb55e145-a2b3-4930-97e7-51be581f4d16",
+      "id": "5f78bfad-4009-4254-ac17-fdcdc72f2e35",
       "name": "No Operation, do nothing"
     },
     {
@@ -108,10 +108,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        340,
-        0
+        1060,
+        500
       ],
-      "id": "708e3c7a-d136-4622-8b98-c9a2f2a4bd08",
+      "id": "217be72b-5b34-473d-baf3-11f1ef514352",
       "name": "Switch"
     },
     {
@@ -122,10 +122,10 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        1200,
-        0
+        1920,
+        500
       ],
-      "id": "27a9429c-8ba6-41b3-aa5b-f74f9cf83f80",
+      "id": "88088657-5839-4eaf-ba9f-ba4c2695a552",
       "name": "Extract from File"
     },
     {
@@ -149,14 +149,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        600,
-        0
+        1320,
+        500
       ],
-      "id": "cb1abf2c-7eb8-478f-bdf0-29ba4617cb7e",
+      "id": "9b0382e5-dac8-4710-b644-f538444cc481",
       "name": "upload",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "SPKZyUCSiEsFSidd",
+          "id": "P89NuqaEffChETXb",
           "name": "Google Drive account"
         }
       }
@@ -180,14 +180,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        800,
-        0
+        1520,
+        500
       ],
-      "id": "4dcb0391-819b-49b4-b99c-e6456788ac05",
+      "id": "0db7490d-53f8-4c23-98e0-eb3c94f3bf8c",
       "name": "share",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "SPKZyUCSiEsFSidd",
+          "id": "P89NuqaEffChETXb",
           "name": "Google Drive account"
         }
       }
@@ -204,10 +204,10 @@
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
       "typeVersion": 1,
       "position": [
-        1480,
-        -80
+        2200,
+        420
       ],
-      "id": "33a2d94b-035f-4e86-ae64-4abeb1be3ef1",
+      "id": "f0e13dbb-2804-4690-b942-4fd7398567d9",
       "name": "Extracteur"
     },
     {
@@ -218,16 +218,16 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        3900,
-        -60
+        4620,
+        440
       ],
-      "id": "badc99be-aa72-475f-b6b3-45c54a6d1853",
+      "id": "8f08652a-f7f2-4235-8840-389f41b440b5",
       "name": "mark as read",
       "webhookId": "7ab59325-0b92-449e-a4ef-ac90a7b7c07a",
       "credentials": {
         "gmailOAuth2": {
-          "id": "mEdJ8LAZCcg4rbbQ",
-          "name": "Gmail Clarium Account"
+          "id": "uF0jtzL8iRYG5pW8",
+          "name": "Gmail account Clarium"
         }
       }
     },
@@ -242,16 +242,16 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        4120,
-        -60
+        4840,
+        440
       ],
-      "id": "0e57b0dd-d518-4ae2-9af3-979b1da4d706",
+      "id": "96eb4ba4-db6b-4f87-a7e5-d21a9843c22e",
       "name": "move email to folder",
       "webhookId": "97a3bb04-1078-4acb-9b64-b3f500d37265",
       "credentials": {
         "gmailOAuth2": {
-          "id": "mEdJ8LAZCcg4rbbQ",
-          "name": "Gmail Clarium Account"
+          "id": "uF0jtzL8iRYG5pW8",
+          "name": "Gmail account Clarium"
         }
       }
     },
@@ -266,16 +266,16 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        4340,
-        -60
+        5060,
+        440
       ],
-      "id": "dc6c5dfa-4498-4415-adb4-c11467569db4",
+      "id": "e34b5b4c-6616-4678-99d7-80995f3e4298",
       "name": "remove from inbox",
       "webhookId": "108b9e10-ebe7-4097-b7a6-8e3bbe904e94",
       "credentials": {
         "gmailOAuth2": {
-          "id": "mEdJ8LAZCcg4rbbQ",
-          "name": "Gmail Clarium Account"
+          "id": "uF0jtzL8iRYG5pW8",
+          "name": "Gmail account Clarium"
         }
       }
     },
@@ -287,14 +287,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        1560,
-        140
+        2280,
+        640
       ],
-      "id": "20b640bf-4f52-4d35-b6fa-1dc9906f1ebd",
+      "id": "d67e543f-c265-4c3c-8b22-4565cce56a49",
       "name": "OpenRouter Chat Model",
       "credentials": {
         "openRouterApi": {
-          "id": "tA7RYcxmQFbKz6KK",
+          "id": "CpvKgTTzwSZqH1Zw",
           "name": "OpenRouter account"
         }
       }
@@ -307,10 +307,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        2340,
-        160
+        3060,
+        660
       ],
-      "id": "16905388-bd35-421c-9fec-81c98fbd76e6",
+      "id": "1b40430e-1bb6-4835-97c0-419e6aed54ee",
       "name": "Structured Output Parser"
     },
     {
@@ -329,10 +329,10 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        2140,
-        -80
+        2860,
+        420
       ],
-      "id": "998a3216-3fbc-4eee-a452-f08eac1bba4f",
+      "id": "4e4a7481-9589-466b-a254-910a16f9fd2a",
       "name": "Evaluation"
     },
     {
@@ -345,10 +345,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -700,
-        -580
+        20,
+        -80
       ],
-      "id": "7df98209-e89d-498f-bd85-427113ec6d9c",
+      "id": "986bdb3b-dacb-4ed5-a436-43c7baddccd1",
       "name": "Sticky Note"
     },
     {
@@ -361,10 +361,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -180,
-        -580
+        540,
+        -80
       ],
-      "id": "36a4fe9e-8339-4e5a-9f53-24441e0fce3d",
+      "id": "2826a514-4eef-4fcf-b976-92f58e6a0a0b",
       "name": "Sticky Note1"
     },
     {
@@ -377,10 +377,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        260,
-        -580
+        980,
+        -80
       ],
-      "id": "7e32ac0b-8823-4282-8abd-22582956eacb",
+      "id": "13f093fe-b798-4270-9a2c-74953f50f1c7",
       "name": "Sticky Note2"
     },
     {
@@ -393,10 +393,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        540,
-        -580
+        1260,
+        -80
       ],
-      "id": "1089f7b0-6390-4b07-87a0-0dfebd746947",
+      "id": "fa314162-6aea-4f82-adec-258f60b0249d",
       "name": "Sticky Note3"
     },
     {
@@ -412,14 +412,14 @@
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        1000,
-        0
+        1720,
+        500
       ],
-      "id": "48d01aa3-cd82-4dc9-af98-ad732e1548ab",
+      "id": "d9b983b1-0120-4eb0-a772-c2580faca43d",
       "name": "Download",
       "credentials": {
         "googleDriveOAuth2Api": {
-          "id": "SPKZyUCSiEsFSidd",
+          "id": "P89NuqaEffChETXb",
           "name": "Google Drive account"
         }
       }
@@ -434,10 +434,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1420,
-        -580
+        2140,
+        -80
       ],
-      "id": "38f0c586-990f-4624-bcaf-05b624405cc9",
+      "id": "79326193-3e6f-4064-9d60-0f4671d4125a",
       "name": "Sticky Note4"
     },
     {
@@ -450,10 +450,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3300,
-        -580
+        4020,
+        -80
       ],
-      "id": "8395c7b6-75df-46a4-99e5-2831351b0ece",
+      "id": "d9925f2e-ad7e-45da-9d69-9d7fba945594",
       "name": "Sticky Note6"
     },
     {
@@ -466,10 +466,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3800,
-        -580
+        4520,
+        -80
       ],
-      "id": "9ba76bbd-bdd6-4a0b-a24a-50afeb097a3a",
+      "id": "e321d655-1b2a-44fc-9f7f-feb35af6a44f",
       "name": "Sticky Note7"
     },
     {
@@ -513,10 +513,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1780,
-        -80
+        2500,
+        420
       ],
-      "id": "9d587bdd-dc7f-421c-92f2-d664031cabd5",
+      "id": "f7145775-d595-4dc9-9163-766d1a1c8cfd",
       "name": "Turn to String"
     },
     {
@@ -529,10 +529,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        3300,
-        120
+        4020,
+        620
       ],
-      "id": "9df03512-e4dd-4a82-a7ae-ebb09888c9ca",
+      "id": "7123b4d9-e623-4758-b99d-d1b8e3c0b3fa",
       "name": "Sticky Note8"
     },
     {
@@ -582,10 +582,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        3020,
-        -80
+        3740,
+        420
       ],
-      "id": "1fbfe533-5f8f-411e-b1a3-c4e98052ca46",
+      "id": "00a0a36d-e4a9-4a3a-8469-13f577120299",
       "name": "If"
     },
     {
@@ -595,10 +595,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        3080,
-        380
+        3800,
+        880
       ],
-      "id": "922a9dda-981d-4ffb-9c61-1eec2df64d0b",
+      "id": "e8d91b64-16d2-4a43-b429-3c686ffa1134",
       "name": "Structured Output Parser1"
     },
     {
@@ -613,10 +613,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.9,
       "position": [
-        2620,
-        -80
+        3340,
+        420
       ],
-      "id": "252b391b-d1dd-40c5-96f0-951ea179558d",
+      "id": "b179a150-76b5-467e-ac37-6a315f177563",
       "name": "Post Matcher"
     },
     {
@@ -686,14 +686,14 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3480,
-        480
+        4200,
+        980
       ],
-      "id": "35c050a4-ba99-44bb-9396-ae45a2e8e1b2",
+      "id": "6d4e47fe-1b08-4ecd-b1f7-a8b2bacf3a12",
       "name": "Create Candidate With post_id",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -761,14 +761,14 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        3480,
-        -380
+        4200,
+        120
       ],
-      "id": "b1129612-365a-4fa8-ab8b-bc717f9dcbad",
+      "id": "c3a527b0-ad48-4933-a82b-ea02d0e747ee",
       "name": "Create Candidate no ID",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -786,14 +786,14 @@
       "type": "n8n-nodes-base.supabaseTool",
       "typeVersion": 1,
       "position": [
-        2740,
-        180
+        3440,
+        740
       ],
-      "id": "3eb4f657-3a28-4174-bfd6-0a83cab99774",
+      "id": "4ad38810-8f4b-431c-8a95-2cc857fcc726",
       "name": "Get Posts",
       "credentials": {
         "supabaseApi": {
-          "id": "TjjIyMYW0lXoF9uh",
+          "id": "4DjZUAZLVswBTR7j",
           "name": "Supabase account"
         }
       }
@@ -808,10 +808,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2520,
-        -580
+        3240,
+        -80
       ],
-      "id": "1d0bf603-888c-4843-970a-19b836981e98",
+      "id": "34c0574f-ae16-4299-a4cb-979b7b668f23",
       "name": "Sticky Note5"
     },
     {
@@ -824,10 +824,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1940,
-        -580
+        2660,
+        -80
       ],
-      "id": "e893266a-3aa8-4448-abee-304c675e4de3",
+      "id": "395212ba-bb4c-433e-b920-1c6717054e6f",
       "name": "Sticky Note9"
     },
     {
@@ -838,14 +838,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        2160,
-        140
+        2880,
+        640
       ],
-      "id": "e51848cc-fe5d-40a4-a373-273018e501cb",
+      "id": "41907467-9772-40de-9f1f-3d4781722227",
       "name": "qwen",
       "credentials": {
         "openRouterApi": {
-          "id": "tA7RYcxmQFbKz6KK",
+          "id": "CpvKgTTzwSZqH1Zw",
           "name": "OpenRouter account"
         }
       }
@@ -858,14 +858,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        20,
-        320
+        740,
+        820
       ],
-      "id": "cc0b9e33-f3b0-4815-aa2a-464510425c3a",
+      "id": "aec57597-bea9-41dc-8554-88d8650c28e4",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "63EsCEjr23QRKIO0",
+          "id": "quBg0Lp5soBXAEqK",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -878,14 +878,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        2580,
-        180
+        3300,
+        740
       ],
-      "id": "647348d1-92d4-4eb9-bcbf-139a4e942c6a",
+      "id": "ceab80f2-d9ab-4823-be64-28638cb953f4",
       "name": "OpenRouter Chat Model1",
       "credentials": {
         "openRouterApi": {
-          "id": "tA7RYcxmQFbKz6KK",
+          "id": "CpvKgTTzwSZqH1Zw",
           "name": "OpenRouter account"
         }
       }
@@ -897,10 +897,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserAutofixing",
       "typeVersion": 1,
       "position": [
-        2900,
-        140
+        3620,
+        640
       ],
-      "id": "be8024ee-935a-4f99-88f2-d72cac62b248",
+      "id": "2e2bb462-2b85-4f34-8fa7-452fc1769edf",
       "name": "Auto-fixing Output Parser"
     },
     {
@@ -911,223 +911,20 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        2900,
-        380
+        3620,
+        880
       ],
-      "id": "f947fc40-a648-4e86-8538-05f3ec4330bd",
+      "id": "67976a61-41db-431b-b24d-1e48d38f5331",
       "name": "Google Gemini Chat Model1",
       "credentials": {
         "googlePalmApi": {
-          "id": "63EsCEjr23QRKIO0",
+          "id": "quBg0Lp5soBXAEqK",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
     }
   ],
-  "pinData": {
-    "Gmail Trigger": [
-      {
-        "json": {
-          "id": "1975c2a677820290",
-          "threadId": "1975c2a677820290",
-          "labelIds": [
-            "UNREAD",
-            "SENT",
-            "INBOX"
-          ],
-          "sizeEstimate": 2565498,
-          "headers": {
-            "return-path": "Return-Path: <clariumsn@gmail.com>",
-            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45325205053sm3516915e9.23.2025.06.10.16.26.10\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:12 -0700 (PDT)",
-            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979698860.22358305575700022\"",
-            "from": "From: clariumsn@gmail.com",
-            "to": "To: clariumsn@gmail.com",
-            "subject": "Subject: Candidature au poste d'ingenieur Logiciel",
-            "message-id": "Message-ID: <521350a7-ce1b-d994-bb10-87239baedadf@gmail.com>",
-            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
-            "date": "Date: Tue, 10 Jun 2025 23:26:09 +0000",
-            "mime-version": "MIME-Version: 1.0"
-          },
-          "html": "Madame, Monsieur,\nSupport utilisateur, dépannage matériel et logiciel, réseaux.",
-          "text": "Madame, Monsieur, Support utilisateur, dépannage matériel et logiciel, réseaux.",
-          "textAsHtml": "<p>Madame, Monsieur, Support utilisateur, d&eacute;pannage mat&eacute;riel et logiciel, r&eacute;seaux.</p>",
-          "subject": "Candidature au poste d'ingenieur Logiciel",
-          "date": "2025-06-10T23:26:09.000Z",
-          "to": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "from": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "messageId": "<521350a7-ce1b-d994-bb10-87239baedadf@gmail.com>"
-        }
-      },
-      {
-        "json": {
-          "id": "1975c2a52c7d5995",
-          "threadId": "1975c2a52c7d5995",
-          "labelIds": [
-            "UNREAD",
-            "SENT",
-            "INBOX"
-          ],
-          "sizeEstimate": 345906,
-          "headers": {
-            "return-path": "Return-Path: <clariumsn@gmail.com>",
-            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a5323bee86sm13243401f8f.43.2025.06.10.16.26.04\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:05 -0700 (PDT)",
-            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979638670.5995508253936954\"",
-            "from": "From: clariumsn@gmail.com",
-            "to": "To: clariumsn@gmail.com",
-            "subject": "Subject: Candidature au poste de Technicien Support Informatique",
-            "message-id": "Message-ID: <7c410ad4-4702-31b3-546d-da35d3d59834@gmail.com>",
-            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
-            "date": "Date: Tue, 10 Jun 2025 23:26:03 +0000",
-            "mime-version": "MIME-Version: 1.0"
-          },
-          "html": "Madame, Monsieur,\nSupport utilisateur, dépannage matériel et logiciel, réseaux.",
-          "text": "Madame, Monsieur, Support utilisateur, dépannage matériel et logiciel, réseaux.",
-          "textAsHtml": "<p>Madame, Monsieur, Support utilisateur, d&eacute;pannage mat&eacute;riel et logiciel, r&eacute;seaux.</p>",
-          "subject": "Candidature au poste de Technicien Support Informatique",
-          "date": "2025-06-10T23:26:03.000Z",
-          "to": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "from": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "messageId": "<7c410ad4-4702-31b3-546d-da35d3d59834@gmail.com>"
-        }
-      },
-      {
-        "json": {
-          "id": "1975c2a3c72064d4",
-          "threadId": "1975c2a3c72064d4",
-          "labelIds": [
-            "UNREAD",
-            "SENT",
-            "INBOX"
-          ],
-          "sizeEstimate": 88340,
-          "headers": {
-            "return-path": "Return-Path: <clariumsn@gmail.com>",
-            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-45325215e75sm3471625e9.27.2025.06.10.16.25.58\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:26:00 -0700 (PDT)",
-            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979584830.3993507856053562\"",
-            "from": "From: clariumsn@gmail.com",
-            "to": "To: clariumsn@gmail.com",
-            "subject": "Subject: Candidature au poste de developpeur web",
-            "message-id": "Message-ID: <35805486-51c1-2837-8a98-223371bdbf1e@gmail.com>",
-            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
-            "date": "Date: Tue, 10 Jun 2025 23:25:58 +0000",
-            "mime-version": "MIME-Version: 1.0"
-          },
-          "html": "Madame, Monsieur,\n\nC'est avec un vif intérêt que je vous soumets ma candidature pour le poste de Développeur Web / Logiciel au sein de votre entreprise. Votre annonce a particulièrement retenu mon attention car elle correspond parfaitement à mon parcours professionnel et à mes aspirations.",
-          "text": "Madame, Monsieur, C'est avec un vif intérêt que je vous soumets ma candidature\npour le poste de Développeur Web / Logiciel au sein de votre entreprise. Votre\nannonce a particulièrement retenu mon attention car elle correspond parfaitement\nà mon parcours professionnel et à mes aspirations.",
-          "textAsHtml": "<p>Madame, Monsieur, C&apos;est avec un vif int&eacute;r&ecirc;t que je vous soumets ma candidature<br/>pour le poste de D&eacute;veloppeur Web / Logiciel au sein de votre entreprise. Votre<br/>annonce a particuli&egrave;rement retenu mon attention car elle correspond parfaitement<br/>&agrave; mon parcours professionnel et &agrave; mes aspirations.</p>",
-          "subject": "Candidature au poste de developpeur web",
-          "date": "2025-06-10T23:25:58.000Z",
-          "to": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "from": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "messageId": "<35805486-51c1-2837-8a98-223371bdbf1e@gmail.com>"
-        }
-      },
-      {
-        "json": {
-          "id": "1975c2a26d9c6ca2",
-          "threadId": "1975c2a26d9c6ca2",
-          "labelIds": [
-            "UNREAD",
-            "SENT",
-            "INBOX"
-          ],
-          "sizeEstimate": 66545,
-          "headers": {
-            "return-path": "Return-Path: <clariumsn@gmail.com>",
-            "received": "Received: from imt-engine-scheduling-engine-fd9c57bd9-kcnjh.farm.integromat.com (ec2-34-254-1-9.eu-west-1.compute.amazonaws.com. [34.254.1.9])\r\n        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3a532435b16sm13584012f8f.46.2025.06.10.16.25.54\r\n        for <clariumsn@gmail.com>\r\n        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);\r\n        Tue, 10 Jun 2025 16:25:55 -0700 (PDT)",
-            "content-type": "Content-Type: multipart/mixed;\r\n boundary=\"----sinikael-?=_1-17495979543200.8585406134692422\"",
-            "from": "From: clariumsn@gmail.com",
-            "to": "To: clariumsn@gmail.com",
-            "subject": "Subject: Candidature au poste de full stack developpeur",
-            "message-id": "Message-ID: <1370188e-ef41-b325-0029-1496f8dd1f70@gmail.com>",
-            "x-mailer": "X-Mailer: nodemailer (2.7.2; +https://nodemailer.com/;\r\n SMTP/2.7.2[client:2.12.0])",
-            "date": "Date: Tue, 10 Jun 2025 23:25:54 +0000",
-            "mime-version": "MIME-Version: 1.0"
-          },
-          "html": "Madame, Monsieur,\n\nJe me permets de vous adresser ma candidature pour le poste de Data Scientist que vous proposez actuellement. Votre annonce a particulièrement retenu mon attention car elle correspond parfaitement à mon parcours professionnel et à mes aspirations dans le domaine de la science des données.",
-          "text": "Madame, Monsieur, Je me permets de vous adresser ma candidature pour le poste de\nData Scientist que vous proposez actuellement. Votre annonce a particulièrement\nretenu mon attention car elle correspond parfaitement à mon parcours\nprofessionnel et à mes aspirations dans le domaine de la science des données.",
-          "textAsHtml": "<p>Madame, Monsieur, Je me permets de vous adresser ma candidature pour le poste de<br/>Data Scientist que vous proposez actuellement. Votre annonce a particuli&egrave;rement<br/>retenu mon attention car elle correspond parfaitement &agrave; mon parcours<br/>professionnel et &agrave; mes aspirations dans le domaine de la science des donn&eacute;es.</p>",
-          "subject": "Candidature au poste de full stack developpeur",
-          "date": "2025-06-10T23:25:54.000Z",
-          "to": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "from": {
-            "value": [
-              {
-                "address": "clariumsn@gmail.com",
-                "name": ""
-              }
-            ],
-            "html": "<span class=\"mp_address_group\"><a href=\"mailto:clariumsn@gmail.com\" class=\"mp_address_email\">clariumsn@gmail.com</a></span>",
-            "text": "clariumsn@gmail.com"
-          },
-          "messageId": "<1370188e-ef41-b325-0029-1496f8dd1f70@gmail.com>"
-        }
-      }
-    ]
-  },
+  "pinData": {},
   "connections": {
     "Gmail Trigger": {
       "main": [
@@ -1419,15 +1216,15 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "0c72a9c4-0b3b-48dc-a2a4-d1f298a66604",
+  "versionId": "88cc8f2b-f7a5-4012-8b55-1750a75803db",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "1f3bf0740e86805879ff06102b8c465db40713bc059e5e6e6903caae1305dc76"
   },
-  "id": "Ks6WIBazdlR0X8tX",
+  "id": "CRrXtjdhxkK8PW8g",
   "tags": []
 }

@@ -150,7 +150,7 @@ export default function Chat() {
       {/* Header */}
       <div className="flex items-center justify-between p-2 bg-white border-b rounded-b-lg shadow-sm">
         <div className="w-24"> {/* Empty div for spacing */}</div>
-        <h1 className="text-xl font-semibold text-center text-gray-900 uppercase tracking-wide">RecruitFlow AI</h1>
+        <h1 className="text-xl font-semibold text-center text-gray-900 tracking-wide">RecruitFlow AI</h1>
         <Button
           variant="ghost"
           onClick={clearHistory}

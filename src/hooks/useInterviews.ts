@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Interview, InterviewFilters, InterviewStatus } from '@/types/interview';
@@ -62,7 +63,13 @@ export function useInterviews(filters: InterviewFilters = {}) {
       const { data, error } = await query;
 
       if (error) {
-        throw error;
+        console.error('Supabase error:', error);
+        throw new Error(`Error fetching interviews: ${error.message}`);
+      }
+
+      if (!data) {
+        setInterviews([]);
+        return;
       }
 
       const formattedInterviews: Interview[] = (data as unknown as DbInterview[]).map((interview) => ({
@@ -76,7 +83,11 @@ export function useInterviews(filters: InterviewFilters = {}) {
     } catch (err: any) {
       console.error('Error in fetchInterviews:', err);
       setError(err);
-      toast.error('Erreur lors du chargement des entretiens');
+      
+      // Only show toast for real errors, not empty data
+      if (err.message && !err.message.includes('PGRST116')) {
+        toast.error('Erreur lors du chargement des entretiens');
+      }
     } finally {
       setLoading(false);
     }
